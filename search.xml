@@ -44,8 +44,10 @@
 <p>&emsp;&emsp;这里顺带一提，ES6提出了块级作用域及新变量声明（let）。<br>&emsp;&emsp;JS使用var声明变量，以function来划分作用域，大括号“{}” 却限定不了var的作用域。用var声明的变量具有变量提升（declaration hoisting，即先试用后声明不报错）的效果。<br>&emsp;&emsp;ES6里增加了一个let，可以在{}， if， for里声明。用法同var，但作用域限定在块级，let声明的变量不存在变量提升。</p>
 <h2 id="什么是闭包"><a href="#什么是闭包" class="headerlink" title="什么是闭包"></a>什么是闭包</h2><p>维基百科是这样说的：</p>
 <blockquote>
-<p>在计算机科学中，闭包（也称词法闭包或函数闭包）是指一个函数或函数的引用，与一个引用环境绑定在一起。这个引用环境是一个存储该函数每个非局部变量（也叫自由变量）的表。<br>闭包，不同于一般的函数，它允许一个函数在立即词法作用域外调用时，仍可访问非本地变量。<br><a id="more"></a><br>&emsp;&emsp;JavaScript之所以有闭包，是因为它是一个第一类函数特性的语言，即可用把函数当做对象去传递作为返回值。<br>&emsp;&emsp;看下面的函数，对于这种函数，当调用函数outer()之后，局部变量localVal就可以被释放了。</p>
+<p>在计算机科学中，闭包（也称词法闭包或函数闭包）是指一个函数或函数的引用，与一个引用环境绑定在一起。这个引用环境是一个存储该函数每个非局部变量（也叫自由变量）的表。<br>闭包，不同于一般的函数，它允许一个函数在立即词法作用域外调用时，仍可访问非本地变量。</p>
 </blockquote>
+<a id="more"></a>
+<p>&emsp;&emsp;JavaScript之所以有闭包，是因为它是一个第一类函数特性的语言，即可用把函数当做对象去传递作为返回值。<br>&emsp;&emsp;看下面的函数，对于这种函数，当调用函数outer()之后，局部变量localVal就可以被释放了。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">outer</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localVal = <span class="number">30</span>;</div><div class="line">	<span class="keyword">return</span> localVal;</div><div class="line">&#125;</div><div class="line">outer();<span class="comment">//30</span></div></pre></td></tr></table></figure>
 <p>&emsp;&emsp;在JavaScript中，函数也是对象，并且函数也可以作为返回值也可以传参，函数里也可以套用别的函数。<br>&emsp;&emsp;对于下面的函数，调用函数outer()时，返回的是匿名函数，这个匿名函数里面依然可以访问外面的局部变量localVal。在调用outer()之后，调用func()，依然可以访问外部函数的局部变量localVal，localVal不会被释放。<br>&emsp;&emsp;这就是闭包。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">outer</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localVal = <span class="number">30</span>;</div><div class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> localVal;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> func = outer();</div><div class="line">func();<span class="comment">//30</span></div></pre></td></tr></table></figure></p>
 <h2 id="闭包无处不在"><a href="#闭包无处不在" class="headerlink" title="闭包无处不在"></a>闭包无处不在</h2><p>&emsp;&emsp;如下面的函数，点击事件中依然可以访问外部函数的局部变量<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localData = <span class="string">"localData here"</span>;</div><div class="line">	<span class="built_in">document</span>.addEvenetListener(<span class="string">"click"</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="built_in">console</span>.log(localData);</div><div class="line">	&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -73,10 +75,10 @@
 <h3 id="为什么我要写博客"><a href="#为什么我要写博客" class="headerlink" title="为什么我要写博客"></a>为什么我要写博客</h3><ul>
 <li>本人表达能力不佳，把脑里的东西写下来能让我印象更深刻，提高我将事情讲清楚的能力和逻辑思维能力</li>
 <li>有利于我积累更多的知识，并享受分享带来的连锁反应</li>
-<li>用markdown写东西觉得自己很geek<a id="more"></a>
-<h2 id="准备步骤"><a href="#准备步骤" class="headerlink" title="准备步骤"></a>准备步骤</h2></li>
+<li>用markdown写东西觉得自己很geek</li>
 </ul>
-<ol>
+<a id="more"></a>
+<h2 id="准备步骤"><a href="#准备步骤" class="headerlink" title="准备步骤"></a>准备步骤</h2><ol>
 <li>安装<a href="https://nodejs.org/" target="_blank" rel="external">node.js</a></li>
 <li>安装<a href="https://git-scm.com/" target="_blank" rel="external">git</a></li>
 <li>注册<a href="http://www.github.com/" target="_blank" rel="external">github</a></li>
