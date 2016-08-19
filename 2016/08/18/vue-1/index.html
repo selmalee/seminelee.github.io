@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="JavaScript,闭包," />
+  <meta name="keywords" content="Vue,MVVM,模块化," />
 
 
 
@@ -84,16 +84,16 @@
 
 
 
-<meta name="description" content="作用域相关定义&amp;emsp;&amp;emsp;在说闭包之前，我们首先说一下作用域。&amp;emsp;&amp;emsp;JavaScript中有全局作用域，函数作用域。看下面的代码123456var a = 10;//全局作用域中定义变量(function()&amp;#123;	var b = 20;//函数作用域中定义变量&amp;#125;)();console.log(a);//可以访问全局变量console.log(b);/">
+<meta name="description" content="前端开发/UI开发/武汉大学/学生">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JavaScript学习笔记之闭包">
-<meta property="og:url" content="http://seminelee.github.io/2016/08/06/bibao/index.html">
+<meta property="og:title" content="Vue.js学习笔记之入门">
+<meta property="og:url" content="http://seminelee.github.io/2016/08/18/vue-1/index.html">
 <meta property="og:site_name" content="seminelee blog">
-<meta property="og:description" content="作用域相关定义&amp;emsp;&amp;emsp;在说闭包之前，我们首先说一下作用域。&amp;emsp;&amp;emsp;JavaScript中有全局作用域，函数作用域。看下面的代码123456var a = 10;//全局作用域中定义变量(function()&amp;#123;	var b = 20;//函数作用域中定义变量&amp;#125;)();console.log(a);//可以访问全局变量console.log(b);/">
-<meta property="og:updated_time" content="2016-08-12T11:38:27.253Z">
+<meta property="og:description" content="前端开发/UI开发/武汉大学/学生">
+<meta property="og:updated_time" content="2016-08-19T01:46:51.592Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JavaScript学习笔记之闭包">
-<meta name="twitter:description" content="作用域相关定义&amp;emsp;&amp;emsp;在说闭包之前，我们首先说一下作用域。&amp;emsp;&amp;emsp;JavaScript中有全局作用域，函数作用域。看下面的代码123456var a = 10;//全局作用域中定义变量(function()&amp;#123;	var b = 20;//函数作用域中定义变量&amp;#125;)();console.log(a);//可以访问全局变量console.log(b);/">
+<meta name="twitter:title" content="Vue.js学习笔记之入门">
+<meta name="twitter:description" content="前端开发/UI开发/武汉大学/学生">
 
 
 
@@ -114,9 +114,9 @@
 
 
 
-  <link rel="canonical" href="http://seminelee.github.io/2016/08/06/bibao/"/>
+  <link rel="canonical" href="http://seminelee.github.io/2016/08/18/vue-1/"/>
 
-  <title> JavaScript学习笔记之闭包 | seminelee blog </title>
+  <title> Vue.js学习笔记之入门 | seminelee blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -279,7 +279,7 @@
             
             
               
-                JavaScript学习笔记之闭包
+                Vue.js学习笔记之入门
               
             
           </h1>
@@ -291,8 +291,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-06T20:57:42+08:00" content="2016-08-06">
-              2016-08-06
+            <time itemprop="dateCreated" datetime="2016-08-18T19:05:16+08:00" content="2016-08-18">
+              2016-08-18
             </time>
           </span>
 
@@ -305,8 +305,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/JavaScript/" itemprop="url" rel="index">
-                    <span itemprop="name">JavaScript</span>
+                  <a href="/categories/VueJS/" itemprop="url" rel="index">
+                    <span itemprop="name">VueJS</span>
                   </a>
                 </span>
 
@@ -317,7 +317,7 @@
 
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/JavaScript/学习笔记/" itemprop="url" rel="index">
+                  <a href="/categories/VueJS/学习笔记/" itemprop="url" rel="index">
                     <span itemprop="name">学习笔记</span>
                   </a>
                 </span>
@@ -333,8 +333,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/06/bibao/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/06/bibao/" itemprop="commentsCount"></span>
+                <a href="/2016/08/18/vue-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/18/vue-1/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -357,28 +357,7 @@
       
 
       
-        <h2 id="作用域相关定义"><a href="#作用域相关定义" class="headerlink" title="作用域相关定义"></a>作用域相关定义</h2><p>&emsp;&emsp;在说闭包之前，我们首先说一下作用域。<br>&emsp;&emsp;JavaScript中有全局作用域，函数作用域。看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">10</span>;<span class="comment">//全局作用域中定义变量</span></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> b = <span class="number">20</span>;<span class="comment">//函数作用域中定义变量</span></div><div class="line">&#125;)();</div><div class="line"><span class="built_in">console</span>.log(a);<span class="comment">//可以访问全局变量</span></div><div class="line"><span class="built_in">console</span>.log(b);<span class="comment">//error, b is not defined</span></div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;JavaScript是没有块级作用域的。看下面的代码</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> item <span class="keyword">in</span> &#123;a:<span class="number">1</span>,b:<span class="number">2</span>&#125;)&#123;</div><div class="line">	<span class="built_in">console</span>.log(item);</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(item); <span class="comment">//没有块级作用域，可以访问item</span></div></pre></td></tr></table></figure>
-<p>&emsp;&emsp;这里顺带一提，ES6提出了块级作用域及新变量声明（let）。<br>&emsp;&emsp;JS使用var声明变量，以function来划分作用域，大括号“{}” 却限定不了var的作用域。用var声明的变量具有变量提升（declaration hoisting，即先试用后声明不报错）的效果。<br>&emsp;&emsp;ES6里增加了一个let，可以在{}， if， for里声明。用法同var，但作用域限定在块级，let声明的变量不存在变量提升。</p>
-<h2 id="什么是闭包"><a href="#什么是闭包" class="headerlink" title="什么是闭包"></a>什么是闭包</h2><p>维基百科是这样说的：</p>
-<blockquote>
-<p>在计算机科学中，闭包（也称词法闭包或函数闭包）是指一个函数或函数的引用，与一个引用环境绑定在一起。这个引用环境是一个存储该函数每个非局部变量（也叫自由变量）的表。<br>闭包，不同于一般的函数，它允许一个函数在立即词法作用域外调用时，仍可访问非本地变量。</p>
-</blockquote>
-<a id="more"></a>
-<p>&emsp;&emsp;JavaScript之所以有闭包，是因为它是一个第一类函数特性的语言，即可用把函数当做对象去传递作为返回值。<br>&emsp;&emsp;看下面的函数，对于这种函数，当调用函数outer()之后，局部变量localVal就可以被释放了。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">outer</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localVal = <span class="number">30</span>;</div><div class="line">	<span class="keyword">return</span> localVal;</div><div class="line">&#125;</div><div class="line">outer();<span class="comment">//30</span></div></pre></td></tr></table></figure>
-<p>&emsp;&emsp;在JavaScript中，函数也是对象，并且函数也可以作为返回值也可以传参，函数里也可以套用别的函数。<br>&emsp;&emsp;对于下面的函数，调用函数outer()时，返回的是匿名函数，这个匿名函数里面依然可以访问外面的局部变量localVal。在调用outer()之后，调用func()，依然可以访问外部函数的局部变量localVal，localVal不会被释放。<br>&emsp;&emsp;这就是闭包。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">outer</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localVal = <span class="number">30</span>;</div><div class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> localVal;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> func = outer();</div><div class="line">func();<span class="comment">//30</span></div></pre></td></tr></table></figure></p>
-<h2 id="闭包无处不在"><a href="#闭包无处不在" class="headerlink" title="闭包无处不在"></a>闭包无处不在</h2><p>&emsp;&emsp;如下面的函数，点击事件中依然可以访问外部函数的局部变量<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localData = <span class="string">"localData here"</span>;</div><div class="line">	<span class="built_in">document</span>.addEvenetListener(<span class="string">"click"</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="built_in">console</span>.log(localData);</div><div class="line">	&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;再如下面的异步请求，jquery的$.ajax方法，在整个函数调用结束之后，回调函数依然可以访问到url，localData这些局部变量<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localData = <span class="string">"localData here"</span>;</div><div class="line">	<span class="keyword">var</span> url = <span class="string">"http://www.qq.com/"</span>;</div><div class="line">	$.ajax(&#123;</div><div class="line">		url: url,</div><div class="line">		success: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			<span class="built_in">console</span>.log(localData);</div><div class="line">		&#125;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="闭包的坑"><a href="#闭包的坑" class="headerlink" title="闭包的坑"></a>闭包的坑</h2><p>&emsp;&emsp;看下面的函数，输出结果是什么？<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">document</span>.body.innerHTML = <span class="string">"&lt;div id='div1'&gt;aaa&lt;/div&gt;"</span> + <span class="string">"&lt;div id='div2'&gt;bbb&lt;/div&gt;"</span> + <span class="string">"&lt;div id='div3'&gt;ccc&lt;/div&gt;"</span>;</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)&#123;</div><div class="line">	<span class="built_in">document</span>.getElementById(<span class="string">'div'</span> + i)</div><div class="line">		.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			alert(i);<span class="comment">//all are 4!</span></div><div class="line">		&#125;</div><div class="line">	);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;实际上，点击任何一个div输出结果都是4。<br>&emsp;&emsp;在点击某个div的时候，执行回调函数，这个时候函数才会动态地拿到i的值。这一切是在整个过程初始化之后的，在初始化之后i的值就已经是4了。<br>&emsp;&emsp;那怎么样才能达到想要的效果呢？看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">document</span>.body.innerHTML = <span class="string">"&lt;div id='div1'&gt;aaa&lt;/div&gt;"</span> + </div><div class="line">	<span class="string">"&lt;div id='div2'&gt;bbb&lt;/div&gt;"</span> + <span class="string">"&lt;div id='div3'&gt;ccc&lt;/div&gt;"</span>;</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)&#123;</div><div class="line">	!<span class="function"><span class="keyword">function</span>(<span class="params">i</span>)</span>&#123;</div><div class="line">		<span class="built_in">document</span>.getElementById(<span class="string">'div'</span> + i)</div><div class="line">			.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">				alert(i);<span class="comment">//1,2,3</span></div><div class="line">			&#125;</div><div class="line">		);</div><div class="line">	&#125;(i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;这里每一层循环的时候，用了立即执行的匿名函数把点击事件函数包装起来，并传参i，即1,2,3。那么每一次点击div，alert(i)里面的i就会取每一个闭包环境下的i，而这个i来自于每一次循环的i，所以点击每一个div的时候就会弹出相应的值了</p>
-<h2 id="闭包的作用"><a href="#闭包的作用" class="headerlink" title="闭包的作用"></a>闭包的作用</h2><p>&emsp;&emsp;闭包可以用于封装一些变量，看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">(<span class="function"><span class="keyword">function</span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> _userId = <span class="number">23492</span>;</div><div class="line">	<span class="keyword">var</span> _typeId = <span class="string">'item'</span>;</div><div class="line">	<span class="keyword">var</span> <span class="keyword">export</span> = &#123;&#125;;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">function</span> <span class="title">converter</span>(<span class="params">userId</span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> +userId;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">export</span>.getUserId = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> converter(_userId);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">export</span>.getTypeId = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> converter(_typeId);</div><div class="line">	&#125;</div><div class="line">	<span class="built_in">window</span>.export = <span class="keyword">export</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">export</span>.getUserId(); <span class="comment">//23492</span></div><div class="line"><span class="keyword">export</span>.getTypeId(); <span class="comment">//item</span></div><div class="line"></div><div class="line"><span class="keyword">export</span>._UserId; <span class="comment">//undefined</span></div><div class="line"><span class="keyword">export</span>._TypeId; <span class="comment">//undefined</span></div><div class="line"><span class="keyword">export</span>.converter; <span class="comment">//undefined</span></div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;这里定义了_userId等一些外部无法直接访问的局部变量，并通过window.export = export把对象export输出出去。在外部使用export的时候，只能通过export的一些方法来访问到函数的局部变量，而无法直接访问这些变量和方法。<br>&emsp;&emsp;这利用了闭包的特性，比如export.getUserId()函数，在整个匿名函数初始化之后，它依然能够访问到局部变量_userId。<br>&emsp;&emsp;同时，闭包也会带来一些问题，比如局部变量没有被释放掉造成空间浪费；内存泄露；性能消耗等。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.imooc.com/learn/277" target="_blank" rel="external">JavaScript深入浅出</a></p>
-<p>友情链接：<a href="http://blog.csdn.net/seminelee/article/details/52131659" target="_blank" rel="external">前端重点知识整理（JavaScript）三：闭包</a></p>
-
+        
       
     </div>
 
@@ -400,9 +379,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/JavaScript/" rel="tag">#JavaScript</a>
+            <a href="/tags/Vue/" rel="tag">#Vue</a>
           
-            <a href="/tags/闭包/" rel="tag">#闭包</a>
+            <a href="/tags/MVVM/" rel="tag">#MVVM</a>
+          
+            <a href="/tags/模块化/" rel="tag">#模块化</a>
           
         </div>
       
@@ -411,17 +392,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/07/24/set-up-a-blog/" rel="next" title="三小时建成github pages + hexo博客">
-                <i class="fa fa-chevron-left"></i> 三小时建成github pages + hexo博客
+              <a href="/2016/08/07/ob/" rel="next" title="JavaScript学习笔记之对象及继承">
+                <i class="fa fa-chevron-left"></i> JavaScript学习笔记之对象及继承
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/07/ob/" rel="prev" title="JavaScript学习笔记之对象及继承">
-                JavaScript学习笔记之对象及继承 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -436,10 +413,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2016/08/06/bibao/"
-     data-title="JavaScript学习笔记之闭包"
+        <div class="ds-share flat" data-thread-key="2016/08/18/vue-1/"
+     data-title="Vue.js学习笔记之入门"
      data-content=""
-     data-url="http://seminelee.github.io/2016/08/06/bibao/">
+     data-url="http://seminelee.github.io/2016/08/18/vue-1/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -597,7 +574,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#作用域相关定义"><span class="nav-text">作用域相关定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是闭包"><span class="nav-text">什么是闭包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#闭包无处不在"><span class="nav-text">闭包无处不在</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#闭包的坑"><span class="nav-text">闭包的坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#闭包的作用"><span class="nav-text">闭包的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+              <p class="post-toc-empty">此文章未包含目录</p>
             
           </div>
         </section>

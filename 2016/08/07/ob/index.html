@@ -91,7 +91,7 @@
 <meta property="og:site_name" content="seminelee blog">
 <meta property="og:description" content="对象属性　　ES5中有两种属性，数据属性和访问器属性。　　数据属性包括[[writable]]（能否修改属性的值）、[[value]]等等；　　访问器属性包括[[Configurable]]（能否通过delete删除属性、能否修改属性的特性）、[[Enumerable]]（能否通过for-in循环返回属性）、[[Get]]、[Set]]　　要修改属性则使用Object.defineProperty">
 <meta property="og:image" content="http://img.blog.csdn.net/20160807001109843">
-<meta property="og:updated_time" content="2016-08-12T11:35:34.530Z">
+<meta property="og:updated_time" content="2016-08-14T03:00:30.451Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JavaScript学习笔记之对象及继承">
 <meta name="twitter:description" content="对象属性　　ES5中有两种属性，数据属性和访问器属性。　　数据属性包括[[writable]]（能否修改属性的值）、[[value]]等等；　　访问器属性包括[[Configurable]]（能否通过delete删除属性、能否修改属性的特性）、[[Enumerable]]（能否通过for-in循环返回属性）、[[Get]]、[Set]]　　要修改属性则使用Object.defineProperty">
@@ -378,9 +378,11 @@
 <ul>
 <li>搜索实例；</li>
 <li>搜索SubType.prototype；</li>
-<li>搜索SuperType.prototype，最后一步才找到方法。<br>　　而所有函数的默认原型都是Object的实例，所以完整的原型链如下图：<br><img src="http://img.blog.csdn.net/20160807001109843" alt="来自《JavaScript高级程序设计（第3版）》"><br>　　即<code>instance.__proto__</code>（instance的原型）指向SubType.prototype，<code>SubType.prototype.__proto__</code>指向SuperType.prototype，而<code>SuperType.prototype.__proto__</code>指向Object.prototype，最后<code>Object.prototype.__proto__</code>指向null。<br>　　果然对象搞到头还是空啊！（开个玩笑==）<h2 id="原型链的问题"><a href="#原型链的问题" class="headerlink" title="原型链的问题"></a>原型链的问题</h2>　　原型链可以用来实现继承，但它也存在一些问题。<br>　　最主要的问题就是在创建原型对象中提及的，包含引用类型值的原型属性会被所有实例共享。<h2 id="借用构造函数"><a href="#借用构造函数" class="headerlink" title="借用构造函数"></a>借用构造函数</h2>　　鉴于上面的问题，我们可以通过使用apply()和call()在新创建的对象上执行构造函数。<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.colors = [<span class="string">"red"</span>, <span class="string">"blue"</span>, <span class="string">"green"</span>];</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	SuperType.call(<span class="keyword">this</span>);<span class="comment">//继承SuperType</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> instance1 = <span class="keyword">new</span> SubType();</div><div class="line">instance1.colors.push(<span class="string">"black"</span>);</div><div class="line">alert(instance1.colors); <span class="comment">//"red,blue,green,black"</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> instance2 = <span class="keyword">new</span> SubType();</div><div class="line">alert(instance2.colors); <span class="comment">//"red,blue,green"</span></div></pre></td></tr></table></figure>
-</li>
+<li>搜索SuperType.prototype，最后一步才找到方法。</li>
 </ul>
+<p>　　而所有函数的默认原型都是Object的实例，所以完整的原型链如下图：<br><img src="http://img.blog.csdn.net/20160807001109843" alt="来自《JavaScript高级程序设计（第3版）》"><br>　　即<code>instance.__proto__</code>（instance的原型）指向SubType.prototype，<code>SubType.prototype.__proto__</code>指向SuperType.prototype，而<code>SuperType.prototype.__proto__</code>指向Object.prototype，最后<code>Object.prototype.__proto__</code>指向null。<br>　　果然对象搞到头还是空啊！（开个玩笑==）</p>
+<h2 id="原型链的问题"><a href="#原型链的问题" class="headerlink" title="原型链的问题"></a>原型链的问题</h2><p>　　原型链可以用来实现继承，但它也存在一些问题。<br>　　最主要的问题就是在创建原型对象中提及的，包含引用类型值的原型属性会被所有实例共享。</p>
+<h2 id="借用构造函数"><a href="#借用构造函数" class="headerlink" title="借用构造函数"></a>借用构造函数</h2><p>　　鉴于上面的问题，我们可以通过使用apply()和call()在新创建的对象上执行构造函数。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.colors = [<span class="string">"red"</span>, <span class="string">"blue"</span>, <span class="string">"green"</span>];</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	SuperType.call(<span class="keyword">this</span>);<span class="comment">//继承SuperType</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> instance1 = <span class="keyword">new</span> SubType();</div><div class="line">instance1.colors.push(<span class="string">"black"</span>);</div><div class="line">alert(instance1.colors); <span class="comment">//"red,blue,green,black"</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> instance2 = <span class="keyword">new</span> SubType();</div><div class="line">alert(instance2.colors); <span class="comment">//"red,blue,green"</span></div></pre></td></tr></table></figure></p>
 <p>　　实际上，我们在新创建的SubType实例的环境下调用了SuperType构造函数。这样，SubType的每个实例就都会有自己的colors属性的副本了。</p>
 <p>　　此外，还有组合继承，原型式继承，寄生式继承等。脑袋内存有限，这里不再作探究。<br>本文主要参考《JavaScript高级程序设计（第3版）》。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>《JavaScript高级程序设计（第3版）》</p>
@@ -427,6 +429,10 @@
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/18/vue-1/" rel="prev" title="Vue.js学习笔记之入门">
+                Vue.js学习笔记之入门 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -527,7 +533,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-count">4</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -535,7 +541,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -544,7 +550,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
