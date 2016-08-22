@@ -282,7 +282,7 @@
               
                 
                 <a class="post-title-link" href="/2016/08/18/vue-1/" itemprop="url">
-                  Vue.js学习笔记之入门
+                  Vue.js学习笔记一：入门
                 </a>
               
             
@@ -350,9 +350,16 @@
 
       
         
-          
-            <h2 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h2>
-          
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　vue是法语中视图的意思，Vue.js是一个轻巧、高性能、可组件化的MVVM库。<br>　　<code>MV*</code>可能大家都经常听说，我们先来理解一下<code>MV*</code>的概念。</p>
+<h3 id="出现的背景"><a href="#出现的背景" class="headerlink" title="出现的背景"></a>出现的背景</h3><p>　　MVC开始是存在于桌面程序中的，但由于后端的mvc框架的v层越来越重，后端的MVC思想就搬移到了前端。随着前端代码越来越重，能力越来越大，重前端的系统越来越多地涌现出来。前端为主的MV*时代中，前端在MVC的结构指导下分为model(模型), view(视图)， controller(控制器)三部分。而controller慢慢演化为presenter和viewmodel。MVC, MVP, MVVM框架不断涌现。</p>
+<h3 id="MVC-MVP-MVVM"><a href="#MVC-MVP-MVVM" class="headerlink" title="MVC, MVP, MVVM"></a>MVC, MVP, MVVM</h3><ul>
+<li>MVC(model-view-controller)，如backbone, angular(较高版本是mvvm, 也许说它是MVW更准确)。<br>　　View: 与页面上元素直接相关的部分，包括html，CSS和一部分直接控制页面元素的JS。它可以从Model中得到数据，并将其显示到页面上。<br>　　Model: 与后端的沟通、AJAX请求以及对数据的处理。Model本身不知道谁是View，谁是Controller。它只提供一些方法供View和Controller调用，并且将变更通知给它的观察者。<br>　　Controller: Model和View的粘合剂。Controller将View方面的请求转发给合适的Model，作为Model的观察者，获取Model的变更,在必要时更新View。</li>
+</ul>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/18/vue-1/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
