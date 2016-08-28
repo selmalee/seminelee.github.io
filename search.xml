@@ -88,7 +88,7 @@
 <p>要查看委员会成员公司的完整列表，请移步到：<br><a href="http://www.iab.net/advertising_technology_council" target="_blank" rel="external">http://www.iab.net/advertising_technology_council</a></p>
 <hr>
 <h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>　执行摘要<br>　目标受众<br>　规格更新</p>
-<p><strong>1. 概况</strong><br>　　1.1　SafeFrames组件<br>　　　1.1.1　网站<br>　　　1.1.2　外部方<br>　　　1.1.3　接口<br>　　　1.1.4　二级域名<br>　　1.2　优点<br>　　　1.2.1　外部方和网站之间的透明度<br>　　　1.2.2　统一规范的API<br>　　　1.2.3　“沙盒”外部内容<br>　　　1.2.4　网站定制&amp;控制<br>　　1.3　SafeFrames和广告可见展视<br>　　　1.3.1　支持3MS广告可见度<br>　　　1.3.2　可见度特性对外部方可选<br>　　1.4　SafeFrames和视频插播广告<br>　　1.5　SafeFrames和移动端<br>　　1.6　报告SafeFrame的数据<br>　　1.7　区别于其他规范<br>　　　1.7.1　IAB友好的iframe<br>　　　1.7.2　跨源资源共享（CORS）<br>　　1.8　超出范围<br>　　1.9　操作注意事项<br><strong>2. 网站实现</strong><br>　　2.1　SafeFrames是如何运作的<br>　　　2.1.1　传递模式A：网站转换外部内容<br>　　　2.1.2　传递模式B：外部内容直接传递<br>　　　2.1.3　渲染SafeFrame<br>　　　2.1.4　通过API进行页内通讯<br>　　2.2　要求<br>　　　2.2.1　JavaScript的网站库和API<br>　　　2.2.2　二级域名<br>　　　2.2.3　资源公约<br>　　　2.2.4　SafeFrame的URI公约<br>　　2.3　实现注意事项<br>　　2.4　SafeFrame的渲染细到<br>　　2.5　通信机制的细到<br><strong>3. SafeFrame标签</strong><br>　　3.1　SafeFrame标签结构&amp;要求<br>　　　3.1.1　SCRIPT标签<br>　　　3.1.2　使用JavaScript处理数据标签<br>　　　　3.1.2.1　例子：一次性处理所有标签<br>　　　　3.1.2.2　例子：在数据标签之前先定义SafeFrame网站库<br>　　　　3.1.2.3　例子：伴随着自动引导的兄弟标签的SafeFrame数据标签(!)<br><strong>4. 网站API实施细则</strong><br>　　4.1　命名空间 <code>$sf.host</code><br>　　4.2　命名空间 <code>$sf.host.conf</code><br>　　4.3　命名空间 <code>$sf.info</code><br>　　4.4　类 <code>$sf.host.Config</code><br>　　4.5　类 <code>$sf.host.PosConfig</code><br>　　4.6　类 <code>$sf.host.Position</code><br>　　4.7　类 <code>$sf.host.PosMeta</code><br>　　4.8　函数 <code>$sf.host.boot</code><br>　　4.9　函数 <code>$sf.host.status</code><br>　　4.10　函数 <code>$sf.host.nuke</code><br>　　4.11　函数 <code>$sf.host.get</code><br>　　4.12　函数 <code>$sf.host.render</code><br><strong>5. 外部方API实现</strong><br>　　5.1　命名空间 <code>$sf.ext</code><br>　　5.2　函数 <code>$sf.ext.register</code><br>　　5.3　函数 <code>$sf.ext.supports</code><br>　　5.4　函数 <code>$sf.ext.geom</code><br>　　5.5　函数 <code>$sf.ext.expand</code><br>　　5.6　函数 <code>$sf.ext.collapse</code><br>　　5.7　函数 <code>$sf.ext.status</code><br>　　5.8　函数 <code>$sf.ext.meta</code><br>　　5.9　函数 <code>$sf.ext.cookie</code><br>　　5.10　函数 <code>$sf.ext.inViewPercentage</code><br>　　5.11　函数 <code>$sf.ext.winHasFocus</code></p>
+<p><strong>1. 概况</strong><br>　　1.1　SafeFrames组件<br>　　　1.1.1　网站<br>　　　1.1.2　外部方<br>　　　1.1.3　接口<br>　　　1.1.4　二级域名<br>　　1.2　优点<br>　　　1.2.1　外部方和网站之间的透明度<br>　　　1.2.2　统一规范的API<br>　　　1.2.3　“沙盒”外部内容<br>　　　1.2.4　网站定制&amp;控制<br>　　1.3　SafeFrames和广告可见展视<br>　　　1.3.1　支持3MS广告可见度<br>　　　1.3.2　可见度特性对外部方可选<br>　　1.4　SafeFrames和视频插播广告<br>　　1.5　SafeFrames和移动端<br>　　1.6　报告SafeFrame的数据<br>　　1.7　区别于其他规范<br>　　　1.7.1　IAB友好的iframe<br>　　　1.7.2　跨源资源共享（CORS）<br>　　1.8　超出范围<br>　　1.9　操作注意事项<br><strong>2. 网站实现</strong><br>　　2.1　SafeFrames是如何运作的<br>　　　2.1.1　传递模式A：网站转换外部内容<br>　　　2.1.2　传递模式B：外部内容直接传递<br>　　　2.1.3　渲染SafeFrame<br>　　　2.1.4　通过API进行页内通讯<br>　　2.2　要求<br>　　　2.2.1　JavaScript的网站库和API<br>　　　2.2.2　二级域名<br>　　　2.2.3　资源公约<br>　　　2.2.4　SafeFrame的URI公约<br>　　2.3　实现注意事项<br>　　2.4　SafeFrame的渲染细到<br>　　2.5　通信机制的细到<br><strong>3. SafeFrame标签</strong><br>　　3.1　SafeFrame标签结构&amp;要求<br>　　　3.1.1　SCRIPT标签<br>　　　3.1.2　使用JavaScript处理数据标签<br>　　　　3.1.2.1　例子：一次性处理所有标签<br>　　　　3.1.2.2　例子：在数据标签之前先定义SafeFrame网站库<br>　　　　3.1.2.3　例子：伴随着自动引导的兄弟标签的SafeFrame数据标签<br><strong>4. 网站API实施细则</strong><br>　　4.1　命名空间 <code>$sf.host</code><br>　　4.2　命名空间 <code>$sf.host.conf</code><br>　　4.3　命名空间 <code>$sf.info</code><br>　　4.4　类 <code>$sf.host.Config</code><br>　　4.5　类 <code>$sf.host.PosConfig</code><br>　　4.6　类 <code>$sf.host.Position</code><br>　　4.7　类 <code>$sf.host.PosMeta</code><br>　　4.8　函数 <code>$sf.host.boot</code><br>　　4.9　函数 <code>$sf.host.status</code><br>　　4.10　函数 <code>$sf.host.nuke</code><br>　　4.11　函数 <code>$sf.host.get</code><br>　　4.12　函数 <code>$sf.host.render</code><br><strong>5. 外部方API实现</strong><br>　　5.1　命名空间 <code>$sf.ext</code><br>　　5.2　函数 <code>$sf.ext.register</code><br>　　5.3　函数 <code>$sf.ext.supports</code><br>　　5.4　函数 <code>$sf.ext.geom</code><br>　　5.5　函数 <code>$sf.ext.expand</code><br>　　5.6　函数 <code>$sf.ext.collapse</code><br>　　5.7　函数 <code>$sf.ext.status</code><br>　　5.8　函数 <code>$sf.ext.meta</code><br>　　5.9　函数 <code>$sf.ext.cookie</code><br>　　5.10　函数 <code>$sf.ext.inViewPercentage</code><br>　　5.11　函数 <code>$sf.ext.winHasFocus</code></p>
 <hr>
 <h3 id="执行摘要"><a href="#执行摘要" class="headerlink" title="执行摘要"></a>执行摘要</h3><p>SafeFrame1.0技术是一种支持API的iframe，它开辟了发布页面内容和包含iframe的外部内容比如广告之间沟通的线路。因为这条沟通线路，不同于标准的iframe，投放到SafeFrame的内容能够收集数据和有丰富的互动，如广告扩张。</p>
 <p>为了避免有破坏性的广告行为和网页内嵌投放广告的潜在安全风险，发布商可以选择投放广告内容到iframe。</p>
@@ -177,26 +177,26 @@
 <h4 id="1-3-2-可见度特性对外部方可选"><a href="#1-3-2-可见度特性对外部方可选" class="headerlink" title="1.3.2 可见度特性对外部方可选"></a>1.3.2 可见度特性对外部方可选</h4><p>SafeFrames框架允许外部内容通过调用<code>$sf.ext.inVewPercentage</code>方法确定它是否在视图中。此特性，与所有的SafeFrame特性，对投放内容到网站的外部方是可选的。但是，无论何时外部方请求网站提供能见度数据，它都要提供。</p>
 <h3 id="1-4-SafeFrames和视频插播广告"><a href="#1-4-SafeFrames和视频插播广告" class="headerlink" title="1.4 SafeFrames和视频插播广告"></a>1.4 SafeFrames和视频插播广告</h3><p>SafeFrame的不是为了插播视频广告而设计的，但在一个VAST标签投放的插播横幅广告可以投放到SafeFrames。IAB的视频套件将需要更新以完全支持SafeFrame渲染，但视频发布商已经可以使用SafeFrame来代替他们的视频网页上使用的任何内部框架。</p>
 <p>任何指定为一个iframe资源的VAST横幅广告可以渲染在SafeFrame内。为了确保VAST插播横幅广告可以投放到SafeFrame，外部方必须指定创造性的资源作为一个iframe。任何包含在VAST插播横幅广告内容的SafeFrame协议可以被任何支持SafeFrame1.0的视频发布商使用。</p>
-<p>一个SafeFrame内渲染VPAID内容的可能性存在，但是实施解决方案需要来自视频网站与外部方的修改。直到IAB VSuite被更新以更容易支持SafeFrame，使用SafeFrame渲染VPAID内容的技术操作必须由愿意执行解决方案的各方加以解决。</p>
+<p>一个SafeFrame内渲染VPAID（Video Player-Ad Interface Definition）内容的可能性存在，但是实施解决方案需要来自视频网站与外部方的修改。直到IAB VSuite被更新以更容易支持SafeFrame，使用SafeFrame渲染VPAID内容的技术操作必须由愿意执行解决方案的各方加以解决。</p>
 <h3 id="1-5-SafeFrames和移动端"><a href="#1-5-SafeFrames和移动端" class="headerlink" title="1.5 SafeFrames和移动端"></a>1.5 SafeFrames和移动端</h3><p>在网页呈现的任何的SafeFrame内容也可以像网页一样在移动设备呈现。基于浏览器的Web应用，包括那些专为移动端设计的，也能充分地从SafeFrame实施中获益。然而，虽然SafeFrame可以在非浏览器应用程序中运作，如那些专门为移动设备（本地应用程序）开发的，但是SafeFrame1.0没有非浏览器支持的详细信息，这些信息将被考虑进未来的SafeFrame发布中。</p>
 <h3 id="1-6-报告SafeFrame的数据"><a href="#1-6-报告SafeFrame的数据" class="headerlink" title="1.6 报告SafeFrame的数据"></a>1.6 报告SafeFrame的数据</h3><p>SafeFrame1.0为您提供可以在报表中使用的数据，但是使用SafeFrame报告数据的机制还没完成。报告系统必须配置为收集和以收件人期望的格式报告SafeFrame数据。</p>
-<h3 id="1-7-区别于其他规范"><a href="#1-7-区别于其他规范" class="headerlink" title="1.7 区别于其他规范"></a>1.7 区别于其他规范</h3><p>IAB的SafeFrame解决其他IAB规范或指南没有解决的问题。下面的章到帮助从行业里其他解决不同的问题的规范中区分SafeFrame。</p>
-<h4 id="1-7-1-IAB友好的iframe"><a href="#1-7-1-IAB友好的iframe" class="headerlink" title="1.7.1 IAB友好的iframe"></a>1.7.1 IAB友好的iframe</h4><p>IAB的SafeFrame规范比IAB记录了“在异步广告环境中富媒体广告的最佳实践”的友好的iframe更加不同。(!)</p>
-<p>IAB的友好iframe的最佳实践是用来支持使用JavaScript调用的富媒体广告，不像AJAX那样使用动态编码框架。使用易用的iframe，来自广告服务器的内容像网站内容一样渲染到来源于同一服务器内容框架。</p>
+<h3 id="1-7-区别于其他规范"><a href="#1-7-区别于其他规范" class="headerlink" title="1.7 区别于其他规范"></a>1.7 区别于其他规范</h3><p>IAB的SafeFrame解决其他IAB规范或指南没有解决的问题。下面的章节帮助从行业里其他解决不同的问题的规范中区分SafeFrame。</p>
+<h4 id="1-7-1-IAB友好的iframe"><a href="#1-7-1-IAB友好的iframe" class="headerlink" title="1.7.1 IAB友好的iframe"></a>1.7.1 IAB友好的iframe</h4><p>IAB的SafeFrame规范跟IAB那些记录了”在异步广告环境中富媒体广告的最佳示例”的友好的iframe不同。</p>
+<p>IAB的友好iframe的最佳示例是用来支持使用JavaScript调用的富媒体广告，不像AJAX那样使用动态编码框架。使用易用的iframe，来自广告服务器的内容像网站内容一样渲染到一个来源于同一服务器的frame。</p>
 <p>虽然友好的iframe解决方案解决了跨平台的障碍，以支持某些富媒体格式，但是它没有把外部内容从网站内容中隔离。在易用的iframe里的富媒体内容像网站的一样，直接由同一个服务器提供。</p>
-<p>相反地，SafeFrame实现了网站和外部内容之间的隔离，并且提供了一个API来让控制和透明相互作用成为可能，同时为网站提供安全性和稳定性控制的最小层。使用SafeFrame，广告内容是由一个中性域提供，而不是与网站内容一样来自于相同的来源。只允许通过SafeFrame指南中指定的API访问该广告内容被最终渲染的网站域。</p>
+<p>相反地，SafeFrame实现了网站和外部内容之间的隔离，并且提供了一个API来让控制和透明相互作用成为可能，同时为网站提供安全性和稳定性控制的最小层。使用SafeFrame时，广告内容是由一个中性域提供，而不是与网站内容一样来自于相同的来源。只允许通过SafeFrame指南中指定的API访问该广告内容被最终渲染的网站域。</p>
 <p>SafeFrame指南删除了许多与投放富媒体到来源于网站的iframe相关的安全风险。SafeFrame API也允许主机和广告内容之间更加透明，以及对丰富的互动有更多的控制和监控工具。该新增的控制也保证了富媒体的更好的渲染能力。</p>
-<h4 id="1-7-2-跨源资源共享（CORS）"><a href="#1-7-2-跨源资源共享（CORS）" class="headerlink" title="1.7.2 跨源资源共享（CORS）"></a>1.7.2 跨源资源共享（CORS）</h4><p>跨源资源共享（CORS）是一种用于实现跨域的HTTP请求的机制。如果没有CORS，同源策略就会阻止一个域的嵌入代码请求来自另一个域的潜在的破坏性的内容。对于良性的内容如图像存在例外。</p>
+<h4 id="1-7-2-跨源资源共享（CORS）"><a href="#1-7-2-跨源资源共享（CORS）" class="headerlink" title="1.7.2 跨源资源共享（CORS）"></a>1.7.2 跨源资源共享（CORS）</h4><p>跨源资源共享（CORS，Cross Origin Resource Sharing）是一种用于实现跨域的HTTP请求的机制。如果没有CORS，同源策略（the Same Origin Policy）就会阻止一个域的嵌入代码请求来自另一个域的潜在的破坏性的内容。对于良性的内容如图像存在例外。</p>
 <p>不幸的是，同源策略阻止内容，比如富媒体广告，请求脚本文件以支持正确的渲染和互动。利用CORS，内容可以让浏览器对信任域进行跨域请求。虽然这个解决方案是有效的，但是它也赋予外部内容对网站的完全访问权限，使外部内容有权不需网站知晓就访问和更改网站内容。</p>
-<p>CORS只需管理一个域名是否可以请求另一个;它不能管理这两个之间的相互作用。</p>
+<p>CORS只能管理一个域名是否可以请求另一个;它不能管理这两个之间的相互作用。</p>
 <p>另一种解决方案是把内容投放到iframe中。在此解决方案中，内容是在提供内容的外部服务器中进行处理。但有了这个解决方案，所有对网站的访问都被拒绝，禁止与外部内容的任何丰富的互动。</p>
-<p>综上所述，CORS没有控制被请求的内容可以访问什么，而一个标准的iframe禁止任何访问。</p>
+<p>综上所述，CORS不能控制被请求的内容可以访问什么，而一个标准的iframe又禁止任何的访问。</p>
 <p>同时使用iframe和API，SafeFrame实现了网站和外部提供的内容之间丰富的互动，同时允许控制对网站信息的访问。</p>
-<h3 id="1-8-超出范围"><a href="#1-8-超出范围" class="headerlink" title="1.8 超出范围"></a>1.8 超出范围</h3><p>鉴于定义本规范的目的，下列项目被认为是超出范围的：</p>
+<h3 id="1-8-超出范围"><a href="#1-8-超出范围" class="headerlink" title="1.8 超出范围"></a>1.8 超出范围</h3><p>在本规范中，下列项是超出范围的：</p>
 <ul>
 <li><p><strong>读取/检索外部内容</strong><br>SafeFrame不指定如何检索外部内容。一旦检索，外部内容就作为一个字符串或URI和网站选择使用的任何元数据，被放入SafeFrame<code>$sf.host.Position</code>对象中。</p>
 </li>
-<li><p><strong>为了特定实现的附加功能</strong><br>对比起其他的创建，操纵和管理一个容器，SafeFrame没有定义任何对象，方法，或者其他属性。进一步的功能，例如额外的安全性，UI元素等可能会被加入，但不会作为SafeFrame1.0的一部分。</p>
+<li><p><strong>为了特定实现的附加功能</strong><br>对比起其他的创建，操纵和管理一个容器，SafeFrame没有定义任何对象，方法，或者其他属性。进一步的功能，例如额外的安全性，UI元素等可能会被加入到未来的版本中，但不会作为SafeFrame1.0的一部分。</p>
 </li>
 <li><p><strong>基于非浏览器的实现</strong><br>SafeFrame的这个版本仅限于JavaScript的格式，基于浏览器的实现。SafeFrame1.0可以在应用内发挥作用，如那些在移动设备（本机），但是对于非基于浏览器实现的细到未包括在SafeFrames的这个版本中。它支持基于浏览器的应用程序，移动设备和任何其他设备。</p>
 </li>
@@ -204,7 +204,7 @@
 <h3 id="1-9-操作注意事项"><a href="#1-9-操作注意事项" class="headerlink" title="1.9 操作注意事项"></a>1.9 操作注意事项</h3><p>使用SafeFrames可能会改变某些熟悉操作。在实施SafeFrames之前，请考虑以下的一些操作效果，并确定你的技术和过程是否需要做出任何修改，以利用SafeFrame的优势。</p>
 <p>以下的考虑情况旨在提供一个用于实现分析的起点。可能需要进一步的评估和测试，以确保顺利实施和过渡。</p>
 <ul>
-<li><p><strong>上下文展示广告</strong><br>以编程方式投放基于网页内容的广告的广告代码，访问网页数据，以识别它显示的内容类型，然后投放适合于内容的广告。使用SafeFrames，因为广告代码不能直接访问主机页面，网站API必须传递这个数据给广告代码。<br>该广告代码提供者应与网站页面所有者（发布者）合作洽谈，为了广告代码提供者投放上下文展示广告，哪些信息应该被传递。<br>欲了解更多信息，请参阅5.8到有关<code>$sf.ext.meta</code>功能的详细信息。</p>
+<li><p><strong>上下文展示广告</strong><br>以编程方式投放基于网页内容的广告的广告代码，访问网页数据，以识别它显示的内容类型，然后投放适合于内容的广告。使用SafeFrames，因为广告代码不能直接访问主机页面，网站API必须传递这个数据给广告代码。<br>该广告代码提供者应与网站页面所有者（发布者）洽谈，为了广告代码提供者投放上下文展示广告，应该传递哪些信息。<br>欲了解更多信息，请参阅第5.8节有关<code>$sf.ext.meta</code>功能的详细信息。</p>
 </li>
 <li><p><strong>访问网站URL</strong><br>当外部方内容使用iframe最初加载到一个网站站点时，HTTP头一般标识URL为网站站点，但不是很准确。由于SafeFrame是一个iframe，这种URL不准确的情况也发生在SafeFrame。为了获取准确的主机URL，在JavaScript中使用document.referrer属性，正如你在一个标准的iframe中会做的一样。</p>
 </li>
@@ -268,7 +268,7 @@
 <p><strong>网站实施注意事项</strong><br>一个SafeFrame可能包括：一个网页视图（移动端），一个嵌入式浏览器，一个HTA（微软HTML应用程序），或原用户的Web浏览器。</p>
 </blockquote>
 <h4 id="2-2-2-二级域名"><a href="#2-2-2-二级域名" class="headerlink" title="2.2.2 二级域名"></a>2.2.2 二级域名</h4><p>通过创建一个比起网站页面具有不同的来源，主机名和域名的iframe，SafeFrame 网站 API创建，渲染并管理外部方HTML内容。这种二级域名创建了一个“跨域屏障”，防止外部方的HTML和JavaScript直接访问网站页面的任何东西。</p>
-<p>Web浏览器遵循“同源”政策，即来自2个不同来源的代码是不允许进行通信（有一些例外）的。因此，网站必须有一个二级域名，从那里可以投放SafeFrame资源。(!)使用CDN（内容分发网络）可以提供二级域名。</p>
+<p>Web浏览器遵循”同源”政策，即来自2个不同来源的代码不允许进行通信（有一些例外）。因此，网站<em>必须</em>有一个二级域名，从那里可以投放SafeFrame资源。使用CDN（内容分发网络）可以提供二级域名。</p>
 <h4 id="2-2-3-资源公约"><a href="#2-2-3-资源公约" class="headerlink" title="2.2.3 资源公约"></a>2.2.3 资源公约</h4><p>对于网站，SafeFrame的定义2种类型的资源：基于渲染的文件和JavaScript文件。</p>
 <p><strong>基本HTML文件（静态HTML文件）</strong></p>
 <p>HTML文件是用来提供一个外部方HTML内容渲染成的基础级的HTML文档。在不支持HTML5报信的情况下，HTML文件还可以被用来充当代理，以促进在网站和外部方之间发送消息。</p>
@@ -306,8 +306,8 @@
 <li>SafeFrame标签（见第3章）放置在iframe里面：<br>a. SafeFrame的JavaScript代码将解析和读取SafeFrame标签以检索内容。<br>b. SafeFrame的JavaScript代码将渲染内容<br>c. SafeFrame的JavaScript代码将不会遵守且不会处理配置调用（请参阅类<code>$sf.host.Config</code>和类<code>$sf.host.PosConfig</code>）。<br>d. SafeFrame的JavaScript代码将不会遵守且不会处理一个iframe中的SafeFrame标签中定义的元数据。<br>e. 如果提供的iframe是一个SafeFrame容器，那么内容伴随着自己的JavaScript代码被渲染，并可以访问外部方的SafeFrame API。</li>
 </ol>
 <p><strong>SafeFrame JavaScript库</strong><br>SafeFrame容器总是包含一个JavaScript库，它响应SafeFrame网站JavaScript库，并且总是包含在HTML渲染文件的第一个JavaScript文件。</p>
-<p><strong>SafeFrame HTML管理</strong><br>SafeFrame管理所有它创建的HTML元素。无论是网站还是外部方都应该试图操纵该SafeFrame创建和管理的HTML节点。这样做产生的是能够打破接口的意外行为。(!)</p>
-<p>SafeFrame的可能会为它控制的HTML元素增加一个CSS类，但网站和外部方应避免为以下的CSS类名添加CSS规则或选择器：</p>
+<p><strong>SafeFrame HTML管理</strong><br>SafeFrame管理所有它创建的HTML元素。无论是网站还是外部方都不应该试图操纵该SafeFrame创建和管理的HTML节点。这样做会意料不到地损坏接口。</p>
+<p>SafeFrame可能会为它控制的HTML元素增加一个CSS类，但网站和外部方应避免为以下的CSS类名添加CSS规则或选择器：</p>
 <ul>
 <li><strong>sf_data: </strong>用于表示包含要渲染的数据的内嵌SafeFram元素</li>
 <li><strong>sf_position: </strong>用于表示一个被渲染的SafeFrame容器的起始HTML元素树</li>
@@ -315,8 +315,8 @@
 <li><strong>sf_el: </strong>一般用来表示由SafeFrame的JavaScript代码保持的其他HTML元素</li>
 </ul>
 <p><strong>递交内容到的SafeFrame网站API以渲染</strong><br>除了配置递送到SafeFrame容器的外部内容，网站应核实相关内容是以一个可以接受的形式给API去处理。网站页面接收外部内容作为原始的HTML或认为的作为一个SafeFrame必须获取和在其渲染的URL。</p>
-<p>在这两种情况下，SafeFrame都使用JavaScript来处理信息。原始HTML内容可能需要在发送到SafeFrame之前进行编码。虽然不需要调整URL，外部方应知道一个JavaScript的响应对于渲染和添加内容到SafeFrame容器是必要的。(!)</p>
-<p>下面的实现注意事项提供更多的细节，且对应2.1节讨论的两个传递模式。</p>
+<p>在这两种情况下，SafeFrame都使用JavaScript来处理信息。原始HTML内容可能需要在发送到SafeFrame之前进行编码。虽然不需要调整URL，外部方应知道一个JavaScript的响应对于渲染和添加内容到SafeFrame容器是必要的。</p>
+<p>下面的实施注意事项提供更多的细节，且与第2.1节讨论的两个传递模式相对应。</p>
 <ul>
 <li><p><strong>原始的HTML作为JavaScript字符串（传递模式A）</strong><br>由于JavaScript处理某些字符和SCRIPT标签时不同于HTML，网站可能必须在发送给SafeFrame API处理之前，修改任何原始的HTML内容。<br>例如，下面的HTML字符串被当做JavaScript处理时，会产生一个语法错误：</p>
 <figure class="highlight plain"><figcaption><span>type="text/javascript"> document.write('Hello "Dave"');</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
@@ -358,20 +358,20 @@
 </ul>
 <h3 id="2-5-通信机制的细节"><a href="#2-5-通信机制的细节" class="headerlink" title="2.5 通信机制的细节"></a>2.5 通信机制的细节</h3><p>为了促进一个的SafeFrame容器内的网站和外部方之间高性能，安全的通信，HTML5的”postMessage”函数是所使用的主要方法。此方法允许实施者，从一个HTML文档发送一个字符串到另一个来源于另一个地方的HTML文档，从而绕过“同源”政策。外部内容被阻止调用此相同的方法去意图欺骗网站API因为消息（发送的字符串）被验证成功而做些错误的或恶意的事情。</p>
 <p>有关W3C同源策略的更多信息，请访问：<br><a href="http://en.wikipedia.org/wiki/Same_origin_policy" target="_blank" rel="external">http://en.wikipedia.org/wiki/Same_origin_policy</a></p>
-<p>每当从容器收到信息，采取以下步骤来确保它是被允许的：</p>
+<p>每当从容器收到信息，采取以下的步骤来确保它是被允许的：</p>
 <ol>
 <li><strong>二级域名/检查来源</strong><br>从外部HTML内容发来的一个消息的原始域，应该与用于创建SafeFrame容器的<code>$sf.host.Config</code>类的<code>renderFile</code>字段中传递的URL的域相吻合。如果起源不吻合，消息就会被忽略。</li>
 <li>检查GUID<br>一个GUID被定义为，SafeFrame容器被渲染和应该与外部API传递的任何信息包含在一起的情况。当提供的GUID不存在或者未知时，则忽略该消息。</li>
 <li>检查 HTML window对象的引用<br>外部方对象的window引用源应该指向一个当SafeFrame被渲染时创建的iframe窗口引用。如果对象的窗口参考不匹配，已经呈现的任何已知的SafeFrame容器，则忽略该消息。</li>
-<li>处理序列消息<br>消息在先来的、先服务的基础上被处理，而且应该总是尝试表示成功或失败的响应。(!)</li>
+<li>处理序列消息<br>消息在先来的、先被发出的基础上被处理，而且应该总是尝试表示成功或失败的响应。</li>
 </ol>
 <h2 id="3-SafeFrame-标签"><a href="#3-SafeFrame-标签" class="headerlink" title="3. SafeFrame 标签"></a>3. SafeFrame 标签</h2><p>SafeFrame标签的高级别目标是封装外部内容数据，以便网站可以管理内容的渲染和控制。以下各节描述SafeFrame标签，如何构建它们，以及如何处理它们。</p>
 <h3 id="3-1-SafeFrame-标签结构-amp-要求"><a href="#3-1-SafeFrame-标签结构-amp-要求" class="headerlink" title="3.1 SafeFrame 标签结构&amp;要求"></a>3.1 SafeFrame 标签结构&amp;要求</h3><p>一个SafeFrame的标签是标准化的一组HTML标签。它必须由下列元素构成：</p>
 <ul>
 <li>与主机配置内联提供的，包含外部内容的元数据的<code>SCRIPT</code>标签。</li>
 <li>在<code>SCRIPT</code>标签中处理数据标签的JavaScript</li>
-<li>(可选)当不支持JavaScript的时候，NOSCRIPT标签对HTML回退。NOSCRIPT tag for fallback on HTML when JavaScript is unsupported (!)</li>
-<li>(可选)DIV标签指定SafeFrame容器将渲染在哪</li>
+<li>(可选)当不支持JavaScript的时候，HTML上的后退的NOSCRIPT标签。</li>
+<li>(可选)指定SafeFrame容器将渲染在哪的DIV标签</li>
 </ul>
 <p>只有主网站应该在网页内容中插入SafeFrame标签。嵌套的SafeFrame标签不被支持。忽略任何包含在来自交换，中介，代理或任何其它二级出版发布伙伴或供应商的标签中的SafeFrame标签。</p>
 <p>如果一个SafeFrame标签渲染在一个已经创建的SafeFrame容器内，渲染过程会假定容器已经创建并跳过以直接渲染外部内容。直接在网站网页上只使用SafeFrame容器确保内容被正确地渲染，数据是共享的，并且该API可以被访问。</p>
@@ -402,7 +402,7 @@
 <h2 id="4-网站API实施细则"><a href="#4-网站API实施细则" class="headerlink" title="4. 网站API实施细则"></a>4. 网站API实施细则</h2><p>SafeFrame网站API使用第4.1节至第4.11节到定义的的命名空间，函数，和类。</p>
 <h3 id="4-1-命名空间-sf-host"><a href="#4-1-命名空间-sf-host" class="headerlink" title="4.1 命名空间$sf.host"></a>4.1 命名空间<code>$sf.host</code></h3><p>此命名空间用来定义网站网页可以用于与SafeFrame容器交互的JavaScript类，对象和方法。</p>
 <p>在<code>$sf.host</code>命名空间是SafeFrame配置，渲染，检查，并与SafeFrame容器互动的SafeFrame起始点。在这个空间中定义的一切都是公开，除非另有被点名的。</p>
-<h3 id="4-2-命名空间-sf-host-conf"><a href="#4-2-命名空间-sf-host-conf" class="headerlink" title="4.2 命名空间$sf.host.conf"></a>4.2 命名空间<code>$sf.host.conf</code></h3><p>指定<code>host.conf</code>命名空间内联将允许SafeFrame容器（包括SafeFrame标签）与你指定的配置选项被加载（或引导）。这个对象是<code>$sf.host.Config</code>对象的书面版本。(!)</p>
+<h3 id="4-2-命名空间-sf-host-conf"><a href="#4-2-命名空间-sf-host-conf" class="headerlink" title="4.2 命名空间$sf.host.conf"></a>4.2 命名空间<code>$sf.host.conf</code></h3><p>指定<code>host.conf</code>命名空间内联将允许SafeFrame容器（包括SafeFrame标签）与你指定的配置选项被加载（或引导）。这个对象是<code>$sf.host.Config</code>对象的字面版本。</p>
 <p><strong>相关章节</strong></p>
 <ul>
 <li>3 SafeFrame标签</li>
@@ -669,7 +669,7 @@
 <ul>
 <li><p><code>{Object} g</code><br>An object containing sub objects with geometric information about the container. Geometric information may be returned as described in the following lists</p>
 <p><strong>win</strong><br>Identifies the location, width, and height (in pixels) of the browser or application window boundaries relative to the device screen.<br>　•  {Number} t<br>　The y coordinate (in pixels) of the top boundary of the browser or application window relative to the screen<br>　•  {Number} b<br>　The y coordinate (in pixels) of the bottom boundary of the browser or application window relative to the screen<br>　•  {Number} l<br>　The x coordinate (in pixels) of the left boundary of the browser or application window relative to the screen<br>　•  {Number} r<br>　The x coordinate (in pixels) of the right boundary of the browser or application window relative to the screen<br>　•  {Number} w<br>　The width (in pixels) of the browser or application window (win.r – win.l)<br>　•  {Number} h<br>　•  The height (in pixels) of the browser or application window (win.b – win.t)<br>　<br><strong>self</strong><br>Identifies the z-index and location, width, and height (in pixels) of the SafeFrame container relative to the browser or application window (win). In addition, width, height, and area percentage of SafeFrame content in view is provided, based on how much of the container is located within the boundaries of the browser or application window (win).<br>　•  {Number} t<br>　The y coordinate (in pixels) of the top boundary of the SafeFrame container<br>　•  {Number} l<br>　The x coordinate (in pixels) of the left side boundary of the SafeFrame container<br>　•  {Number} r<br>　The x coordinate (in pixels) of the right side boundary of the SafeFrame container (self.l + width of container)<br>　•  {Number} b<br>　The y coordinate (in pixels) of the bottom boundary of the SafeFrame container (self.t + height of container)<br>　•  {Number} xiv<br>　The percentage (%) of width for the SafeFrame container that is in view (formatted as “0.14” or “1”)<br>　•  {Number} yiv<br>　•  The percentage (%) of height for the SafeFrame container that is in view (formatted as “0.14” or “1”)<br>　•  {Number} iv<br>　The percentage (%) of area for the SafeFrame container that is in view (formatted as “0.14” or “1”)<br>　•  {Number} z<br>　The Z-index of the SafeFrame container<br>　•  {Number} w<br>　The width (in pixels) of the SafeFrame container<br>　•  {Number} h<br>　The height (in pixels) of the SafeFrame container<br>　<br><strong>exp</strong><br>Identifies the expected distance available for expansion within the host content along with information about whether controls allow the end user to scroll the page. If “scrollable,” the SafeFrame content can expand to dimensions greater than those provided.<br>　•  {Number} t<br>　The number of pixels that can be expanded upwards<br>　•  {Number} l<br>　The number of pixels that can be expanded left<br>　•  {Number} r<br>　The number of pixels that can be expanded right<br>　•  {Number} b<br>　The number of pixels that can be expanded down<br>　•  {Number/Boolean} xs<br>　A response that indicates whether the host content is scrollable along the x-axis (1 = scrollable; 0 = not scrollable)<br>　•  {Number/Boolean} yx<br>　A response that indicates whether the host content is scrollable along the y-axis (1 = scrollable; 0 = not scrollable)<br>　<br>由于计算几何信息和交换消息会影响性能，几何信息应只在以下时间段更新：</p>
-<p>　<strong>SafeFrame容器的首次渲染</strong><br>　当SafeFrame容器首次被渲染时，<code>$sf.ext.geom</code>应被处理，并与要渲染的外部内容一起发送结果。<br>　<br>　<strong>当改变SafeFrame容器的大小或位置时</strong><br>　当使用下列功能之一改变容器尺寸或位置时，<code>$ sf.ext.geom</code>函数应该被处理：<br>　　o  <code>$sf.ext.expand</code><br>　　o  <code>$sf.ext.collapse</code><br>　　<br>　<strong>当来源于网站的外部更新被接收时</strong><br>　　o  收到来自从其中该容器的几何形状已经由网站本身更新的网站端的信息，例如强制内容折叠。(!)查看注册回调消息。<br>　　o  在所有可视面积的滚动，但是只允许每秒一个更新（节流）。<br>　　o  在所有可视面积的大小调整，但是只允许每秒一个更新（节流）。</p>
+<p>　<strong>SafeFrame容器的首次渲染</strong><br>　当SafeFrame容器首次被渲染时，<code>$sf.ext.geom</code>应被处理，并与要渲染的外部内容一起发送结果。<br>　<br>　<strong>当改变SafeFrame容器的大小或位置时</strong><br>　当使用下列功能之一改变容器尺寸或位置时，<code>$ sf.ext.geom</code>函数应该被处理：<br>　　o  <code>$sf.ext.expand</code><br>　　o  <code>$sf.ext.collapse</code><br>　　<br>　<strong>当来源于网站的外部更新被接收时</strong><br>　　o  收到来自从其中该容器的几何形状已经被网站自己更新的网站端的信息，例如强制内容折叠。查看注册回调消息。<br>　　o  在所有可视面积的滚动，但是只允许每秒一个更新（节流）。<br>　　o  在所有可视面积的大小调整，但是只允许每秒一个更新（节流）。</p>
 </li>
 </ul>
 <blockquote>
@@ -678,7 +678,7 @@
 <p><strong>例子</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Sample JavaScript implementation </span></div><div class="line"><span class="comment">//Let's say that a 300x250 ad has been declared to fully expand to 400 pixels </span></div><div class="line">to the left and <span class="number">200</span> pixels to the top. </div><div class="line"> </div><div class="line">function expand() </div><div class="line">&#123; </div><div class="line">    <span class="keyword">var</span> w = <span class="built_in">window</span>, sf = w[<span class="string">"$sf"</span>], ext = sf &amp;&amp; sf.ext, g, ex; </div><div class="line"> </div><div class="line">    <span class="keyword">if</span> (ext) &#123; </div><div class="line">      <span class="keyword">try</span> &#123; </div><div class="line">        g  = ext.geom(); </div><div class="line">        ex  = g &amp;&amp; g.exp; </div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Math</span>.abs(ex.l) &gt;= <span class="number">400</span> &amp;&amp; <span class="built_in">Math</span>.abs(ex.t) &gt;= <span class="number">200</span>) &#123; </div><div class="line">            ext.expand(&#123;l:<span class="number">400</span>,t:<span class="number">200</span>&#125;); </div><div class="line">        &#125; </div><div class="line">      &#125; <span class="keyword">catch</span> (e) &#123; </div><div class="line">        <span class="comment">//do not expand, not enough room </span></div><div class="line">      &#125; </div><div class="line">    &#125; <span class="keyword">else</span> &#123; </div><div class="line">      <span class="comment">//api expansion not supported </span></div><div class="line">    &#125; </div><div class="line">  &#125; </div><div class="line"> </div><div class="line"> <span class="function"><span class="keyword">function</span> <span class="title">status_update_handler</span>(<span class="params">status</span>) </span></div><div class="line">  &#123; </div><div class="line">   <span class="keyword">if</span> (status == <span class="string">"expanded"</span>) &#123; </div><div class="line">      <span class="comment">// The ad has finished expanding </span></div><div class="line">    &#125; </div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <h3 id="5-5-函数-sf-ext-expand"><a href="#5-5-函数-sf-ext-expand" class="headerlink" title="5.5 函数$sf.ext.expand"></a>5.5 函数<code>$sf.ext.expand</code></h3><p><code>$sf.ext.expand(obj)</code></p>
 <p>可用性：异步（仅第一个请求被接受;另外的请求被拒绝，直到最初的请求被处理）</p>
-<p>此方法扩展SafeFrame容器到指定的几何位置，允许媒介扩张。每个方向上的像素是在相对于由init寄存器方法声明的原始偏移值的绝对位置。如果调用此方法没有初始化方法，一个错误可能会被抛出，而且它会被忽略。扩展方法只能从初始大小调用(!)，以保持性能。</p>
+<p>此方法扩展SafeFrame容器到指定的几何位置，允许媒介扩张。每个方向上的像素是相对于由init寄存器方法声明的原始偏移值的绝对位置。如果没有初始化方法就调用此方法，一个错误可能会被抛出，而且它会被忽略。扩展方法只能从初始大小调用，以保持性能。</p>
 <p>SafeFrame中不支持补间，所以每当它需要扩大到其最大尺寸时，任何动画必须由外部方在容器内进行处理和调用此方法。</p>
 <p>至少所述偏移参数之一是强制性的。如果所有的参数丢失，调用将被忽略，而且可能会抛出一个错误。在这个方法结束时，外部方注册执行的状态。如果SafeFrame的iframe是已经在最大尺寸，调用将被忽略。</p>
 <p><strong>参数：</strong></p>
