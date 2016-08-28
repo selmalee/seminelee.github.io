@@ -1,162 +1,383 @@
-<?xml version="1.0" encoding="utf-8"?>
-<search>
-  
-  
-    
-    <entry>
-      <title><![CDATA[JavaScript Promise API]]></title>
-      <url>http://seminelee.github.io/2016/08/28/promise1/</url>
-      <content type="html"><![CDATA[<p>本文译自<a href="https://davidwalsh.name/promises" target="_blank" rel="external">https://davidwalsh.name/promises</a></p>
-<p>虽然同步代码更容易跟踪和调试，但是异步的性能和灵活性通常更好。为什么在你可以立刻发起多个请求，然后在每个都准备好了的时候处理它们时，要停下来等呢？Promises正在成为JavaScript世界的一个重要组成部分，有许多新的API正在与Promise理念来实施。下面让我们来看看promise及其API是如何使用的！</p>
-<h2 id="在自然环境下的Promises"><a href="#在自然环境下的Promises" class="headerlink" title="在自然环境下的Promises"></a><strong>在自然环境下的Promises</strong></h2><p>XMLHttpRequest API是异步的，但<em>不</em>使用Promises API。然而，现在有一些原生API使用promises：</p>
-<ul>
-<li><a href="https://davidwalsh.name/javascript-battery-api" target="_blank" rel="external">Battery API</a></li>
-<li><a href="https://davidwalsh.name/fetch" target="_blank" rel="external">fetch API</a>(用来代替XHR)</li>
-<li>ServiceWorker API (还没有该API文章)</li>
-</ul>
-<p>Promises只会变得更加普遍，它很重要，所有的前端开发人员都应该熟悉它。另外值得一提的是，Node.js的是Promises的另一个平台（显然，Promises是一个核心的语言功能）。</p>
-<p><em>测试promises比你想象的更简单，因为<code>setTimeout</code>可以作为你的异步”任务”！</em></p>
-<h2 id="Promise的基本用法"><a href="#Promise的基本用法" class="headerlink" title="Promise的基本用法"></a><strong>Promise的基本用法</strong></h2><p><code>new Promise()</code>构造函数应该只用于传统异步任务，如<code>setTimeout</code>或<code>XMLHttpRequest</code>的用法。即，用关键字<code>new</code>创建一个新的Promise对象，该promise对象提供<code>resolve</code>和<code>reject</code>两个回调函数：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// Do an async task async task and then...</span></div><div class="line"></div><div class="line">	<span class="keyword">if</span>(<span class="comment">/* good condition */</span>) &#123;</div><div class="line">		resolve(<span class="string">'Succes!'</span>;)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">else</span> &#123;</div><div class="line">		reject(<span class="string">'Failure!'</span>);</div><div class="line">	&#125;</div><div class="line">&#125;);</div><div class="line"></div><div class="line">p.then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">	<span class="comment">/* do something with the result */</span></div><div class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">	<span class="comment">/* error :( */</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
-<p>这取决于开发者异步任务执行的结果，在回调函数中手动调用<code>resolve</code>或<code>reject</code>。一个典型的例子是，转换XMLHttpRequest成基于promise的任务：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// From Jake Archibald's Promises and Back:</span></div><div class="line"><span class="comment">// http://www.html5rocks.com/en/tutorials/es6/promises/#toc-promisifying-xmlhttprequest</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params">url</span>) </span>&#123;</div><div class="line">	<span class="comment">// Return a new promise.</span></div><div class="line">	<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">		<span class="comment">// Do the usual XHR stuff</span></div><div class="line">		<span class="keyword">var</span> req = <span class="keyword">new</span> XMLHttpRequest();</div><div class="line">		req.open(<span class="string">'GET'</span>, url);</div><div class="line"></div><div class="line">		req.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">			<span class="comment">// This is called even on 404 etc</span></div><div class="line">			<span class="comment">// so check the status</span></div><div class="line">			<span class="keyword">if</span> (req.status == <span class="number">200</span>) &#123;</div><div class="line">				<span class="comment">// Resolve the promise with the response text</span></div><div class="line">				resolve(req.response);</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">else</span> &#123;</div><div class="line">				<span class="comment">// Otherwise reject with the status text</span></div><div class="line">				<span class="comment">// which will hopefully be meaningful error</span></div><div class="line">				reject(<span class="built_in">Error</span>(req.statusText));</div><div class="line">			&#125;</div><div class="line">		&#125;;</div><div class="line"></div><div class="line">		<span class="comment">// Handle network errors</span></div><div class="line">		req.onerror = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">			reject(<span class="built_in">Error</span>(<span class="string">"Network Error"</span>));</div><div class="line">		&#125;;</div><div class="line"></div><div class="line">		<span class="comment">// Make the request</span></div><div class="line">		req.send();</div><div class="line">	&#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//Use it!</span></div><div class="line">get(<span class="string">'story.json'</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">response</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">"success!"</span>, response);</div><div class="line">&#125;, fucntion(error) &#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">"Failed!"</span>, error);</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
-<p>有时候,你并不<em>需要</em>在promise内执行一个异步任务————但是，如果可能执行一个异步任务，返回一个promise对象将是最好的做法，这样，你只需要给定结果处理函数就可以了。在这种情况下，不需要使用关键字<code>new</code>你只需要简单地调用<code>Promise.resolve()</code>或<code>Promise.reject()</code>就可以了。 例如：</p>
-<p>var userCache = {};</p>
-<p>function getUserDetail(username) {<br>    // In both cases, cached or not, a promise will be returned</p>
-<pre><code>if (userCache[username]) {
-    // Return a promise without the &quot;new&quot; keyword
-    return Promise.resolve(userCache[username]);
-}
+<!doctype html>
 
-// Use the fetch API to get the information
-// fetch return a promise
-return fetch(&apos;users/&apos; + username + &apos;.json&apos;)
-    .then(function(result) {
-        userCache[username] = result;
-        return result;
-    })
-    .catch(function() {
-        throw new Error(&apos;Could not find user: &apos; + username);
-    })
-</code></pre><p>}</p>
-<p>因为总是返回一个promise，你可以在它的返回值上随时使用<code>then</code>和<code>catch</code>方法！</p>
-<p>##then##<br>所有promise实例有一个<code>then</code>方法，用来处理执行结果。第一个<code>then</code>方法回调接收<code>resolve()</code>调用的结果作为参数：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// A mock async acton using setTimeout</span></div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		resolve(<span class="number">10</span>);</div><div class="line">	&#125;, <span class="number">3000</span>);</div><div class="line">&#125;)</div><div class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">result</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(result);</div><div class="line">&#125;)</div><div class="line"></div><div class="line"><span class="comment">// From the console</span></div><div class="line"><span class="comment">// 10</span></div></pre></td></tr></table></figure></p>
-<p>当promise的resolve触发，<code>then</code>回调函数被触发。你也可以使用链式的<code>then</code>回调方法：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		resolve(<span class="number">10</span>);</div><div class="line">	&#125;, <span class="number">3000</span>)</div><div class="line">&#125;)</div><div class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'first then: '</span>, num);</div><div class="line">	<span class="keyword">return</span> num * <span class="number">2</span>;</div><div class="line">&#125;)</div><div class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'second then: '</span>, num);</div><div class="line">	<span class="keyword">return</span> num * <span class="number">2</span>;</div><div class="line">&#125;)</div><div class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'last then: '</span>, num);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">// From the console</span></div><div class="line"><span class="comment">// first then: 10</span></div><div class="line"><span class="comment">// second then: 20</span></div><div class="line"><span class="comment">//last then: 40</span></div></pre></td></tr></table></figure></p>
-<p>每个<code>then</code>接收之前的<code>then</code>返回值的结果。</p>
-<p>如果一个promise的resolve已经触发，但之后<code>then</code>再次被调用，回调将立即触发。如果promise被拒绝，你被拒绝后调用<code>then</code>的话，回调不会被调用。</p>
-<h2 id="catch"><a href="#catch" class="headerlink" title="catch"></a><strong>catch</strong></h2><p>当<code>promise</code>被拒绝时，<code>catch</code>回调函数就会被执行：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// A mock async action using setTimeout</span></div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		reject(<span class="string">'Done!'</span>);</div><div class="line">	&#125;, <span class="number">3000</span>);</div><div class="line">&#125;)</div><div class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'done'</span>, e);</div><div class="line">&#125;)</div><div class="line">.catch(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'catch: '</span>, e);</div><div class="line">&#125;)</div><div class="line"></div><div class="line"><span class="comment">// Frome the console:</span></div><div class="line"><span class="comment">// 'catch: Done!'</span></div></pre></td></tr></table></figure></p>
-<p>传入<code>reject</code>方法的参数由你决定。一般来说是传入一个<code>Error</code> 对象`：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">reject(<span class="built_in">Error</span>(<span class="string">'Data could not be found'</span>));</div></pre></td></tr></table></figure></p>
-<h2 id="Promise-all"><a href="#Promise-all" class="headerlink" title="Promise.all"></a><code>Promise.all</code></h2><p>想想JavaScript加载器的情形：有些时候你触发多个异步交互，但只希望在他们都完成后才作出响应————这就是<code>Promise.all</code>的用处所在。<code>Promise.all</code>方法接受一个promise数组，一旦他们的resolve都触发之后就执行一个回调函数：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">Promise</span>.all([promise1, promise2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</div><div class="line">	<span class="comment">// Both promises resolved</span></div><div class="line">&#125;)</div><div class="line">.catch(<span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</div><div class="line">	<span class="comment">// One or more promises was rejected</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
-<p>使用<code>Promise.all</code>的最佳示例是（通过<code>fetch</code>）同时发起多个 AJAX请求时:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> request1 = fetch(<span class="string">'/user.json'</span>);</div><div class="line"><span class="keyword">var</span> request2 = fetch(<span class="string">'./articles.json'</span>);</div><div class="line"></div><div class="line"><span class="built_in">Promise</span>.all([request1, request2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</div><div class="line">	<span class="comment">// Both promises done!</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
-<p>你可以结合API像<code>fetch</code>和Battery API，因为它们都返回promises：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">Promise</span>.all([fetch(<span class="string">'./users.json'</span>), navigator.getBattery()])</div><div class="line">	.then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</div><div class="line">		<span class="comment">// Both promises done!</span></div><div class="line">	&#125;);</div></pre></td></tr></table></figure></p>
-<p>处理拒绝(rejection)当然是复杂的。如果任何promise被reject，<code>catch</code>将会被第一个拒绝(rejection)所触发。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> req1 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// A mock async action using setTimeout</span></div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		resolve(<span class="string">'First!'</span>);</div><div class="line">	&#125;, <span class="number">4000</span>);</div><div class="line">&#125;);</div><div class="line"><span class="keyword">var</span> req2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// A mock async action using setTimeout</span></div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		reject(<span class="string">'Second!'</span>);</div><div class="line">	&#125;, <span class="number">3000</span>);</div><div class="line">&#125;);</div><div class="line"><span class="built_in">Promise</span>.all([req1, req2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'Then: '</span>, results);</div><div class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'Catch: '</span>, err);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">// From the console:</span></div><div class="line"><span class="comment">// Catch: Second!</span></div></pre></td></tr></table></figure></p>
-<p>随着越来越多API支持promises，<code>Promise.all</code>将会变得十分有用。</p>
-<h2 id="Promise-race"><a href="#Promise-race" class="headerlink" title="Promise.race"></a><code>Promise.race</code></h2><p><code>Promise.race</code>是一个有趣的函数————一旦数组中任何一个Promise被解决或者拒绝，<code>Promise.race</code>就会触发，而不会等待所有的promise对象被解决或者拒绝。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> req1 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// A mock async action using setTimeout</span></div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		resolve(<span class="string">'First!'</span>);</div><div class="line">	&#125;, <span class="number">4000</span>);</div><div class="line">&#125;);</div><div class="line"><span class="keyword">var</span> req2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</div><div class="line">	<span class="comment">// A mock async action using setTimeout</span></div><div class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		reject(<span class="string">'Second!'</span>);</div><div class="line">	&#125;, <span class="number">3000</span>);</div><div class="line">&#125;);</div><div class="line"><span class="built_in">Promise</span>.race([req1, req2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'Then: '</span>, results);</div><div class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">one, two</span>) </span>&#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'Catch: '</span>, err);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">// From the console:</span></div><div class="line"><span class="comment">// Then: Second!</span></div></pre></td></tr></table></figure></p>
-<p>用例可发起一个请求到主站资源和备用资源（以防主站和备用之一不可用）。</p>
-<h2 id="熟悉Promise"><a href="#熟悉Promise" class="headerlink" title="熟悉Promise"></a>熟悉Promise</h2><p>Promise在过去的几年里（或者在过去10年，如果你是一个Dojo Toolkit的用户）一直是热议的话题，他们已经从JavaScript框架的一部分变成一个JavaScript语言的主要部分。很有可能，你将看到大多数的新的JavaScript API都将基于promise实现…</p>
-<p>……这是一个伟大的事情！开发人员能够避免回调地狱，而且异步交互可以像任何其他变量那样来传递。Promise还需要一段时间来普及，现在是学习他们的时候了！</p>
-<p> &gt;</p>
-<blockquote>
-<p>我觉得翻译带给我的好处是，让我不停思考、认认真真地看第一手资料，而且可以慢慢看得懂其他前沿文章。<br>想了解我更多的作品，请点击菜单<a href="https://seminelee.github.io/works/">关于</a></p>
-</blockquote>
-]]></content>
-    </entry>
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
     
-    <entry>
-      <title><![CDATA[Vue.js学习笔记一：入门]]></title>
-      <url>http://seminelee.github.io/2016/08/18/vue-1/</url>
-      <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　vue是法语中视图的意思，Vue.js是一个轻巧、高性能、可组件化的MVVM库。<br>　　<code>MV*</code>可能大家都经常听说，我们先来理解一下<code>MV*</code>的概念。</p>
-<h3 id="出现的背景"><a href="#出现的背景" class="headerlink" title="出现的背景"></a>出现的背景</h3><p>　　MVC开始是存在于桌面程序中的，但由于后端的mvc框架的v层越来越重，后端的MVC思想就搬移到了前端。随着前端代码越来越重，能力越来越大，重前端的系统越来越多地涌现出来。前端为主的MV*时代中，前端在MVC的结构指导下分为model(模型), view(视图)， controller(控制器)三部分。而controller慢慢演化为presenter和viewmodel。MVC, MVP, MVVM框架不断涌现。</p>
-<h3 id="MVC-MVP-MVVM"><a href="#MVC-MVP-MVVM" class="headerlink" title="MVC, MVP, MVVM"></a>MVC, MVP, MVVM</h3><ul>
-<li>MVC(model-view-controller)，如backbone, angular(较高版本是mvvm, 也许说它是MVW更准确)。<br>　　View: 与页面上元素直接相关的部分，包括html，CSS和一部分直接控制页面元素的JS。它可以从Model中得到数据，并将其显示到页面上。<br>　　Model: 与后端的沟通、AJAX请求以及对数据的处理。Model本身不知道谁是View，谁是Controller。它只提供一些方法供View和Controller调用，并且将变更通知给它的观察者。<br>　　Controller: Model和View的粘合剂。Controller将View方面的请求转发给合适的Model，作为Model的观察者，获取Model的变更,在必要时更新View。</li>
-</ul>
-<a id="more"></a>
-<ul>
-<li>MVP(model-view-presenter)使用此模型的框架不多，现在几乎倒向MVVM。MVP 模式将 Controller 改名为 Presenter，同时改变了通信方向。<br>　　Presenter，与Controller一样，接收View的命令，对Model进行操作；与Controller不同的是Presenter会反作用于View，Model的变更通知首先被Presenter获得，然后Presenter再去更新View。</li>
-<li>MVVM(model-view-viewmodel)如Vue.js。将Controller改为ViewModel。它与MVP的区别是，它采用双向绑定（data-binding）：View的变动，自动反映在ViewModel。<br>　　下图来自<a href="http://blog.csdn.net/napolunyishi/article/details/22722345" target="_blank" rel="external">对MVC、MVP、MVVM的理解</a>，清晰地说明它们之间的区别<br><img src="/static/2016/08/mvc.png" alt="mvc,mvp和mvvm"></li>
-</ul>
-<h2 id="Vue-js起步"><a href="#Vue-js起步" class="headerlink" title="Vue.js起步"></a>Vue.js起步</h2><h3 id="简单介绍一下"><a href="#简单介绍一下" class="headerlink" title="简单介绍一下"></a>简单介绍一下</h3><ul>
-<li>尤雨溪老师写的一个用于创建 web交互界面的库，是一个精简的MVVM，和其他库相比是一个小而美的库</li>
-<li>官方文档很清晰，比 Angular 简单易学</li>
-<li>采用双向绑定，用解耦的组件组合你的应用程序<br><img src="/static/2016/08/vue1.png" alt="vue.js概况"></li>
-</ul>
-<p>　　下图是<a href="http://vuejs.org/" target="_blank" rel="external">vue.js官网</a>上的双向绑定的小例子。首先是VM -&gt; V，VM中的data里的message变化，会自动反映在V中的p标签里大括号内的message；V -&gt; VM，V中input里输入的值，会自动反映到VM中的message值。所以，你在输入框中输入的文字会被实时显示成上方的文字。<br><img src="/static/2016/08/vuedemo.png" alt="vue.js官网例子"></p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>　　安装步骤<a href="https://vuejs.org.cn/guide/installation.html" target="_blank" rel="external">vue.js官网</a>上介绍得十分清楚。这里我推荐先安装<a href="https://npm.taobao.org/" target="_blank" rel="external">淘宝镜像</a>，再进行安装Vue.js官方命令行工具，这样会更快。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 全局安装 cnpm淘宝镜像</span></div><div class="line">$ npm install -g cnpm --registry=https://registry.npm.taobao.org</div><div class="line"><span class="comment"># 全局安装 vue-cli</span></div><div class="line">$ cnpm install -g vue-cli</div><div class="line"><span class="comment"># 创建一个基于 "webpack" 模板的新项目</span></div><div class="line">$ vue init webpack my-project</div><div class="line"><span class="comment"># 安装依赖，走你</span></div><div class="line">$ <span class="built_in">cd</span> my-project</div><div class="line">$ cnpm install</div><div class="line">$ npm run dev</div></pre></td></tr></table></figure></p>
-<h2 id="一些常用的指令"><a href="#一些常用的指令" class="headerlink" title="一些常用的指令"></a>一些常用的指令</h2><h3 id="v-model"><a href="#v-model" class="headerlink" title="v-model"></a>v-model</h3><p>　　用法：在表单控件(<code>&lt;input&gt;</code>、<code>&lt;select&gt;</code>、<code>&lt;textarea&gt;</code>)上创建双向绑定。<br>　　例子：输入框中初始化文字是”hello vue.js”，而你在输入框中输入的文字会被实时显示成上方的文字。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123;newItem&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"newItem"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">    el:<span class="string">'#app'</span>,</div><div class="line">    data: &#123;</div><div class="line">        newItem:<span class="string">'hello vue.js.'</span></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h3 id="v-for"><a href="#v-for" class="headerlink" title="v-for"></a>v-for</h3><p>　　用法：基于源数据将元素或模板块重复数次，简单来说就是列表渲染。如果之前学过Angular会觉得很相似。<br>　　例子：会显示列表，列表中有”No.1”、”No.2”。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"item in items"</span>&gt;</span></div><div class="line">    &#123;&#123;item.label&#125;&#125;</div><div class="line">  <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">    el:<span class="string">'#app'</span>,</div><div class="line">    data: &#123;</div><div class="line">        newItem:<span class="string">'hello vue.js.'</span>,</div><div class="line">        items: [</div><div class="line">        	&#123;label: <span class="string">"No.1"</span>,isFinished: <span class="literal">false</span>&#125;,</div><div class="line">        	&#123;label: <span class="string">"No.2"</span>,isFinished: <span class="literal">true</span>&#125;</div><div class="line">        ]</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h3 id="v-on"><a href="#v-on" class="headerlink" title="v-on"></a>v-on</h3><p>　　用法：绑定事件监听器。事件类型由参数指定。表达式可以是一个方法的名字或一个内联语句，如果没有修饰符（如.stop、.prevent等）也可以省略。<br>　　例子：<code>&lt;li&gt;</code>标签上绑定了点击事件，每次点击会改变item的isFinished属性。v-on:click可以缩写成@click。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"item in items"</span> <span class="attr">v-on:click</span>=<span class="string">"toggleFinish(item)"</span>&gt;</span></div><div class="line">    &#123;&#123;item.label&#125;&#125;</div><div class="line">  <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">    methods: &#123;</div><div class="line">      toggleFinish: <span class="function"><span class="keyword">function</span>(<span class="params">item</span>) </span>&#123;</div><div class="line">        item.isFinished = !item.isFinished</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h3 id="v-bind"><a href="#v-bind" class="headerlink" title="v-bind"></a>v-bind</h3><p>　　用法：动态地绑定一个或多个 attribute，或一个组件prop到表达式。在绑定 class 或 style 时，支持其它类型的值，如数组或对象；在绑定 prop 时，prop 必须在子组件中声明。可以用修饰符指定不同的绑定类型。<br>　　例子：如果<code>&lt;li&gt;</code>的数据item.isFinished是true，<code>&lt;li&gt;</code>的class就是finished，文字颜色就会变成#ccc。v-bind:class可以缩写成:class。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"item in items"</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;finished: item.isFinished&#125;"</span> <span class="attr">v-on:click</span>=<span class="string">"toggleFinish(item)"</span>&gt;</span></div><div class="line">    &#123;&#123;item.label&#125;&#125;</div><div class="line">  <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-class">.finished</span> &#123;</div><div class="line">  <span class="attribute">color</span>: <span class="number">#ccc</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="父向子组件传参"><a href="#父向子组件传参" class="headerlink" title="父向子组件传参"></a>父向子组件传参</h3><p>　　例子：App.vue为父，引入componetA组件之后，则可以在template中使用<component-a>标签（注意驼峰写法要改成componet-a写法，因为html对大小写不敏感，componenta与componentA对于它来说是一样的，不好区分，所以使用小写-小写这种写法）。而子组件componetA中，声明props参数’msgfromfa’之后，就可以收到父向子组件传的参数了。例子中将msgfromfa显示在<code>&lt;p&gt;</code>标签中。<br>App.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">component-a</span> <span class="attr">msgfromfa</span>=<span class="string">"(Just Say U Love Me)"</span>&gt;</span><span class="tag">&lt;/<span class="name">component-a</span>&gt;</span></div></pre></td></tr></table></figure></component-a></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	<span class="keyword">new</span> Vue(&#123;</div><div class="line">	    components: &#123;</div><div class="line">	      componentA</div><div class="line">	    &#125;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>componentA.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; msgfromfa &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	props: [<span class="string">'msgfromfa'</span>]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="父向子组件传参（-broadcast）"><a href="#父向子组件传参（-broadcast）" class="headerlink" title="父向子组件传参（.$broadcast）"></a>父向子组件传参（.$broadcast）</h3><p>　　用法：vm.$broadcast( event, […args] )广播事件，通知给当前实例的全部后代。因为后代有多个枝杈，事件将沿着各“路径”通知。<br>　　例子：父组件App.vue中<code>&lt;input&gt;</code>绑定了键盘事件，回车触发addNew方法，广播事件”onAddnew”，并传参this.items。子组件componentA中，注册”onAddnew”事件，打印收到的参数items。<br>App.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"newItem"</span> @<span class="attr">keyup.enter</span>=<span class="string">"addNew"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	<span class="keyword">new</span> Vue(&#123;</div><div class="line">		methods: &#123;</div><div class="line">		  addNew: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		    <span class="keyword">this</span>.$broadcast(<span class="string">'onAddnew'</span>, <span class="keyword">this</span>.items)</div><div class="line">		  &#125;</div><div class="line">		&#125;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>componentA.vue中<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	events: &#123;</div><div class="line">	    <span class="string">'onAddnew'</span>: <span class="function"><span class="keyword">function</span>(<span class="params">items</span>)</span>&#123;</div><div class="line">	      <span class="built_in">console</span>.log(items)</div><div class="line">	    &#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="子组件向父传参（-emit）"><a href="#子组件向父传参（-emit）" class="headerlink" title="子组件向父传参（.$emit）"></a>子组件向父传参（.$emit）</h3><p>　　用法：vm.$emit( event, […args] )，触发当前实例上的事件。附加参数都会传给监听器回调。<br>　　例子：App.vue中component-a绑定了自定义事件”child-say”。子组件componentA中，单击按钮后触发”child-say”事件，并传参msg给父组件。父组件中listenToMyBoy方法把msg赋值给childWords，显示在<code>&lt;p&gt;</code>标签中。<br>App.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>Do you like me? &#123;&#123;childWords&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">component-a</span> <span class="attr">msgfromfa</span>=<span class="string">"(Just Say U Love Me)"</span> <span class="attr">v-on:child-say</span>=<span class="string">"listenToMyBoy"</span>&gt;</span><span class="tag">&lt;/<span class="name">component-a</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	<span class="keyword">new</span> Vue(&#123;</div><div class="line">		data: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">		    <span class="keyword">return</span> &#123;</div><div class="line">		      childWords: <span class="string">""</span></div><div class="line">		    &#125;</div><div class="line">		&#125;,</div><div class="line">		components: &#123;</div><div class="line">		  componentA</div><div class="line">		&#125;,</div><div class="line">	    methods: &#123;</div><div class="line">		    listenToMyBoy: <span class="function"><span class="keyword">function</span> (<span class="params">msg</span>)</span>&#123;</div><div class="line">		      <span class="keyword">this</span>.childWords = msg</div><div class="line">		    &#125;</div><div class="line">		&#125;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>componentA.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"onClickMe"</span>&gt;</span>like!<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	data: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">	    <span class="keyword">return</span> &#123;</div><div class="line">	      msg: <span class="string">'I like you!'</span></div><div class="line">	    &#125;</div><div class="line">	&#125;,</div><div class="line">    methods: &#123;</div><div class="line">      onClickMe: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">        <span class="keyword">this</span>.$emit(<span class="string">'child-say'</span>,<span class="keyword">this</span>.msg);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="子组件向父传参（-dispatch）"><a href="#子组件向父传参（-dispatch）" class="headerlink" title="子组件向父传参（.$dispatch）"></a>子组件向父传参（.$dispatch）</h3><p>　　用法：vm.$dispatch( event, […args] )，派发事件，首先在实例上触发它，然后沿着父链向上冒泡在触发一个监听器后停止。<br>　　例子：App.vue中events中注册”child-say”事件。子组件componentA中，单击按钮后触发”child-say”事件，并传参msg给父组件。父组件中”child-say”方法把msg赋值给childWords，显示在<code>&lt;p&gt;</code>标签中。<br>App.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>Do you like me? &#123;&#123;childWords&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">component-a</span> <span class="attr">msgfromfa</span>=<span class="string">"(Just Say U Love Me)"</span>&gt;</span><span class="tag">&lt;/<span class="name">component-a</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	<span class="keyword">new</span> Vue(&#123;</div><div class="line">		events: &#123;</div><div class="line">		    <span class="string">'child-say'</span> : <span class="function"><span class="keyword">function</span>(<span class="params">msg</span>)</span>&#123;</div><div class="line">		      <span class="keyword">this</span>.childWords = msg</div><div class="line">		    &#125;</div><div class="line">		&#125;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>componentA.vue中<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"onClickMe"</span>&gt;</span>like!<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	data: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">	    <span class="keyword">return</span> &#123;</div><div class="line">	      msg: <span class="string">'I like you!'</span></div><div class="line">	    &#125;</div><div class="line">	&#125;,</div><div class="line">    methods: &#123;</div><div class="line">      onClickMe: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">        <span class="keyword">this</span>.$dispatch(<span class="string">'child-say'</span>,<span class="keyword">this</span>.msg);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>　　这里只提及了一些指令，更多功能建议在官网上刷一遍<a href="http://vuejs.org.cn/api/#vm-emit" target="_blank" rel="external">API文档</a>。</p>
-<h2 id="做一个todolist"><a href="#做一个todolist" class="headerlink" title="做一个todolist"></a>做一个todolist</h2><p>　　用以上的指令写一个简单的demo。实现添加事情，删除事情，点击事情表示事情已完成，点赞等功能。代码思路源自慕课网教程，我作了一些修改。<br>　　详细代码如下：</p>
-<h3 id="src-App-vue"><a href="#src-App-vue" class="headerlink" title="src/App.vue"></a>src/App.vue</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">v-text</span>=<span class="string">"title"</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"newItem"</span> @<span class="attr">keyup.enter</span>=<span class="string">"addNew"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"item in items"</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;finished: item.isFinished&#125;"</span> <span class="attr">v-on:click</span>=<span class="string">"toggleFinish(item)"</span>&gt;</span></div><div class="line">        ❤ &#123;&#123;item.label&#125;&#125;</div><div class="line">        <span class="tag">&lt;<span class="name">span</span> <span class="attr">v-on:click</span>=<span class="string">"deleteThis(item)"</span>&gt;</span>delete<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">hr</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line">        </div><div class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Do you like me? &#123;&#123;childWords&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">component-a</span> <span class="attr">msgfromfa</span>=<span class="string">"(Just Say U Love Me)"</span>&gt;</span><span class="tag">&lt;/<span class="name">component-a</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"><span class="keyword">import</span> Store <span class="keyword">from</span> <span class="string">'./store'</span></div><div class="line"><span class="keyword">import</span> componentA <span class="keyword">from</span> <span class="string">'./components/componentA'</span></div><div class="line"><span class="comment">//相当于module.export</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">  <span class="comment">/*function data()&#123;</span></div><div class="line">    return...</div><div class="line">  &#125;*/</div><div class="line">  <span class="comment">/*相当于var vue = new vue(&#123;data: function()&#123;&#125;&#125;)*/</span></div><div class="line">  data () &#123;</div><div class="line">    <span class="keyword">return</span> &#123;</div><div class="line">      title: <span class="string">'TODO LIST'</span>,</div><div class="line">      items: Store.fetch() || [],</div><div class="line">      newItem: <span class="string">''</span>,</div><div class="line">      childWords: <span class="string">''</span></div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  components: &#123;</div><div class="line">    componentA</div><div class="line">  &#125;,</div><div class="line">  watch: &#123;</div><div class="line">    items: &#123;</div><div class="line">      handler: <span class="function"><span class="keyword">function</span>(<span class="params">items</span>)</span>&#123;</div><div class="line">        Store.save(items)</div><div class="line">      &#125;,</div><div class="line">      deep: <span class="literal">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  events: &#123;</div><div class="line">    <span class="string">'child-say'</span> : <span class="function"><span class="keyword">function</span>(<span class="params">msg</span>)</span>&#123;</div><div class="line">      <span class="keyword">this</span>.childWords = msg</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  methods: &#123;</div><div class="line">    toggleFinish: <span class="function"><span class="keyword">function</span>(<span class="params">item</span>) </span>&#123;</div><div class="line">      item.isFinished = !item.isFinished</div><div class="line">    &#125;,</div><div class="line">    addNew: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">this</span>.items.push(&#123;</div><div class="line">        label: <span class="keyword">this</span>.newItem,</div><div class="line">        isFinished: <span class="literal">false</span></div><div class="line">      &#125;)</div><div class="line">      <span class="keyword">this</span>.newItem = <span class="string">''</span></div><div class="line">      <span class="keyword">this</span>.$broadcast(<span class="string">'onAddnew'</span>, <span class="keyword">this</span>.items)</div><div class="line">    &#125;,</div><div class="line">    listenToMyBoy: <span class="function"><span class="keyword">function</span> (<span class="params">msg</span>)</span>&#123;</div><div class="line">      <span class="keyword">this</span>.childWords = msg</div><div class="line">    &#125;,</div><div class="line">    deleteThis: <span class="function"><span class="keyword">function</span>(<span class="params">item</span>) </span>&#123;</div><div class="line">      <span class="keyword">this</span>.items.splice(<span class="keyword">this</span>.items.indexOf(item), <span class="number">1</span>)</div><div class="line">      Store.save(<span class="keyword">this</span>.items)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></div><div class="line">*&#123;</div><div class="line">  margin: 0;</div><div class="line">  padding: 0;</div><div class="line">&#125;</div><div class="line">html &#123;</div><div class="line">  height: 100%;</div><div class="line">&#125;</div><div class="line"></div><div class="line">body &#123;</div><div class="line">  display: flex;</div><div class="line">  align-items: center;</div><div class="line">  justify-content: center;</div><div class="line">  height: 100%;</div><div class="line">  width: 100%;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#app &#123;</div><div class="line">  color: #2c3e50;</div><div class="line">  font-family: Source Sans Pro, Helvetica, sans-serif;</div><div class="line">  text-align: center;</div><div class="line">  width: 60%;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#app a &#123;</div><div class="line">  color: #42b983;</div><div class="line">  text-decoration: none;</div><div class="line">&#125;</div><div class="line">#app h1:nth-child(1) &#123;</div><div class="line">  line-height: 3;</div><div class="line">  position: absolute;</div><div class="line">  top: 10%;</div><div class="line">&#125;</div><div class="line">#app input &#123;</div><div class="line">  width: 60%;</div><div class="line">  line-height: 24px;</div><div class="line">  font-size: 24px;</div><div class="line">  position: absolute;</div><div class="line">  top: 25%; left: 20%;</div><div class="line">&#125;</div><div class="line"></div><div class="line">ul &#123;</div><div class="line">  position: absolute;</div><div class="line">  top: 35%;</div><div class="line">  text-align: left;</div><div class="line">  width: 60%;</div><div class="line">  height: 45%;</div><div class="line">  overflow: auto;</div><div class="line">&#125;</div><div class="line"></div><div class="line">ul li &#123;</div><div class="line">  list-style: none;</div><div class="line">  line-height: 2;</div><div class="line">  font-size: 24px;</div><div class="line">&#125;</div><div class="line">span &#123;</div><div class="line">  font-size: 16px;</div><div class="line">  color: #fff;</div><div class="line">  padding: 2px 5px;</div><div class="line">  text-align: right;</div><div class="line">  background-color: red;</div><div class="line">  border-radius: 5px;</div><div class="line">&#125;</div><div class="line">.logo &#123;</div><div class="line">  width: 100px;</div><div class="line">  height: 100px</div><div class="line">&#125;</div><div class="line">.finished &#123;</div><div class="line">  color: #ccc;</div><div class="line">&#125;</div><div class="line">hr &#123;</div><div class="line">  ;border-top:1px dashed #ccc;</div><div class="line">&#125;</div><div class="line">p &#123;</div><div class="line">  text-align: left;</div><div class="line">  position: absolute;</div><div class="line">  bottom: 10%;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
-<h3 id="src-components-componentA-vue"><a href="#src-components-componentA-vue" class="headerlink" title="src/components/componentA.vue"></a>src/components/componentA.vue</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"hello"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; msgfromfa &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"onClickMe"</span>&gt;</span>like!<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">  data: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> &#123;</div><div class="line">      msg: <span class="string">'I like you!'</span></div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  props: [<span class="string">'msgfromfa'</span>],</div><div class="line">  events: &#123;</div><div class="line">    <span class="string">'onAddnew'</span>: <span class="function"><span class="keyword">function</span>(<span class="params">items</span>)</span>&#123;</div><div class="line">      <span class="built_in">console</span>.log(items)</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  methods: &#123;</div><div class="line">    onClickMe: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">      <span class="keyword">this</span>.$dispatch(<span class="string">'child-say'</span>,<span class="keyword">this</span>.msg);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- Add "scoped" attribute to limit CSS to this component only --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">scoped</span>&gt;</span><span class="css"></span></div><div class="line"><span class="selector-tag">h1</span> &#123;</div><div class="line">  <span class="attribute">color</span>: <span class="number">#42b983</span>;</div><div class="line">&#125;</div><div class="line"><span class="selector-tag">button</span> &#123;</div><div class="line">  <span class="attribute">position</span>: absolute;</div><div class="line">  <span class="attribute">bottom</span>: <span class="number">10%</span>;</div><div class="line">  <span class="attribute">right</span>: <span class="number">20%</span>;</div><div class="line">  <span class="attribute">width</span>: <span class="number">100px</span>;</div><div class="line">  <span class="attribute">background-color</span>: green;</div><div class="line">  <span class="attribute">font-size</span>: <span class="number">16px</span>;</div><div class="line">  <span class="attribute">color</span>: <span class="number">#fff</span>;</div><div class="line">  <span class="attribute">padding</span>: <span class="number">2px</span> <span class="number">5px</span>;</div><div class="line">  <span class="attribute">border</span>: none;</div><div class="line">&#125;</div><div class="line"><span class="selector-class">.hello</span> <span class="selector-tag">p</span> &#123;</div><div class="line">  <span class="attribute">bottom</span>: <span class="number">5%</span>;</div><div class="line">  <span class="attribute">font-size</span>: <span class="number">12px</span>;</div><div class="line">  <span class="attribute">color</span>: green;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
-<h3 id="src-store-js"><a href="#src-store-js" class="headerlink" title="src/store.js"></a>src/store.js</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> STORAGE_KEY = <span class="string">'todos-vuejs'</span><span class="comment">//es6语法 const定义一个常量</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">	fetch () &#123;<span class="comment">//es6语法 相当于 fetch:function()&#123;&#125;</span></div><div class="line">		<span class="keyword">return</span> <span class="built_in">JSON</span>.parse(<span class="built_in">window</span>.localStorage.getItem(STORAGE_KEY) || <span class="string">'[]'</span>)</div><div class="line">	&#125;,</div><div class="line">	save (items) &#123;</div><div class="line">		<span class="built_in">window</span>.localStorage.setItem(STORAGE_KEY, <span class="built_in">JSON</span>.stringify(items))</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>　　完成后如下图：<br><img src="/static/2016/08/todolist.png" alt="ToDoList"></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="http://www.imooc.com/view/694" target="_blank" rel="external">vuejs入门基础（慕课网视频）</a></li>
-<li><a href="https://segmentfault.com/a/1190000003968020" target="_blank" rel="external">Vue.js 快速入门</a></li>
-<li><a href="http://www.ruanyifeng.com/blog/2007/11/mvc.html" target="_blank" rel="external">谈谈MVC模式</a></li>
-<li><a href="http://zakwu.me/node/assets/ppts/tpls/bigFe.html" target="_blank" rel="external">大前端技术分享</a></li>
-<li><a href="http://blog.csdn.net/napolunyishi/article/details/22722345" target="_blank" rel="external">对MVC、MVP、MVVM的理解</a></li>
-</ul>
-]]></content>
-    </entry>
     
-    <entry>
-      <title><![CDATA[JavaScript学习笔记之对象及继承]]></title>
-      <url>http://seminelee.github.io/2016/08/07/ob/</url>
-      <content type="html"><![CDATA[<h2 id="对象属性"><a href="#对象属性" class="headerlink" title="对象属性"></a>对象属性</h2><p>　　ES5中有两种属性，数据属性和访问器属性。<br>　　数据属性包括[[writable]]（能否修改属性的值）、[[value]]等等；<br>　　访问器属性包括[[Configurable]]（能否通过delete删除属性、能否修改属性的特性）、[[Enumerable]]（能否通过for-in循环返回属性）、[[Get]]、[Set]]<br>　　要修改属性则使用Object.defineProperty()，这个方法接收三个参数：属性所在的对象、属性的名字和一个描述符对象。其中描述符对象的属性必须是：configurable、enumerable、writable和value。如下面的代码</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;</div><div class="line"><span class="built_in">Object</span>.defineProperty(person, <span class="string">"name"</span>, &#123;</div><div class="line">	configurable: <span class="literal">false</span>,</div><div class="line">	value: <span class="string">"Nicholas"</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line">alert(person.name); <span class="comment">//"Nicholas"</span></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line">alert(person.name); <span class="comment">//"Nicholas"</span></div></pre></td></tr></table></figure>
-<a id="more"></a>
-<p>　　也可以使用Object.defineProperties()定义多个属性</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> book = &#123;&#125;;</div><div class="line"><span class="built_in">Object</span>.defineProperties(book,&#123;</div><div class="line">	_year: &#123;</div><div class="line">		value: <span class="number">2004</span></div><div class="line">	&#125;,</div><div class="line">	edition: &#123;</div><div class="line">		value: <span class="number">1</span></div><div class="line">	&#125;,</div><div class="line">	year: &#123;</div><div class="line">		get: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>._year;</div><div class="line">		&#125;,</div><div class="line">		set: <span class="function"><span class="keyword">function</span>(<span class="params">newValue</span>)</span>&#123;</div><div class="line">			<span class="keyword">if</span>(newValue &gt; <span class="number">2004</span>) &#123;</div><div class="line">				<span class="keyword">this</span>._year = newValue;</div><div class="line">				<span class="keyword">this</span>.edition += newValue - <span class="number">2004</span>;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h2 id="创建对象"><a href="#创建对象" class="headerlink" title="创建对象"></a>创建对象</h2><h3 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">createPerson</span>(<span class="params">name, age, job</span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> o = <span class="keyword">new</span> <span class="built_in">Object</span>();</div><div class="line">	o.name = name;</div><div class="line">	o.age = age;</div><div class="line">	o.job = job;</div><div class="line">	o.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		alert(<span class="keyword">this</span>.name);</div><div class="line">	&#125;;</div><div class="line">	<span class="keyword">return</span> o;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> person1 = createPerson(<span class="string">"Nicholas"</span>, <span class="number">29</span>, <span class="string">"Software Engineer"</span>);</div><div class="line"><span class="keyword">var</span> person2 = createPerson(<span class="string">"Greg"</span>, <span class="number">27</span>, <span class="string">"Doctor"</span>);</div></pre></td></tr></table></figure>
-<p>　　抽象了出案件具体对象的过程，每次调用函数会返回一个对象</p>
-<h3 id="构造函数模式"><a href="#构造函数模式" class="headerlink" title="构造函数模式"></a>构造函数模式</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, job</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.name = name;</div><div class="line">	<span class="keyword">this</span>.age = age;</div><div class="line">	<span class="keyword">this</span>.job = job;</div><div class="line">	<span class="keyword">this</span>.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		alert(<span class="keyword">this</span>.name);</div><div class="line">	&#125;;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> person1 = <span class="keyword">new</span> Person(<span class="string">"Nicholas"</span>, <span class="number">29</span>, <span class="string">"Software Engineer"</span>);</div><div class="line"><span class="keyword">var</span> person2 = <span class="keyword">new</span> Person(<span class="string">"Greg"</span>, <span class="number">27</span>, <span class="string">"Doctor"</span>);</div><div class="line"></div><div class="line">alert(person1.constructor == Person);<span class="comment">//true</span></div><div class="line">alert(person1 <span class="keyword">instanceof</span> <span class="built_in">Object</span>);<span class="comment">//true</span></div><div class="line">alert(person1 <span class="keyword">instanceof</span> Person);<span class="comment">//true</span></div></pre></td></tr></table></figure>
-<p>　　构造函数没有显性地创建对象；直接将属性和方法赋给了this对象；没有return语句。<br>　　创建实例的步骤是这样的：创建一个新对象；将构造函数的作用于赋给新对象（this指向这个新对象）；执行构造函数中的代码；返回新对象。<br>　　我们也可以将构造函数当做函数：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Person(<span class="string">"Greg"</span>, <span class="number">27</span>, <span class="string">"Doctor"</span>);</div><div class="line"><span class="built_in">window</span>.sayName(); <span class="comment">//"Greg"</span></div><div class="line"></div><div class="line"><span class="comment">//在另一个对象的作用域中调用</span></div><div class="line"><span class="keyword">var</span> o = <span class="keyword">new</span> <span class="built_in">Object</span>();</div><div class="line">Person.call(o, <span class="string">"Kristen"</span>, <span class="number">25</span>, <span class="string">"Nurse"</span>);</div><div class="line">o.sayName();</div></pre></td></tr></table></figure>
-<p>　　而构造函数的主要问题就是，每个方法都要在每个实例上重新创建一遍，不同实例上的同名函数是不相等的。</p>
-<h3 id="原型对象"><a href="#原型对象" class="headerlink" title="原型对象"></a>原型对象</h3><p>　　原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。即不必在构造函数中定义对象实例的信息，而是可以将这些信息直接添加到原型对象中。<br>看下面的代码</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>)</span>&#123;&#125;</div><div class="line">Person.prototype = &#123;</div><div class="line">	name : <span class="string">"Nicholas"</span>,</div><div class="line">	age : <span class="number">29</span>,</div><div class="line">	job : <span class="string">"Software Engineer"</span>,</div><div class="line">	sayName : <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		alert(<span class="keyword">this</span>.name);</div><div class="line">	&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> Person1 = <span class="keyword">new</span> Person();</div><div class="line"><span class="keyword">var</span> Person2 = <span class="keyword">new</span> Person();</div><div class="line"></div><div class="line">alert(person1.hasOwnProperty(<span class="string">"name"</span>));<span class="comment">//false</span></div><div class="line">alert(<span class="string">"name"</span> <span class="keyword">in</span> Person1);<span class="comment">//true</span></div><div class="line"></div><div class="line">person1.name = <span class="string">"Greg"</span>;</div><div class="line">alert(person1.name);<span class="comment">//"Greg"  ——来自实例</span></div><div class="line">alert(hasPrototypeProperty(person, <span class="string">"name"</span>));<span class="comment">//false</span></div><div class="line">alert(person1.hasOwnProperty(<span class="string">"name"</span>));<span class="comment">//true</span></div><div class="line">alert(<span class="string">"name"</span> <span class="keyword">in</span> Person1);<span class="comment">//true</span></div><div class="line"></div><div class="line">alert(person2.name);<span class="comment">//"Nicholas"  ——来自原型</span></div><div class="line">alert(person2.hasOwnProperty(<span class="string">"name"</span>));<span class="comment">//false</span></div><div class="line">alert(<span class="string">"name"</span> <span class="keyword">in</span> Person1);<span class="comment">//true</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person1.name;</div><div class="line">alert(person1.name);<span class="comment">//"Nicholas"  ——来自原型</span></div><div class="line">alert(person1.hasOwnProperty(<span class="string">"name"</span>));<span class="comment">//false</span></div><div class="line">alert(<span class="string">"name"</span> <span class="keyword">in</span> Person1);<span class="comment">//true</span></div></pre></td></tr></table></figure>
-<p>　　当然原型对象也有缺点：所有实例在默认情况下都取得相同的属性值，即共享性。这个问题尤其对于包含引用类型值的属性来说更为突出。<br>　　所以，组合使用构造函数模式与原型模式是更好的选择。即在构造函数中定义实例属性，而所有实例共享的属性在原型中定义。</p>
-<h2 id="什么是原型链"><a href="#什么是原型链" class="headerlink" title="什么是原型链"></a>什么是原型链</h2><p>　　JavaScript主要是依靠原型链实现继承。<br>　　什么是原型链？我们来看看构造函数、原型和实例的关系：每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个指向原型对象的内部指针。看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.property = <span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line">SuperType.prototype.getSuperValue = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.property;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.subProperty = <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line"><span class="comment">//继承了SuperType</span></div><div class="line">SubType.prototype = <span class="keyword">new</span> SuperType();</div><div class="line">SubType.prototype.getSubValue = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.subproperty;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> instance = <span class="keyword">new</span> SubType();</div><div class="line">alert(instance.getSuperValue()); <span class="comment">//true</span></div></pre></td></tr></table></figure></p>
-<p>　　instance.getSuperValue()调用时会经历三个步骤：</p>
-<ul>
-<li>搜索实例；</li>
-<li>搜索SubType.prototype；</li>
-<li>搜索SuperType.prototype，最后一步才找到方法。</li>
-</ul>
-<p>　　而所有函数的默认原型都是Object的实例，所以完整的原型链如下图：<br><img src="http://img.blog.csdn.net/20160807001109843" alt="来自《JavaScript高级程序设计（第3版）》"><br>　　即<code>instance.__proto__</code>（instance的原型）指向SubType.prototype，<code>SubType.prototype.__proto__</code>指向SuperType.prototype，而<code>SuperType.prototype.__proto__</code>指向Object.prototype，最后<code>Object.prototype.__proto__</code>指向null。<br>　　果然对象搞到头还是空啊！（开个玩笑==）</p>
-<h2 id="原型链的问题"><a href="#原型链的问题" class="headerlink" title="原型链的问题"></a>原型链的问题</h2><p>　　原型链可以用来实现继承，但它也存在一些问题。<br>　　最主要的问题就是在创建原型对象中提及的，包含引用类型值的原型属性会被所有实例共享。</p>
-<h2 id="借用构造函数"><a href="#借用构造函数" class="headerlink" title="借用构造函数"></a>借用构造函数</h2><p>　　鉴于上面的问题，我们可以通过使用apply()和call()在新创建的对象上执行构造函数。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.colors = [<span class="string">"red"</span>, <span class="string">"blue"</span>, <span class="string">"green"</span>];</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	SuperType.call(<span class="keyword">this</span>);<span class="comment">//继承SuperType</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> instance1 = <span class="keyword">new</span> SubType();</div><div class="line">instance1.colors.push(<span class="string">"black"</span>);</div><div class="line">alert(instance1.colors); <span class="comment">//"red,blue,green,black"</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> instance2 = <span class="keyword">new</span> SubType();</div><div class="line">alert(instance2.colors); <span class="comment">//"red,blue,green"</span></div></pre></td></tr></table></figure></p>
-<p>　　实际上，我们在新创建的SubType实例的环境下调用了SuperType构造函数。这样，SubType的每个实例就都会有自己的colors属性的副本了。</p>
-<p>　　此外，还有组合继承，原型式继承，寄生式继承等。脑袋内存有限，这里不再作探究。<br>本文主要参考《JavaScript高级程序设计（第3版）》。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>《JavaScript高级程序设计（第3版）》</p>
-<h3 id="友情链接"><a href="#友情链接" class="headerlink" title="友情链接"></a>友情链接</h3><p><a href="http://blog.csdn.net/SemineLee/article/details/52140233" target="_blank" rel="external">前端重点知识整理（JavaScript）四：对象及继承</a></p>
-]]></content>
-    </entry>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
     
-    <entry>
-      <title><![CDATA[SafeFrames v1.1]]></title>
-      <url>http://seminelee.github.io/2016/08/07/safeframe1/</url>
-      <content type="html"><![CDATA[<h1 id="iab-Interactive-Advertising-Bureau"><a href="#iab-Interactive-Advertising-Bureau" class="headerlink" title="iab.(Interactive Advertising Bureau)"></a><strong>iab.(Interactive Advertising Bureau)</strong></h1><h3 id="安全框架"><a href="#安全框架" class="headerlink" title="安全框架"></a><strong>安全框架</strong></h3><h3 id="版本1-1-草案"><a href="#版本1-1-草案" class="headerlink" title="版本1.1 草案"></a>版本1.1 草案</h3><h4 id="2014年8月发布"><a href="#2014年8月发布" class="headerlink" title="2014年8月发布"></a>2014年8月发布</h4><hr>
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="SafeFrame,iad,iframe," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="iab.(Interactive Advertising Bureau)安全框架版本1.1 草案2014年8月发布
+这个文档是IAB广告技术委员会开发的
+SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组开发的。SafeFrame工作小组的领导者是：
+
+肖恩·斯奈德，雅虎公司（Sean Snider, Yahoo!）
+普拉巴卡尔·戈亚尔，微软公司（Prabhakar Goya">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SafeFrames v1.1">
+<meta property="og:url" content="http://seminelee.github.io/2016/08/07/safeframe1/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="iab.(Interactive Advertising Bureau)安全框架版本1.1 草案2014年8月发布
+这个文档是IAB广告技术委员会开发的
+SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组开发的。SafeFrame工作小组的领导者是：
+
+肖恩·斯奈德，雅虎公司（Sean Snider, Yahoo!）
+普拉巴卡尔·戈亚尔，微软公司（Prabhakar Goya">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf1.png">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf2.png">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf3.png">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf4.png">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf5.png">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf6.png">
+<meta property="og:image" content="http://119.29.142.213/static/201608/sf7.png">
+<meta property="og:updated_time" content="2016-08-28T02:37:50.349Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SafeFrames v1.1">
+<meta name="twitter:description" content="iab.(Interactive Advertising Bureau)安全框架版本1.1 草案2014年8月发布
+这个文档是IAB广告技术委员会开发的
+SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组开发的。SafeFrame工作小组的领导者是：
+
+肖恩·斯奈德，雅虎公司（Sean Snider, Yahoo!）
+普拉巴卡尔·戈亚尔，微软公司（Prabhakar Goya">
+<meta name="twitter:image" content="http://119.29.142.213/static/201608/sf1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://seminelee.github.io/2016/08/07/safeframe1/"/>
+
+  <title> SafeFrames v1.1 | seminelee blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">seminelee blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Sometime we come last, but we did our best!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+              首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+              归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+              分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+              标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/works" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+              关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                SafeFrames v1.1
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-07T00:37:00+08:00" content="2016-08-07">
+              2016-08-07
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/译文/" itemprop="url" rel="index">
+                    <span itemprop="name">译文</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/07/safeframe1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/07/safeframe1/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/08/07/safeframe1/" class="leancloud_visitors" data-flag-title="SafeFrames v1.1">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="iab-Interactive-Advertising-Bureau"><a href="#iab-Interactive-Advertising-Bureau" class="headerlink" title="iab.(Interactive Advertising Bureau)"></a><strong>iab.(Interactive Advertising Bureau)</strong></h1><h3 id="安全框架"><a href="#安全框架" class="headerlink" title="安全框架"></a><strong>安全框架</strong></h3><h3 id="版本1-1-草案"><a href="#版本1-1-草案" class="headerlink" title="版本1.1 草案"></a>版本1.1 草案</h3><h4 id="2014年8月发布"><a href="#2014年8月发布" class="headerlink" title="2014年8月发布"></a>2014年8月发布</h4><hr>
 <p><strong>这个文档是IAB广告技术委员会开发的</strong></p>
 <p>SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组开发的。<br>SafeFrame工作小组的领导者是：</p>
 <ul>
@@ -888,98 +1109,613 @@ return fetch(&apos;users/&apos; + username + &apos;.json&apos;)
 <p>下面的代码示例演示了一个注册的监听器会如何确定主浏览器窗口或选项卡是否聚焦。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> win_has_focus = <span class="literal">false</span>; </div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">status_update</span>(<span class="params">status, data</span>) </span></div><div class="line">&#123; </div><div class="line"><span class="comment">// notify if 50% in view for 1 second </span></div><div class="line"><span class="keyword">if</span>(status == “focus-change”) &#123; </div><div class="line">    win_has_focus = $sf.ext.winHasFocus(); </div><div class="line">&#125; </div><div class="line">&#125; </div><div class="line"> </div><div class="line">$sf.ext.register(<span class="number">160</span>, <span class="number">650</span>, status_update)</div></pre></td></tr></table></figure></p>
 <hr>
 <p>end</p>
-]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[JavaScript学习笔记之闭包]]></title>
-      <url>http://seminelee.github.io/2016/08/06/bibao/</url>
-      <content type="html"><![CDATA[<h2 id="作用域相关定义"><a href="#作用域相关定义" class="headerlink" title="作用域相关定义"></a>作用域相关定义</h2><p>&emsp;&emsp;在说闭包之前，我们首先说一下作用域。<br>&emsp;&emsp;JavaScript中有全局作用域，函数作用域。看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">10</span>;<span class="comment">//全局作用域中定义变量</span></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> b = <span class="number">20</span>;<span class="comment">//函数作用域中定义变量</span></div><div class="line">&#125;)();</div><div class="line"><span class="built_in">console</span>.log(a);<span class="comment">//可以访问全局变量</span></div><div class="line"><span class="built_in">console</span>.log(b);<span class="comment">//error, b is not defined</span></div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;JavaScript是没有块级作用域的。看下面的代码</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> item <span class="keyword">in</span> &#123;a:<span class="number">1</span>,b:<span class="number">2</span>&#125;)&#123;</div><div class="line">	<span class="built_in">console</span>.log(item);</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(item); <span class="comment">//没有块级作用域，可以访问item</span></div></pre></td></tr></table></figure>
-<p>&emsp;&emsp;这里顺带一提，ES6提出了块级作用域及新变量声明（let）。<br>&emsp;&emsp;JS使用var声明变量，以function来划分作用域，大括号“{}” 却限定不了var的作用域。用var声明的变量具有变量提升（declaration hoisting，即先试用后声明不报错）的效果。<br>&emsp;&emsp;ES6里增加了一个let，可以在{}， if， for里声明。用法同var，但作用域限定在块级，let声明的变量不存在变量提升。</p>
-<h2 id="什么是闭包"><a href="#什么是闭包" class="headerlink" title="什么是闭包"></a>什么是闭包</h2><p>维基百科是这样说的：</p>
-<blockquote>
-<p>在计算机科学中，闭包（也称词法闭包或函数闭包）是指一个函数或函数的引用，与一个引用环境绑定在一起。这个引用环境是一个存储该函数每个非局部变量（也叫自由变量）的表。<br>闭包，不同于一般的函数，它允许一个函数在立即词法作用域外调用时，仍可访问非本地变量。</p>
-</blockquote>
-<a id="more"></a>
-<p>&emsp;&emsp;JavaScript之所以有闭包，是因为它是一个第一类函数特性的语言，即可用把函数当做对象去传递作为返回值。<br>&emsp;&emsp;看下面的函数，对于这种函数，当调用函数outer()之后，局部变量localVal就可以被释放了。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">outer</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localVal = <span class="number">30</span>;</div><div class="line">	<span class="keyword">return</span> localVal;</div><div class="line">&#125;</div><div class="line">outer();<span class="comment">//30</span></div></pre></td></tr></table></figure>
-<p>&emsp;&emsp;在JavaScript中，函数也是对象，并且函数也可以作为返回值也可以传参，函数里也可以套用别的函数。<br>&emsp;&emsp;对于下面的函数，调用函数outer()时，返回的是匿名函数，这个匿名函数里面依然可以访问外面的局部变量localVal。在调用outer()之后，调用func()，依然可以访问外部函数的局部变量localVal，localVal不会被释放。<br>&emsp;&emsp;这就是闭包。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">outer</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localVal = <span class="number">30</span>;</div><div class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> localVal;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> func = outer();</div><div class="line">func();<span class="comment">//30</span></div></pre></td></tr></table></figure></p>
-<h2 id="闭包无处不在"><a href="#闭包无处不在" class="headerlink" title="闭包无处不在"></a>闭包无处不在</h2><p>&emsp;&emsp;如下面的函数，点击事件中依然可以访问外部函数的局部变量<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localData = <span class="string">"localData here"</span>;</div><div class="line">	<span class="built_in">document</span>.addEvenetListener(<span class="string">"click"</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="built_in">console</span>.log(localData);</div><div class="line">	&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;再如下面的异步请求，jquery的$.ajax方法，在整个函数调用结束之后，回调函数依然可以访问到url，localData这些局部变量<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> localData = <span class="string">"localData here"</span>;</div><div class="line">	<span class="keyword">var</span> url = <span class="string">"http://www.qq.com/"</span>;</div><div class="line">	$.ajax(&#123;</div><div class="line">		url: url,</div><div class="line">		success: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			<span class="built_in">console</span>.log(localData);</div><div class="line">		&#125;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="闭包的坑"><a href="#闭包的坑" class="headerlink" title="闭包的坑"></a>闭包的坑</h2><p>&emsp;&emsp;看下面的函数，输出结果是什么？<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">document</span>.body.innerHTML = <span class="string">"&lt;div id='div1'&gt;aaa&lt;/div&gt;"</span> + <span class="string">"&lt;div id='div2'&gt;bbb&lt;/div&gt;"</span> + <span class="string">"&lt;div id='div3'&gt;ccc&lt;/div&gt;"</span>;</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)&#123;</div><div class="line">	<span class="built_in">document</span>.getElementById(<span class="string">'div'</span> + i)</div><div class="line">		.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			alert(i);<span class="comment">//all are 4!</span></div><div class="line">		&#125;</div><div class="line">	);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;实际上，点击任何一个div输出结果都是4。<br>&emsp;&emsp;在点击某个div的时候，执行回调函数，这个时候函数才会动态地拿到i的值。这一切是在整个过程初始化之后的，在初始化之后i的值就已经是4了。<br>&emsp;&emsp;那怎么样才能达到想要的效果呢？看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">document</span>.body.innerHTML = <span class="string">"&lt;div id='div1'&gt;aaa&lt;/div&gt;"</span> + </div><div class="line">	<span class="string">"&lt;div id='div2'&gt;bbb&lt;/div&gt;"</span> + <span class="string">"&lt;div id='div3'&gt;ccc&lt;/div&gt;"</span>;</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)&#123;</div><div class="line">	!<span class="function"><span class="keyword">function</span>(<span class="params">i</span>)</span>&#123;</div><div class="line">		<span class="built_in">document</span>.getElementById(<span class="string">'div'</span> + i)</div><div class="line">			.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">				alert(i);<span class="comment">//1,2,3</span></div><div class="line">			&#125;</div><div class="line">		);</div><div class="line">	&#125;(i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;这里每一层循环的时候，用了立即执行的匿名函数把点击事件函数包装起来，并传参i，即1,2,3。那么每一次点击div，alert(i)里面的i就会取每一个闭包环境下的i，而这个i来自于每一次循环的i，所以点击每一个div的时候就会弹出相应的值了</p>
-<h2 id="闭包的作用"><a href="#闭包的作用" class="headerlink" title="闭包的作用"></a>闭包的作用</h2><p>&emsp;&emsp;闭包可以用于封装一些变量，看下面的代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">(<span class="function"><span class="keyword">function</span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> _userId = <span class="number">23492</span>;</div><div class="line">	<span class="keyword">var</span> _typeId = <span class="string">'item'</span>;</div><div class="line">	<span class="keyword">var</span> <span class="keyword">export</span> = &#123;&#125;;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">function</span> <span class="title">converter</span>(<span class="params">userId</span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> +userId;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">export</span>.getUserId = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> converter(_userId);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">export</span>.getTypeId = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> converter(_typeId);</div><div class="line">	&#125;</div><div class="line">	<span class="built_in">window</span>.export = <span class="keyword">export</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">export</span>.getUserId(); <span class="comment">//23492</span></div><div class="line"><span class="keyword">export</span>.getTypeId(); <span class="comment">//item</span></div><div class="line"></div><div class="line"><span class="keyword">export</span>._UserId; <span class="comment">//undefined</span></div><div class="line"><span class="keyword">export</span>._TypeId; <span class="comment">//undefined</span></div><div class="line"><span class="keyword">export</span>.converter; <span class="comment">//undefined</span></div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;这里定义了_userId等一些外部无法直接访问的局部变量，并通过window.export = export把对象export输出出去。在外部使用export的时候，只能通过export的一些方法来访问到函数的局部变量，而无法直接访问这些变量和方法。<br>&emsp;&emsp;这利用了闭包的特性，比如export.getUserId()函数，在整个匿名函数初始化之后，它依然能够访问到局部变量_userId。<br>&emsp;&emsp;同时，闭包也会带来一些问题，比如局部变量没有被释放掉造成空间浪费；内存泄露；性能消耗等。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.imooc.com/learn/277" target="_blank" rel="external">JavaScript深入浅出</a></p>
-<p>友情链接：<a href="http://blog.csdn.net/seminelee/article/details/52131659" target="_blank" rel="external">前端重点知识整理（JavaScript）三：闭包</a></p>
-]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[三小时建成github pages + hexo博客]]></title>
-      <url>http://seminelee.github.io/2016/07/24/set-up-a-blog/</url>
-      <content type="html"><![CDATA[<p>因为受到了<a href="https://woohoodai.github.io/" target="_blank" rel="external">戴老板</a>的激励和羡慕身边大神都有个炫酷的博客，所以下午的时候花时间建立起这个博客。得益于网络教程，发现原来并不难。以下是这一过程的记录，顺便练练markdown。</p>
-<h2 id="为什么要建立这个博客"><a href="#为什么要建立这个博客" class="headerlink" title="为什么要建立这个博客"></a>为什么要建立这个博客</h2><h3 id="为什么选择GitHub-Pages"><a href="#为什么选择GitHub-Pages" class="headerlink" title="为什么选择GitHub Pages"></a>为什么选择GitHub Pages</h3><ul>
-<li>域名是github的二级域名，不用给空间付费，不用给域名付费</li>
-<li>流行又简洁的MarkDown写作语法</li>
-<li>支持本地编写、本地预览</li>
-<li>seo优化上，github在google上权重高</li>
-</ul>
-<h3 id="为什么我要写博客"><a href="#为什么我要写博客" class="headerlink" title="为什么我要写博客"></a>为什么我要写博客</h3><ul>
-<li>本人表达能力不佳，把脑里的东西写下来能让我印象更深刻，提高我将事情讲清楚的能力和逻辑思维能力</li>
-<li>有利于我积累更多的知识，并享受分享带来的连锁反应</li>
-<li>用markdown写东西觉得自己很geek</li>
-</ul>
-<a id="more"></a>
-<h2 id="准备步骤"><a href="#准备步骤" class="headerlink" title="准备步骤"></a>准备步骤</h2><ol>
-<li>安装<a href="https://nodejs.org/" target="_blank" rel="external">node.js</a></li>
-<li>安装<a href="https://git-scm.com/" target="_blank" rel="external">git</a></li>
-<li>注册<a href="http://www.github.com/" target="_blank" rel="external">github</a></li>
-</ol>
-<h2 id="配置SSH-keys"><a href="#配置SSH-keys" class="headerlink" title="配置SSH keys"></a>配置SSH keys</h2><h3 id="生成SSH-Keys"><a href="#生成SSH-Keys" class="headerlink" title="生成SSH Keys"></a>生成SSH Keys</h3><p>建立博客之前要先用SSH keys让我们的本地git项目与远程的github建立联系。<br>首先我们需要检查你电脑上现有的ssh key。右键打开Git Bash，输入：<br>（如果提示：No such file or directory 说明你是第一次使用git。）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> ~/. ssh</div></pre></td></tr></table></figure></p>
-<p>生成新的SSH Key<br>（此处的邮箱地址请输入你自己的邮箱地址）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ssh-keygen -t rsa -C <span class="string">"邮件地址@youremail.com"</span></div></pre></td></tr></table></figure></p>
-<p>然后回车</p>
-<p>然后系统会要你输入密码。这个密码会在你提交项目时使用，如果为空的话提交项目时则不用输入。<br>（输入密码的时候没有*字样的，你直接输入就可以了）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):&lt;输入加密串&gt;</div><div class="line">Enter same passphrase again:&lt;再次输入加密串&gt;</div></pre></td></tr></table></figure></p>
-<p>看到这样的界面就成功设置ssh key了。<br><img src="/static/2016/07/1.png" alt="成功设置 ssh key"></p>
-<h3 id="将SSH-Key添加到Github上"><a href="#将SSH-Key添加到Github上" class="headerlink" title="将SSH Key添加到Github上"></a>将SSH Key添加到Github上</h3><ol>
-<li>打开本地C:\Documents and Settings\Administrator.ssh\id_rsa.pub文件。路径也有可能是C:\Users\Administrator.ssh，你可以直接在C盘中查找id_rsa.pub文件。此文件里面内容为刚才生成人密钥。如果看不到这个文件，你需要设置显示隐藏文件。打开，准确的复制这个文件的内容。</li>
-<li>登陆github系统。点击右上角的图像—&gt;Settings —&gt; SSH and GPG keys。<br><img src="/static/2016/07/2.png" alt="将SSH Key添加到Github上"></li>
-<li>点击右上角New SSH key，把你刚刚复制的本地生成的密钥文件内容黏贴到里面（Key文本框中）， 点击Add SSH key就ok了<br><img src="/static/2016/07/3.png" alt="将SSH Key添加到Github上"></li>
-</ol>
-<h3 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h3><p>可以输入下面的命令，看看设置是否成功，git@github.com的部分不要修改：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ssh -T git@github.com</div></pre></td></tr></table></figure></p>
-<p>然后输入yes<br>然后就会看到<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Hi seminelee! You<span class="string">'ve successfully authenticated, but GitHub does not provide shell access.</span></div></pre></td></tr></table></figure></p>
-<h3 id="设置用户信息"><a href="#设置用户信息" class="headerlink" title="设置用户信息"></a>设置用户信息</h3><p>现在你已经可以通过SSH链接到GitHub了，还有一些个人信息需要完善的。<br>Git会根据用户的名字和邮箱来记录提交。GitHub也是用这些信息来做权限的处理，输入下面的代码进行个人信息的设置，把名称和邮箱替换成你自己的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git config --global user.name <span class="string">"seminelee"</span>//用户名</div><div class="line">$ git config --global user.email  <span class="string">"may.air@qq.com"</span>//填写自己的邮箱</div></pre></td></tr></table></figure></p>
-<p>完成以上步骤后本机就已成功连接到github</p>
-<h2 id="开始建立博客"><a href="#开始建立博客" class="headerlink" title="开始建立博客"></a>开始建立博客</h2><p>与GitHub建立好链接之后，就可以方便的使用它提供的Pages服务，GitHub Pages分两种，一种是你的GitHub用户名建立的username.github.io这样的用户&amp;组织页（站），另一种是依附项目的pages。<br>想建立个人博客是用的第一种，形如seminelee.github.io这样的可访问的站，每个用户名下面只能建立一个。</p>
-<h3 id="Github上建立仓库"><a href="#Github上建立仓库" class="headerlink" title="Github上建立仓库"></a>Github上建立仓库</h3><p>登陆Github，建立一个名为seminelee.github.io的仓库。<br>注意！Github Pages的Repository名字是特定的，比如我Github账号是seminelee，那么我Github Pages Repository名字就是seminelee.github.io。<br>详细建立仓库过程略过。</p>
-<h3 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h3><p>Hexo是一个简单、快速、强大的博客发布工具，支持Markdown格式。<br>打开Git Bash<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install -g hexo</div></pre></td></tr></table></figure></p>
-<p>安装完毕后，在我的电脑某个位置中建立一个名字叫hexo的文件夹，然后在此文件夹中右键打开Git Bash。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo init</div></pre></td></tr></table></figure></p>
-<p>Hexo随后会自动在目标文件夹建立网站所需要的所有文件。<br>现在我们已经搭建起本地的hexo博客了。<br>在hexo目录下输入<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ hexo g</div><div class="line">$ hexo s</div></pre></td></tr></table></figure></p>
-<p>然后到浏览器输入localhost:4000看看，可以看到默认主题下的博客，这就实现了本地预览了。</p>
-<h3 id="更换主题"><a href="#更换主题" class="headerlink" title="更换主题"></a>更换主题</h3><p>每次更换主题前清空一下database<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ hexo clean</div><div class="line">$ hexo g</div><div class="line">$ hexo s</div></pre></td></tr></table></figure></p>
-<p>通过git clone克隆主题，这里用的是next主题<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ git <span class="built_in">clone</span> https://github.com/iissnan/hexo-theme-next.git</div></pre></td></tr></table></figure></p>
-<p>更多主题可以参考<a href="https://www.zhihu.com/question/24422335" target="_blank" rel="external">有哪些好看的 Hexo 主题? - GitHub - 知乎</a></p>
-<p>启用主题<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">theme: hexo-theme-next</div></pre></td></tr></table></figure></p>
-<p>修改hexo目录下的config.yml配置文件中的theme属性，将其设置为hexo-theme-next。<br>（注意：Hexo有两个config.yml文件，一个在根目录，一个在theme下，此时修改的是在根目录下的。）</p>
-<p>更新主题<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> themes/hexo-theme-next</div><div class="line">$ git pull</div></pre></td></tr></table></figure></p>
-<p>然后可以本地预览一下<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ hexo g <span class="comment">#generate生成</span></div><div class="line">$ hexo s <span class="comment">#server测试环境，启动本地服务，进行文章预览调试</span></div></pre></td></tr></table></figure></p>
-<h3 id="上传到Github仓库"><a href="#上传到Github仓库" class="headerlink" title="上传到Github仓库"></a>上传到Github仓库</h3><p>打开hexo目录下的_config.yml，拉到最下面<br>配置为这样子,只需要把seminelee改为你自己的github用户名就可以了。（注意格式，冒号后要有空格，你可以直接复制以下代码再作修改）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># Deployment</span></div><div class="line"><span class="comment">## Docs: http://hexo.io/docs/deployment.html</span></div><div class="line">deploy:</div><div class="line">  <span class="built_in">type</span>: git</div><div class="line">  repository: https://github.com/seminelee/seminelee.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure></p>
-<p>然后执行命令<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ hexo g <span class="comment">#generate生成</span></div><div class="line">$ hexo d <span class="comment">#deploy开发环境</span></div></pre></td></tr></table></figure></p>
-<p>如果看到结果最后一行是INFO Deploy done:git则没有问题。否则，则可以把上面的配置改为下面这种使用SSH方式的提交，把用户名改为你自己的用户名<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># Deployment</span></div><div class="line"><span class="comment">## Docs: http://hexo.io/docs/deployment.html</span></div><div class="line">deploy:</div><div class="line">  <span class="built_in">type</span>: git</div><div class="line">  repository: git@github.com:seminelee/seminelee.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure></p>
-<p>再次执行命令<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ hexo g <span class="comment">#generate生成</span></div><div class="line">$ hexo d <span class="comment">#deploy开发环境</span></div></pre></td></tr></table></figure></p>
-<p>如果在执行 hexo deploy 后,出现 error deployer not found:github 的错误，网上说是hexo 更新到3.0之后的一个坑，则需要安装hexo-deployer-git<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install hexo-deployer-git --save</div></pre></td></tr></table></figure></p>
-<p>再次执行命令之后，打开<a href="https://seminelee.github.io/">https://seminelee.github.io/</a>就能看到你建立好的博客了！</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="http://www.jianshu.com/p/05289a4bc8b2" target="_blank" rel="external">如何搭建一个独立博客——简明Github Pages与Hexo教程</a></li>
-<li><a href="http://www.jianshu.com/p/863f3f2d1733" target="_blank" rel="external">使用github+Hexo人人都能拥有一个美美的博客</a></li>
-<li><a href="http://www.v2ex.com/t/175940" target="_blank" rel="external">搭建 hexo，在执行 hexo deploy 后,出现 error deployer not found:github 的错误</a></li>
-</ul>
-]]></content>
-    </entry>
-    
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SafeFrame/" rel="tag">#SafeFrame</a>
+          
+            <a href="/tags/iad/" rel="tag">#iad</a>
+          
+            <a href="/tags/iframe/" rel="tag">#iframe</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/06/bibao/" rel="next" title="JavaScript学习笔记之闭包">
+                <i class="fa fa-chevron-left"></i> JavaScript学习笔记之闭包
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/07/ob/" rel="prev" title="JavaScript学习笔记之对象及继承">
+                JavaScript学习笔记之对象及继承 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/08/07/safeframe1/"
+     data-title="SafeFrames v1.1"
+     data-content=""
+     data-url="http://seminelee.github.io/2016/08/07/safeframe1/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+<section id="comment">  
+ <!-- 多说评论框 start -->  
+<div class="ds-thread" data-thread-key="<%= page.path %>" data-title="<%= page.title %>" data-url="http://seminelee.github.io/<%= page.permalink %>"></div>  
+<!-- 多说评论框 end -->  
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->  
+<script type="text/javascript">  
+    var duoshuoQuery = {short_name:"seminelee"};  
+        (function() {  
+            var ds = document.createElement('script');  
+            ds.type = 'text/javascript';ds.async = true;  
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';  
+            ds.charset = 'UTF-8';  
+            (document.getElementsByTagName('head')[0]   
+             || document.getElementsByTagName('body')[0]).appendChild(ds);  
+        })();  
+</script>  
+<!-- 多说公共JS代码 end -->  
+</section>  
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar.jpg"
+               alt="Semine Lee" />
+          <p class="site-author-name" itemprop="name">Semine Lee</p>
+          <p class="site-description motion-element" itemprop="description">前端开发/UI开发/武汉大学/学生</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/seminelee" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiao-qing-long-41-67" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-coffee"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://119.29.142.213/" target="_blank" title="Wordpress">
+                  
+                    <i class="fa fa-fw fa-bicycle"></i>
+                  
+                  Wordpress
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#iab-Interactive-Advertising-Bureau"><span class="nav-text">iab.(Interactive Advertising Bureau)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安全框架"><span class="nav-text">安全框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#版本1-1-草案"><span class="nav-text">版本1.1 草案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2014年8月发布"><span class="nav-text">2014年8月发布</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录"><span class="nav-text">目录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行摘要"><span class="nav-text">执行摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#目标受众"><span class="nav-text">目标受众</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#规格更新"><span class="nav-text">规格更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-概况"><span class="nav-text">1. 概况</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-SafeFrames组件"><span class="nav-text">1.1 SafeFrames组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-1-主网站"><span class="nav-text">1.1.1 主网站</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-2-外部方"><span class="nav-text">1.1.2 外部方</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-3-API"><span class="nav-text">1.1.3 API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-4-二级域名"><span class="nav-text">1.1.4 二级域名</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-优点"><span class="nav-text">1.2 优点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-外部方和网站之间的透明度"><span class="nav-text">1.2.1 外部方和网站之间的透明度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-统一规范的API"><span class="nav-text">1.2.2 统一规范的API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3-“沙盒”外部内容"><span class="nav-text">1.2.3 “沙盒”外部内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-4-网站定制-amp-控制"><span class="nav-text">1.2.4 网站定制&控制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-SafeFrames和广告可见度曝光"><span class="nav-text">1.3 SafeFrames和广告可见度曝光</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-1-支持3MS广告可见度"><span class="nav-text">1.3.1 支持3MS广告可见度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-2-可见度特性对外部方可选"><span class="nav-text">1.3.2 可见度特性对外部方可选</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-SafeFrames和视频插播广告"><span class="nav-text">1.4 SafeFrames和视频插播广告</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-SafeFrames和移动端"><span class="nav-text">1.5 SafeFrames和移动端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-报告SafeFrame的数据"><span class="nav-text">1.6 报告SafeFrame的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-区别于其他规范"><span class="nav-text">1.7 区别于其他规范</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7-1-IAB友好的iframe"><span class="nav-text">1.7.1 IAB友好的iframe</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7-2-跨源资源共享（CORS）"><span class="nav-text">1.7.2 跨源资源共享（CORS）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-超出范围"><span class="nav-text">1.8 超出范围</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-9-操作注意事项"><span class="nav-text">1.9 操作注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-网站实施"><span class="nav-text">2. 网站实施</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-SafeFrames是如何运作的"><span class="nav-text">2.1 SafeFrames是如何运作的</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-传递模式A：网站转换外部内容"><span class="nav-text">2.1.1 传递模式A：网站转换外部内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-传递模式B：外部内容直接传递"><span class="nav-text">2.1.2 传递模式B：外部内容直接传递</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-渲染SafeFrame"><span class="nav-text">2.1.3 渲染SafeFrame</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4通过API进行页内通讯"><span class="nav-text">2.1.4通过API进行页内通讯</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2要求"><span class="nav-text">2.2要求</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-JavaScript网站库和API"><span class="nav-text">2.2.1 JavaScript网站库和API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-二级域名"><span class="nav-text">2.2.2 二级域名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-资源公约"><span class="nav-text">2.2.3 资源公约</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-4-SafeFrame的URI公约"><span class="nav-text">2.2.4 SafeFrame的URI公约</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-实现注意事项"><span class="nav-text">2.3 实现注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-SafeFrame的渲染细节"><span class="nav-text">2.4 SafeFrame的渲染细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-通信机制的细节"><span class="nav-text">2.5 通信机制的细节</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SafeFrame-标签"><span class="nav-text">3. SafeFrame 标签</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-SafeFrame-标签结构-amp-要求"><span class="nav-text">3.1 SafeFrame 标签结构&要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-SCRIPT标签"><span class="nav-text">3.1.1 SCRIPT标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-使用JavaScript处理数据标签"><span class="nav-text">3.1.2 使用JavaScript处理数据标签</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-1-例子：一次性处理所有标签"><span class="nav-text">3.1.2.1 例子：一次性处理所有标签</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-3-伴随着自动引导的兄弟标签的SafeFrame数据标签"><span class="nav-text">3.1.2.3 伴随着自动引导的兄弟标签的SafeFrame数据标签</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-网站API实施细则"><span class="nav-text">4. 网站API实施细则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-命名空间-sf-host"><span class="nav-text">4.1 命名空间$sf.host</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-命名空间-sf-host-conf"><span class="nav-text">4.2 命名空间$sf.host.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-命名空间-sf-info"><span class="nav-text">4.3 命名空间$sf.info</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-类-sf-host-Config"><span class="nav-text">4.4 类$sf.host.Config</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-类-sf-host-PosConfig"><span class="nav-text">4.5 类$sf.host.PosConfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-类-sf-host-Position"><span class="nav-text">4.6 类$sf.host.Position</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-类-sf-host-PosMeta"><span class="nav-text">4.7 类$sf.host.PosMeta</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-函数-sf-host-boot"><span class="nav-text">4.8 函数 $sf.host.boot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-函数-sf-host-status"><span class="nav-text">4.9 函数$sf.host.status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-10-函数-sf-host-nuke"><span class="nav-text">4.10 函数$sf.host.nuke</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-11-函数-sf-host-get"><span class="nav-text">4.11 函数$sf.host.get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-12-函数-sf-host-render"><span class="nav-text">4.12 函数$sf.host.render</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-外部方API实施"><span class="nav-text">5.外部方API实施</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-命名空间-sf-ext"><span class="nav-text">5.1 命名空间$sf.ext</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-函数-sf-ext-register"><span class="nav-text">5.2 函数$sf.ext.register</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-函数-sf-ext-supports"><span class="nav-text">5.3 函数 $sf.ext.supports</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-函数-sf-ext-geom"><span class="nav-text">5.4 函数$sf.ext.geom</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-函数-sf-ext-expand"><span class="nav-text">5.5 函数$sf.ext.expand</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-6-函数-sf-ext-collapse"><span class="nav-text">5.6 函数$sf.ext.collapse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-7-函数-sf-ext-status"><span class="nav-text">5.7 函数$sf.ext.status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-8-函数-sf-ext-meta"><span class="nav-text">5.8 函数$sf.ext.meta</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-9-函数-sf-ext-cookie"><span class="nav-text">5.9 函数$sf.ext.cookie</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-10-函数-sf-ext-inViewPercentage"><span class="nav-text">5.10 函数$sf.ext.inViewPercentage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-11-函数-sf-ext-winHasFocus"><span class="nav-text">5.11 函数$sf.ext.winHasFocus</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
   
   
-</search>
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"seminelee"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("NbcRQg6b55yEFLU2hc5l9mNk-gzGzoHsz", "NN7ov5pIcPFyUXuHoH9BLfl1");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
