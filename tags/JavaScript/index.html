@@ -87,7 +87,7 @@
 <meta name="description" content="前端开发/UI开发/武汉大学/学生">
 <meta property="og:type" content="website">
 <meta property="og:title" content="seminelee blog">
-<meta property="og:url" content="http://seminelee.github.io/tags/JavaScript/index.html">
+<meta property="og:url" content="http://seminelee.github.io/tags/javascript/index.html">
 <meta property="og:site_name" content="seminelee blog">
 <meta property="og:description" content="前端开发/UI开发/武汉大学/学生">
 <meta name="twitter:card" content="summary">
@@ -113,9 +113,9 @@
 
 
 
-  <link rel="canonical" href="http://seminelee.github.io/tags/JavaScript/"/>
+  <link rel="canonical" href="http://seminelee.github.io/tags/javascript/"/>
 
-  <title> 标签: JavaScript | seminelee blog </title>
+  <title> 标签: javascript | seminelee blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -260,7 +260,7 @@
   <div id="posts" class="posts-collapse">
     <div class="collection-title">
       <h2 >
-        JavaScript
+        javascript
         <small>标签</small>
       </h2>
     </div>
@@ -273,37 +273,9 @@
 
       <h1 class="post-title">
         
-            <a class="post-title-link" href="/2016/08/07/ob/" itemprop="url">
+            <a class="post-title-link" href="/2016/08/28/promise1/" itemprop="url">
               
-                <span itemprop="name">JavaScript学习笔记之对象及继承</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-07T00:37:00+08:00"
-              content="2016-08-07" >
-          08-07
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/06/bibao/" itemprop="url">
-              
-                <span itemprop="name">JavaScript学习笔记之闭包</span>
+                <span itemprop="name">JavaScript Promise API</span>
               
             </a>
         
@@ -311,9 +283,9 @@
 
       <div class="post-meta">
         <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-06T20:57:42+08:00"
-              content="2016-08-06" >
-          08-06
+              datetime="2016-08-28T11:01:57+08:00"
+              content="2016-08-28" >
+          08-28
         </time>
       </div>
 
@@ -398,7 +370,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -801,6 +773,36 @@
               success: function(newcounter) {
                 var $element = $(document.getElementById(url));
                 $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
+             $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
               },
               error: function(newcounter, error) {
                 console.log('Failed to create');
