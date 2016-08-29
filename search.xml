@@ -319,9 +319,9 @@
 <p>下面的实施注意事项提供更多的细节，且与第2.1节讨论的两个传递模式相对应。</p>
 <ul>
 <li><p><strong>原始的HTML作为JavaScript字符串（传递模式A）</strong><br>由于JavaScript处理某些字符和SCRIPT标签时不同于HTML，网站可能必须在发送给SafeFrame API处理之前，修改任何原始的HTML内容。<br>例如，下面的HTML字符串被当做JavaScript处理时，会产生一个语法错误：</p>
-<figure class="highlight plain"><figcaption><span>type="text/javascript"> document.write('Hello "Dave"');</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;script type=&quot;text/javascript&quot;&gt; document.write(&apos;Hello &quot;Dave&quot;&apos;);</div><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
 <p>为了使上述HTML字符串在SafeFrame API中正常被处理，必须重写格式如下：</p>
-<figure class="highlight plain"><figcaption><span>html = "<scr"+"ipt type="\"text\/javascript\""> </scr"+"ipt></span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">document.write(&apos;Hello \&quot;Dave\&quot;&apos;); &lt;/scr&quot;+&quot;ipt&gt;&quot;;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var html = &quot;&lt;scr&quot;+&quot;ipt type=\&quot;text\/javascript\&quot;&gt; </div><div class="line">document.write(&apos;Hello \&quot;Dave\&quot;&apos;); &lt;/scr&quot;+&quot;ipt&gt;&quot;;</div></pre></td></tr></table></figure>
 <p>以上的JavaScript格式的HTML字符串可以在SafeFrame<code>$sf.host.Position</code>对象中正常运行。</p>
 </li>
 <li><p><strong>使用URL来获取第三方内容（传递模式B）</strong><br>主机可以提供一个URL到外部内容，而不是提供所述HTML内容本身。在此情况下，网站页面不能直接把外部内容渲染到的SafeFrame<code>$sf.host.Position</code>对象，给SafeFrame去获取和渲染在容器中的内容。<br>由于网页不能编码外部内容使其在SafeFrame中处理，从SafeFrame的请求得到的响应应该是JavaScript格式的。一旦生成SafeFrame容器，外部内容的URL响应的SCRIPT标签产生，并且可以传递附加内容。使用一个SCRIPT标签，所以从被提供的URL传递的内容可以在SafeFrame的容器内访问外部的API，而不是使用一个嵌套的iframe标签。</p>
