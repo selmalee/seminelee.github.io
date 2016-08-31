@@ -1,0 +1,1069 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="bfcache,往返存储,pageshow,pagehide,persisted," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前言一些浏览器中返回按钮是直接使用缓存的，不会执行任何js代码，例如, 在提交的时候将按钮设置为loading状态，如果在提交成功后没有对按钮进行处理，那么返回后按钮依然是loading状态，这种体验很差。这是因为：部分浏览器在后退时不会触发onload事件，這是HTML5世代浏览器新增的特性之一——Back-Forward Cache(简称bfcache)
+什么是bfcache我们熟悉的红本本《">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BFCache相关">
+<meta property="og:url" content="http://seminelee.github.io/2016/08/29/bfcache/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="前言一些浏览器中返回按钮是直接使用缓存的，不会执行任何js代码，例如, 在提交的时候将按钮设置为loading状态，如果在提交成功后没有对按钮进行处理，那么返回后按钮依然是loading状态，这种体验很差。这是因为：部分浏览器在后退时不会触发onload事件，這是HTML5世代浏览器新增的特性之一——Back-Forward Cache(简称bfcache)
+什么是bfcache我们熟悉的红本本《">
+<meta property="og:image" content="http://119.29.142.213/static/201608/bfcacheex.png">
+<meta property="og:updated_time" content="2016-08-31T14:12:36.063Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BFCache相关">
+<meta name="twitter:description" content="前言一些浏览器中返回按钮是直接使用缓存的，不会执行任何js代码，例如, 在提交的时候将按钮设置为loading状态，如果在提交成功后没有对按钮进行处理，那么返回后按钮依然是loading状态，这种体验很差。这是因为：部分浏览器在后退时不会触发onload事件，這是HTML5世代浏览器新增的特性之一——Back-Forward Cache(简称bfcache)
+什么是bfcache我们熟悉的红本本《">
+<meta name="twitter:image" content="http://119.29.142.213/static/201608/bfcacheex.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://seminelee.github.io/2016/08/29/bfcache/"/>
+
+  <title> BFCache相关 | seminelee blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">seminelee blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Sometime we come last, but we did our best!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+              首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+              归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+              分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+              标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/works" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+              关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                BFCache相关
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-29T16:47:00+08:00" content="2016-08-29">
+              2016-08-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cache/" itemprop="url" rel="index">
+                    <span itemprop="name">cache</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/29/bfcache/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/29/bfcache/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/08/29/bfcache/" class="leancloud_visitors" data-flag-title="BFCache相关">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一些浏览器中返回按钮是直接使用缓存的，不会执行任何js代码，例如, 在提交的时候将按钮设置为loading状态，如果在提交成功后没有对按钮进行处理，那么返回后按钮依然是loading状态，这种体验很差。<br><img src="http://119.29.142.213/static/201608/bfcacheex.png" alt="example"><br>这是因为：<br>部分浏览器在后退时<strong>不会</strong>触发onload事件，這是HTML5世代浏览器新增的特性之一——Back-Forward Cache(简称bfcache)</p>
+<h2 id="什么是bfcache"><a href="#什么是bfcache" class="headerlink" title="什么是bfcache"></a>什么是bfcache</h2><p>我们熟悉的红本本《JavaScript高级程序设计》有提及bfcache：</p>
+<blockquote>
+<p>bfcache，即back-forward cache，可称为“往返缓存”，可以在用户使用浏览器的“后退”和“前进”按钮时加快页面的转换速度。这个缓存不仅保存页面数据，还保存了DOM和JS的状态，实际上是将整个页面都保存在内存里。如果页面位于bfcache中，那么再次打开该页面就不会触发onload事件</p>
+</blockquote>
+<h3 id="pageshow事件"><a href="#pageshow事件" class="headerlink" title="pageshow事件"></a>pageshow事件</h3><p> 这个事件在页面显示时触发，无论页面是否来自bfcache。在重新加载的页面中，pageshow会在load事件触发后触发；而对于bfcache中的页面，pageshow会在页面状态完全恢复的那一刻触发。</p>
+<h3 id="pagehide事件"><a href="#pagehide事件" class="headerlink" title="pagehide事件"></a>pagehide事件</h3><p> 该事件会在浏览器卸载页面的时候触发，而且是在unload事件之前触发。</p>
+<h3 id="persisted属性"><a href="#persisted属性" class="headerlink" title="persisted属性"></a>persisted属性</h3><p> pageshow事件和pagehide事件的event对象还包含一个名为persisted的布尔值属性。</p>
+<ul>
+<li>对于pageshow事件，如果页面是从bfcache中加载的，则这个属性的值为true；否则，这个属性的值为false。</li>
+<li>对于pagehide事件，如果页面在卸载之后被保存在bfcache中，则这个属性的值为true；否则，这个属性的值为false。</li>
+</ul>
+<p>不同的浏览器在浏览器会在当前窗口“打开”历史纪录中的前一个页面的表现上并不统一，这和浏览器的实现以及页面本身的设置都有关系。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><h3 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h3><p><a href="http://119.29.142.213/static/201608/bfcachetest.html" target="_blank" rel="external">线上示例</a><br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Page Events<span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></div><div class="line">        function appendFunc(msg)&#123;</div><div class="line">        	var d = new Date();</div><div class="line">        	var li = document.createElement("li");</div><div class="line">        	li.innerHTML = d.toISOString().substr(14, 9) + " " + msg;</div><div class="line">        	document.querySelector("ul").appendChild(li);</div><div class="line">        &#125;</div><div class="line">        window.addEventListener('load', function()&#123;</div><div class="line">        	appendFunc('Load Event');</div><div class="line">        	document.querySelector("#changeColor").onclick = function()&#123;</div><div class="line">        		document.querySelector("a").style.color = "red";</div><div class="line">        	&#125;</div><div class="line">        &#125;)</div><div class="line">        window.addEventListener('pagehide', function( e )&#123;</div><div class="line">        	appendFunc("Pagehide Event");</div><div class="line">        	appendFunc("pagehide persisted is :"  + e.persisted);</div><div class="line">        &#125;)</div><div class="line"></div><div class="line">        window.addEventListener('pageshow', function( e )&#123;</div><div class="line">        	appendFunc("Pageshow Event");</div><div class="line">        	appendFunc("pageshow persisted is :"  + e.persisted);</div><div class="line">        &#125;)</div><div class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.sina.com.cn/"</span>&gt;</span>前往大新浪<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">id</span>=<span class="string">"changeColor"</span> <span class="attr">value</span>=<span class="string">"变红"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h3><table>
+<thead>
+<tr>
+<th>browser</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IE 11</td>
+<td>新载入会触发load和pageshow事件，紅色未保留，没有bfcache</td>
+</tr>
+<tr>
+<td>Chrome 52.0.2743.116</td>
+<td>新载入会触发load和pageshow事件，紅色未保留，没有bfcache</td>
+</tr>
+<tr>
+<td>Opera 39.0</td>
+<td>新载入会触发load和pageshow事件，紅色未保留，没有bfcache</td>
+</tr>
+<tr>
+<td>Firefox 48.0.2</td>
+<td>新载入会触发load和pageshow事件，点前往大新浪时触发pagehide事件，但不存入bfcache，紅色未保留</td>
+</tr>
+<tr>
+<td>Safari(iPhone) iOS 9.3.5</td>
+<td>新载入会触发load和pageshow事件，点前往大新浪时触发pagehide事件，存入bfcache ，紅色保留</td>
+</tr>
+<tr>
+<td>UC</td>
+<td>新载入会触发load和pageshow事件，点前往大新浪时触发pagehide事件，存入bfcache ，紅色保留</td>
+</tr>
+<tr>
+<td>qq浏览器</td>
+<td>新载入会触发load和pageshow事件，点前往大新浪时触发pagehide事件，显示没有存入bfcache ，但是紅色保留，有bfcache但是不支持pagehide事件的persisted属性（存疑）</td>
+</tr>
+<tr>
+<td>browser</td>
+<td>新载入会触发load和pageshow事件，回上页时不触发任何事件且红色被保留，有bfcache（存疑）</td>
+</tr>
+</tbody>
+</table>
+<p> 可以看到，Safari、Firefox、UC、qq浏览器、browser保留了红色，有往返缓存。<br> 回到上页时，</p>
+<ul>
+<li>Safari、UC和qq浏览器都不会触发load；</li>
+<li>IE、Firefox、Chrome和Opera会触发load；  </li>
+<li>browser不触发任何事件。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>Firefox的<a href="https://developer.mozilla.org/en-US/Firefox/Releases/1.5/Using_Firefox_1.5_caching" target="_blank" rel="external">开发者文档</a>中提供了一些思路：</p>
+<ul>
+<li>页面监听了 unload 或者 beforeunload 事件;</li>
+<li>页面设置了 “cache-control: no-store”.</li>
+<li>网站使用 HTTPS 同时页面至少满足以下一个条件:<ul>
+<li>“Cache-Control: no-cache”</li>
+<li>“Pragma: no-cache”</li>
+<li>设置请求头 “Expires: 0” 或者 “Expires” 的值为 “Date” 之前的值 (除非 “Cache-Control: max-age=” 也被设置了);</li>
+</ul>
+</li>
+<li>页面在用户前进后退的时候还没有完全加载完或者它有正在进行的网络请求,比如 XMLHttpRequest;</li>
+<li>页面正在进行IndexedDB操作;</li>
+<li>顶层的页面包含有frame,并且这些frame由于这里列的任何一条原因而不能被缓存;</li>
+<li>页面在一个frame内，并且用户在这个frame内跳转到了一个新的网页,这里将被缓存的是新载入的网页</li>
+</ul>
+<h3 id="JS监听pageshow事件阻止页面进入bfcache"><a href="#JS监听pageshow事件阻止页面进入bfcache" class="headerlink" title="JS监听pageshow事件阻止页面进入bfcache"></a>JS监听pageshow事件阻止页面进入bfcache</h3><p>一言不合放代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'pageshow'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"> e </span>)</span>&#123;</div><div class="line">	<span class="keyword">if</span> (e.persisted) &#123;</div><div class="line">		<span class="built_in">window</span>.location.reload() </div><div class="line">	&#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>Safari、UC、qq浏览器测试通过。但是UC、qq浏览器会先闪过bfcache中的页面，因为pageshow是在load事件触发之后才触发的。browser依然会保留红色，我认为是因为browser回到上页时不触发任何事件。</p>
+<h3 id="JS监听pagehide事件阻止页面进入bfcache"><a href="#JS监听pagehide事件阻止页面进入bfcache" class="headerlink" title="JS监听pagehide事件阻止页面进入bfcache"></a>JS监听pagehide事件阻止页面进入bfcache</h3><p>一言不合放代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'pagehide'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">	<span class="keyword">var</span> $body = $(<span class="built_in">document</span>.body);</div><div class="line">	$body.children().remove();</div><div class="line"></div><div class="line">    <span class="comment">// 要等到回调函数完成，用户按返回才执行script标签的代码</span></div><div class="line">    setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">	    $body.append(<span class="string">"&lt;script type='text/javascript'&gt;window.location.reload();&lt;\/script&gt;"</span>);</div><div class="line">    &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>Safari、UC、qq浏览器测试通过。browser依然会保留红色，我认为是因为browser回到上页时不触发任何事件。</p>
+<h3 id="给响应添加Cache-Control的header"><a href="#给响应添加Cache-Control的header" class="headerlink" title="给响应添加Cache-Control的header"></a>给响应添加Cache-Control的header</h3><p>代码示例如下：<br>在jsp模板的header部分加入如下的禁用缓存设置：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">%</span></span></div><div class="line">  <span class="attr">response.setHeader</span>("<span class="attr">Cache-Control</span>","<span class="attr">no-cache</span>,<span class="attr">no-store</span>,<span class="attr">must-revalidate</span>");</div><div class="line">  <span class="attr">response.setHeader</span>("<span class="attr">Expires</span>", "<span class="attr">0</span>");</div><div class="line">  <span class="attr">response.setHeader</span>("<span class="attr">Pragma</span>","<span class="attr">no-cache</span>"); </div><div class="line">%&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="安卓webview-cache的解决方案"><a href="#安卓webview-cache的解决方案" class="headerlink" title="安卓webview cache的解决方案"></a>安卓webview cache的解决方案</h3><p>该方案的前提是浏览器在向server请求页面时，每次都用jsp重新生成html。需要页面本身有禁用缓存的配置。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 安卓webview 后退强制刷新解决方案 START --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">jsp:useBean</span> <span class="attr">id</span>=<span class="string">"now"</span> <span class="attr">class</span>=<span class="string">"java.util.Date"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"SERVER_TIME"</span> <span class="attr">value</span>=<span class="string">"$&#123;now.getTime()&#125;"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"><span class="comment">//每次webview重新打开H5首页，就把server time记录本地存储</span></div><div class="line"><span class="keyword">var</span> SERVER_TIME = <span class="built_in">document</span>.getElementById(<span class="string">"SERVER_TIME"</span>); </div><div class="line"><span class="keyword">var</span> REMOTE_VER = SERVER_TIME &amp;&amp; SERVER_TIME.value;</div><div class="line"><span class="keyword">if</span>(REMOTE_VER)&#123;</div><div class="line">    <span class="keyword">var</span> LOCAL_VER = sessionStorage &amp;&amp; sessionStorage.PAGEVERSION;</div><div class="line">    <span class="keyword">if</span>(LOCAL_VER &amp;&amp; <span class="built_in">parseInt</span>(LOCAL_VER) &gt;= <span class="built_in">parseInt</span>(REMOTE_VER))&#123;</div><div class="line">        <span class="comment">//说明html是从本地缓存中读取的</span></div><div class="line">        location.reload(<span class="literal">true</span>);</div><div class="line">    &#125;<span class="keyword">else</span>&#123;</div><div class="line">        <span class="comment">//说明html是从server端重新生成的，更新LOCAL_VER</span></div><div class="line">        sessionStorage.PAGEVERSION = REMOTE_VER;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- 安卓webview 后退强制刷新解决方案 END --&gt;</span></div></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li><p>PC浏览器，设置禁用页面缓存header即可实现后退刷新</p>
+</li>
+<li><p>支持bfcache/page cache的移动端浏览器，JS监听pageshow/pagehide，在检测到后退时强制刷新</p>
+</li>
+<li><p>在前2个方案都不work的情况下，可以在HTML中写入服务端页面生成版本号，与本地存储中的版本号对比判断是否发生了后退并使用缓存中的页面</p>
+</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://stackoverflow.com/questions/24524248/forcing-mobile-safari-to-re-evaluate-the-cached-page-when-user-presses-back-butt/24524249#24524249" target="_blank" rel="external">Forcing mobile Safari to re-evaluate the cached page when user presses back button</a></li>
+<li><a href="http://hzxiaosheng.bitbucket.org/work/2015/09/23/refresh-webpage-on-history-back-for-mobile-browser-and-webview.html" target="_blank" rel="external">H5浏览器和webview后退刷新方案</a></li>
+<li><a href="http://blog.darkthread.net/post-2012-08-02-trigger-onload-event-when-back-forward.aspx" target="_blank" rel="external">瀏覽器在回上頁時不會觸發網頁onLoad事件</a></li>
+<li><a href="http://jser.me/2012/09/22/BFcache%E6%98%AF%E4%BB%80%E4%B9%88%E4%B8%9C%E8%A5%BF.html" target="_blank" rel="external">BFcache是什么东西</a></li>
+<li><a href="https://developer.mozilla.org/en-US/Firefox/Releases/1.5/Using_Firefox_1.5_caching" target="_blank" rel="external">开发者文档</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/bfcache/" rel="tag">#bfcache</a>
+          
+            <a href="/tags/往返存储/" rel="tag">#往返存储</a>
+          
+            <a href="/tags/pageshow/" rel="tag">#pageshow</a>
+          
+            <a href="/tags/pagehide/" rel="tag">#pagehide</a>
+          
+            <a href="/tags/persisted/" rel="tag">#persisted</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/28/promise1/" rel="next" title="JavaScript Promise API">
+                <i class="fa fa-chevron-left"></i> JavaScript Promise API
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/08/29/bfcache/"
+     data-title="BFCache相关"
+     data-content=""
+     data-url="http://seminelee.github.io/2016/08/29/bfcache/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+<section id="comment">  
+ <!-- 多说评论框 start -->  
+<div class="ds-thread" data-thread-key="<%= page.path %>" data-title="<%= page.title %>" data-url="http://seminelee.github.io/<%= page.permalink %>"></div>  
+<!-- 多说评论框 end -->  
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->  
+<script type="text/javascript">  
+    var duoshuoQuery = {short_name:"seminelee"};  
+        (function() {  
+            var ds = document.createElement('script');  
+            ds.type = 'text/javascript';ds.async = true;  
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';  
+            ds.charset = 'UTF-8';  
+            (document.getElementsByTagName('head')[0]   
+             || document.getElementsByTagName('body')[0]).appendChild(ds);  
+        })();  
+</script>  
+<!-- 多说公共JS代码 end -->  
+</section>  
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar.jpg"
+               alt="Semine Lee" />
+          <p class="site-author-name" itemprop="name">Semine Lee</p>
+          <p class="site-description motion-element" itemprop="description">前端开发/UI开发/武汉大学/学生</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/seminelee" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiao-qing-long-41-67" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-coffee"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://119.29.142.213/" target="_blank" title="Wordpress">
+                  
+                    <i class="fa fa-fw fa-bicycle"></i>
+                  
+                  Wordpress
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是bfcache"><span class="nav-text">什么是bfcache</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pageshow事件"><span class="nav-text">pageshow事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pagehide事件"><span class="nav-text">pagehide事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#persisted属性"><span class="nav-text">persisted属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-text">测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试代码"><span class="nav-text">测试代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试结果"><span class="nav-text">测试结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JS监听pageshow事件阻止页面进入bfcache"><span class="nav-text">JS监听pageshow事件阻止页面进入bfcache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JS监听pagehide事件阻止页面进入bfcache"><span class="nav-text">JS监听pagehide事件阻止页面进入bfcache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#给响应添加Cache-Control的header"><span class="nav-text">给响应添加Cache-Control的header</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安卓webview-cache的解决方案"><span class="nav-text">安卓webview cache的解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"seminelee"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("NbcRQg6b55yEFLU2hc5l9mNk-gzGzoHsz", "NN7ov5pIcPFyUXuHoH9BLfl1");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

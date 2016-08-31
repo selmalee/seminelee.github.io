@@ -101,7 +101,7 @@ SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组
 <meta property="og:image" content="http://119.29.142.213/static/201608/sf5.png">
 <meta property="og:image" content="http://119.29.142.213/static/201608/sf6.png">
 <meta property="og:image" content="http://119.29.142.213/static/201608/sf7.png">
-<meta property="og:updated_time" content="2016-08-29T13:27:20.413Z">
+<meta property="og:updated_time" content="2016-08-29T13:42:02.820Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SafeFrames v1.1">
 <meta name="twitter:description" content="iab.(Interactive Advertising Bureau)安全框架版本1.1 草案2014年8月发布
@@ -873,7 +873,7 @@ SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组
 <p><strong>例子</strong><br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- SafeFrame Inline Tag --&gt;</span>   </div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"tgtLREC"</span>&gt;</span>  </div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">'text/x-safeframe'</span> <span class="attr">class</span>=<span class="string">'sf_data'</span>&gt;</span><span class="javascript">  </span></div><div class="line">&#123;  </div><div class="line">	id: <span class="string">"LREC"</span>,  </div><div class="line">	src: <span class="string">"http://secondarydomain.com/safeframe"</span>,   </div><div class="line">	conf:  </div><div class="line">	&#123;    </div><div class="line">	dest: <span class="string">"tgtLREC"</span>,  </div><div class="line">	size: <span class="string">"300x250"</span>  </div><div class="line">	&#125;   </div><div class="line">	meta:  </div><div class="line">	&#123;    </div><div class="line">		rmx:  </div><div class="line">		&#123;  </div><div class="line">			sectionID:<span class="string">"14800347"</span>,   </div><div class="line">			siteID: <span class="string">"140509"</span>   </div><div class="line">		&#125;  </div><div class="line">	&#125;  </div><div class="line">&#125;  </div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span>  </div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">'text/javascript'</span>&gt;</span><span class="javascript">  </span></div><div class="line"><span class="keyword">try</span> &#123;  </div><div class="line">$sf.host.boot();  </div><div class="line">&#125; <span class="keyword">catch</span> (e) &#123;  &#125;  </div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span> </div><div class="line"> <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <h3 id="4-9-函数-sf-host-status"><a href="#4-9-函数-sf-host-status" class="headerlink" title="4.9 函数$sf.host.status"></a>4.9 函数<code>$sf.host.status</code></h3><p>status函数用于确定位置的状态。它返回一个指示页面中的是否有任何位置当前在所渲染的过程中，或者如果有一些其它的操作，诸如扩展，正在发生的布尔值响应。<br><strong>参数</strong></p>
 <ul>
-<li><code>{Object} positions</code><br>可选的对象参数提供了一个可由，代表每个SafeFrame正在管理的$sf.host.Position对象（使用其ID属性）的密钥列表中的一个填充。每个键的值包含一个有一个代表容器的当前状态的状态代码串的对象。在此版本中，可能值如下：<br>　•  ready: the container is available for rendering but has not yet been rendered<br>　•  loading: the container is currently in the process of being rendered<br>　•  expanding: the container is currently in the process of expanding<br>　•  expanded: the container is currently in expanded state<br>　•  collapsing: the container is currently in the process of collapsing<br>　•  error: the container has experienced an error that is preventing any interaction </li>
+<li><code>{Object} positions</code><br>可选的对象参数提供了一个空的对象引用，它可以被代表每个SafeFrame正在管理的$sf.host.Position对象（使用其ID属性）的密钥列表中的一个填充。每个键的值包含一个对象，该对象有一个代表容器的当前状态的状态代码串。在此版本中，可能值如下：<br>　•  ready: the container is available for rendering but has not yet been rendered<br>　•  loading: the container is currently in the process of being rendered<br>　•  expanding: the container is currently in the process of expanding<br>　•  expanded: the container is currently in expanded state<br>　•  collapsing: the container is currently in the process of collapsing<br>　•  error: the container has experienced an error that is preventing any interaction </li>
 </ul>
 <p><strong>返回值</strong></p>
 <ul>
@@ -1251,7 +1251,7 @@ SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1259,7 +1259,7 @@ SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1268,7 +1268,7 @@ SafeFrame规范是由来自21个IAB成员公司的志愿者组成的工作小组
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
