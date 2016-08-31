@@ -56,11 +56,15 @@
 </tr>
 <tr>
 <td>qq浏览器</td>
-<td>【ios 9.3.5】新载入会触发load和pageshow事件，回上页时不触发任何事件且红色被保留，有bfcache（不同机型有不一样的结果）</td>
+<td>【ios 9.3.5】新载入会触发load和pageshow事件，回上页时不触发任何事件且红色被保留，有bfcache【安卓】新载入会触发load和pageshow事件，点前往大新浪时触发pagehide事件，显示没有存入bfcache ，但是红色保留，有bfcache但是不支持pagehide事件的persisted属性 （不同机型有不一样的结果）</td>
+</tr>
+<tr>
+<td>browser</td>
+<td>新载入会触发load和pageshow事件，回上页时不触发任何事件且红色被保留，有bfcache（存疑）</td>
 </tr>
 </tbody>
 </table>
-<p>【安卓】新载入会触发load和pageshow事件，点前往大新浪时触发pagehide事件，显示没有存入bfcache ，但是红色保留，有bfcache但是不支持pagehide事件的persisted属性<br> |<br> | browser | 新载入会触发load和pageshow事件，回上页时不触发任何事件且红色被保留，有bfcache（存疑） |<br> 可以看到，Safari、Firefox、UC、qq浏览器、browser保留了红色，有往返缓存。<br> 回到上页时，</p>
+<p> 可以看到，Safari、Firefox、UC、qq浏览器、browser保留了红色，有往返缓存。<br> 回到上页时，</p>
 <ul>
 <li>Safari、UC和qq浏览器都不会触发load；</li>
 <li>IE、Firefox、Chrome和Opera会触发load；  </li>
