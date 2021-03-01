@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言最近要做一个关于若干点的最短连线的小游戏，才发现自己关于算法方面的知识有多不扎实＝＝ 吃一堑，长一智。借此文简单总结一下。若有大神无意看见此文，请轻拍。">
+<meta name="keywords" content="JavaScript,dijkstra算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最优路径算法之小游戏实战">
+<meta property="og:url" content="http://159.75.213.179/2016/11/13/shortest/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="前言最近要做一个关于若干点的最短连线的小游戏，才发现自己关于算法方面的知识有多不扎实＝＝ 吃一堑，长一智。借此文简单总结一下。若有大神无意看见此文，请轻拍。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2016/11/shortest-1.gif">
+<meta property="og:image" content="http://159.75.213.179/static/2016/11/shortest-2.png">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.109Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="最优路径算法之小游戏实战">
+<meta name="twitter:description" content="前言最近要做一个关于若干点的最短连线的小游戏，才发现自己关于算法方面的知识有多不扎实＝＝ 吃一堑，长一智。借此文简单总结一下。若有大神无意看见此文，请轻拍。">
+<meta name="twitter:image" content="http://159.75.213.179/static/2016/11/shortest-1.gif">
+
+<link rel="canonical" href="http://159.75.213.179/2016/11/13/shortest/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>最优路径算法之小游戏实战 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2016/11/13/shortest/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          最优路径算法之小游戏实战
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-11-13 16:27:55" itemprop="dateCreated datePublished" datetime="2016-11-13T16:27:55+08:00">2016-11-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近要做一个关于若干点的最短连线的小游戏，才发现自己关于算法方面的知识有多不扎实＝＝ 吃一堑，长一智。借此文简单总结一下。若有大神无意看见此文，请轻拍。<br><a id="more"></a></p>
+<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>随机给出若干点，求这些点的最短连线。可以延伸出一个小游戏，给出若干点，让用户在一个面板上绘线将点连起，判断是否最短路径，给出提示。<br>实质是有权无向完全图中，没有特定源点的最短路径算法。</p>
+<h2 id="Dijkstra算法和Floyd算法"><a href="#Dijkstra算法和Floyd算法" class="headerlink" title="Dijkstra算法和Floyd算法"></a>Dijkstra算法和Floyd算法</h2><p>搜索资料，Dijkstra算法和Floyd算法是比较接近需求的算法。</p>
+<h3 id="stra算法"><a href="#stra算法" class="headerlink" title="stra算法"></a>stra算法</h3><p>Dijkstra算法是典型的单源最短路径算法，用于计算一个节点到其他所有节点的最短路径。主要特点是以起始点为中心向外层层扩展，直到扩展到终点为止。<br>算法思路：</p>
+<ol>
+<li>初始时，S只包含源点，即S＝{v}，v的距离为0。U包含除v外的其他顶点，即U={其余顶点}，若v与U中顶点k有边，则&lt;k,v&gt;正常有权值，若k不是v的出边邻接点，则&lt;k,v&gt;权值为∞。</li>
+<li>从U中选取一个距离v最小的顶点k，把k，加入S中。</li>
+<li>以k为新考虑的中间点，修改U中各顶点的距离；若从源点v到顶点u的距离（经过顶点k）比原来距离（不经过顶点k）短，则修改顶点u的距离值，修改后的距离值的顶点k的距离加上边上的权。</li>
+<li>重复步骤2和3直到所有顶点都包含在S中。</li>
+</ol>
+<p><img src="/static/2016/11/shortest-1.gif" alt="Dijkstra算法"></p>
+<h3 id="Floyd算法"><a href="#Floyd算法" class="headerlink" title="Floyd算法"></a>Floyd算法</h3><p>Floyd-Warshall算法（Floyd-Warshall algorithm）是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权的最短路径问题。<br>算法思路：</p>
+<ol>
+<li>从任意一条单边路径开始。所有两点之间的距离是边的权，如果两点之间没有边相连，则权为无穷大。</li>
+<li>对于每一对顶点u和v，看看是否存在一个顶点k使得从u到k再到v比己知的路径更短。如果是更新它。</li>
+</ol>
+<p>关于Dijkstra算法和Floyd算法详细见<a href="http://www.cnblogs.com/biyeymyhjob/archive/2012/07/31/2615833.html" target="_blank" rel="noopener">最短路径—Dijkstra算法和Floyd算法</a></p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>借鉴Dijkstra算法和Floyd算法思路，结合需求，开始实现。</p>
+<h3 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h3><ol>
+<li>随机生成若干个点，每个点有x坐标、y坐标、是否被访问过visited三个属性。</li>
+<li>用勾股定理算出任意两点的直线距离，生成二维矩阵</li>
+<li>将源点记为uNext，从所有连线选择一条与uNext的最短连线，将线上的此点(重新记为uNext)放入U中，将最短连线放入到一个数组中。</li>
+<li>重复步骤3，直到所有点都被放进U，计算数组中的路径和，返回最短路径。</li>
+<li>遍历点，求出各点作为源点时的最短路径，比较，得出最终的最短路径。</li>
+</ol>
+<h3 id="主要代码"><a href="#主要代码" class="headerlink" title="主要代码"></a>主要代码</h3><p>声明类Graph及其属性和方法。实现随机生成点。做一些限制，使各点不会过于聚集。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Graph</span>(<span class="params">v,w</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.vertices = v;</span><br><span class="line">  <span class="keyword">this</span>.points = []; <span class="comment">// V 总的点集</span></span><br><span class="line">  <span class="keyword">this</span>.u = []; <span class="comment">// U 点集</span></span><br><span class="line">  <span class="keyword">this</span>.width = w;</span><br><span class="line">  <span class="keyword">this</span>.pythagorean = pythagorean; <span class="comment">// 勾股定理</span></span><br><span class="line">  <span class="keyword">this</span>.getPoints = getPoints;</span><br><span class="line">  <span class="keyword">this</span>.matrix = [];</span><br><span class="line">  <span class="keyword">this</span>.getMatrix = getMatrix;</span><br><span class="line">  <span class="keyword">this</span>.path = [];</span><br><span class="line">  <span class="keyword">this</span>.pathSum = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">this</span>.getPath = getPath;</span><br><span class="line">  <span class="keyword">this</span>.getTempPath = getTempPath;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Point</span>(<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.x = x;</span><br><span class="line">  <span class="keyword">this</span>.y = y;</span><br><span class="line">  <span class="keyword">this</span>.visited = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getPoints</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.points = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.vertices; i++) &#123;</span><br><span class="line">    <span class="keyword">this</span>.points[i] = <span class="keyword">new</span> Point(<span class="built_in">Math</span>.ceil(<span class="number">15</span>+<span class="built_in">Math</span>.random()*(<span class="keyword">this</span>.width<span class="number">-30</span>)),<span class="built_in">Math</span>.ceil(<span class="number">15</span>+<span class="built_in">Math</span>.random()*(<span class="keyword">this</span>.width<span class="number">-30</span>)));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="keyword">this</span>.vertices; j++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> k = j+<span class="number">1</span>; k &lt; <span class="keyword">this</span>.vertices; k++) &#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="built_in">Math</span>.abs(<span class="keyword">this</span>.points[j].x - <span class="keyword">this</span>.points[k].x) &lt; <span class="number">30</span> &amp;&amp; <span class="built_in">Math</span>.abs(<span class="keyword">this</span>.points[j].y - <span class="keyword">this</span>.points[k].y) &lt; <span class="number">30</span>) &#123;</span><br><span class="line">          <span class="keyword">this</span>.getPoints();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>用勾股定理算出任意两点的直线距离，生成二维矩阵。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a^2 + b^2 = c^2</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pythagorean</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Math</span>.pow(<span class="keyword">this</span>.points[a].x-<span class="keyword">this</span>.points[b].x,<span class="number">2</span>) + <span class="built_in">Math</span>.pow(<span class="keyword">this</span>.points[a].y-<span class="keyword">this</span>.points[b].y,<span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getMatrix</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> min = <span class="number">999999</span>;</span><br><span class="line">  <span class="keyword">var</span> pointI, pointJ;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.vertices; i++) &#123;</span><br><span class="line">    <span class="keyword">this</span>.matrix[i] = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="keyword">this</span>.vertices; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (i === j) &#123;</span><br><span class="line">        <span class="keyword">this</span>.matrix[i][j] = <span class="number">0</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.matrix[i][j] = <span class="keyword">this</span>.pythagorean(i,j);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.matrix;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>将源点记为uNext，从所有连线选择一条与uNext的最短连线，将线上的此点(重新记为uNext)放入U中，将最短连线放入到一个数组中。重复此步，直到所有点都被放进U，计算数组中的路径和，返回最短路径。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getTempPath</span>(<span class="params">uNext</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.path = [];</span><br><span class="line">  <span class="keyword">this</span>.u = [];</span><br><span class="line">  <span class="keyword">var</span> pathTempSum = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> k = <span class="number">0</span>; k &lt; <span class="keyword">this</span>.vertices; k++) &#123;</span><br><span class="line">    <span class="keyword">this</span>.points[k].visited = <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.u.push(uNext);</span><br><span class="line">  <span class="keyword">this</span>.points[uNext].visited = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">this</span>.u.length !== <span class="keyword">this</span>.vertices) &#123;</span><br><span class="line">    <span class="keyword">var</span> min = <span class="number">999999</span>;</span><br><span class="line">    <span class="keyword">var</span> tempNext;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.vertices; i++)&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="keyword">this</span>.points[i].visited === <span class="literal">false</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.matrix[uNext][i] &lt; min) &#123;</span><br><span class="line">          min = <span class="keyword">this</span>.matrix[uNext][i];</span><br><span class="line">          tempNext = i;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    uNext = tempNext;</span><br><span class="line">    <span class="keyword">this</span>.u.push(uNext);</span><br><span class="line">    <span class="keyword">this</span>.path.push(min);</span><br><span class="line">    <span class="keyword">this</span>.points[uNext].visited = <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="keyword">this</span>.path.length; j++) &#123;</span><br><span class="line">    pathTempSum += <span class="keyword">this</span>.path[j];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> pathTempSum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>遍历点，求出各点作为源点时的最短路径，比较，得出最终的最短路径。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getPath</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> min = <span class="number">9999999</span>;</span><br><span class="line">  <span class="keyword">var</span> temp = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">var</span> shortest;</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.vertices; i++) &#123;</span><br><span class="line">    temp = <span class="keyword">this</span>.getTempPath(i);</span><br><span class="line">    <span class="keyword">if</span>(temp &lt; min) &#123;</span><br><span class="line">      min = temp;</span><br><span class="line">      shortest = i;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.pathSum = min;</span><br><span class="line">  <span class="keyword">this</span>.getTempPath(shortest);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="结合canvas做出小游戏"><a href="#结合canvas做出小游戏" class="headerlink" title="结合canvas做出小游戏"></a>结合canvas做出小游戏</h2><p>主要思路：</p>
+<ol>
+<li>new一个Graph对象。利用canvas画出随机生成的点。</li>
+<li>监听touchstart、touchmove、touchend事件。实现随着触摸绘线。touchmove事件中判断是否经过图中的点并用数组记录。touchend事件触发后经过的点样式发生变化，点与点间用直线连起来。</li>
+<li>点击开始检测，计算经过的路径，并比较经过的路径和最短的路径，分别给出提示。</li>
+</ol>
+<p>demo地址：<a href="http://119.29.142.213/shortest" target="_blank" rel="noopener">http://119.29.142.213/shortest</a><br><img src="/static/2016/11/shortest-2.png" alt="demo"></p>
+<h2 id="6-不足之处"><a href="#6-不足之处" class="headerlink" title="6 不足之处"></a>6 不足之处</h2><ul>
+<li>UI方面待实现：经过点时有呼吸灯效果；画布边缘不能绘线等；错误后显示重新开始按钮</li>
+<li>声明了较多数组和用了较多循环。我再想想= =b</li>
+</ul>
+<h2 id="7-参考"><a href="#7-参考" class="headerlink" title="7 参考"></a>7 参考</h2><ul>
+<li><a href="http://www.cnblogs.com/biyeymyhjob/archive/2012/07/31/2615833.html" target="_blank" rel="noopener">最短路径—Dijkstra算法和Floyd算法</a></li>
+<li><a href="http://www.108js.com/article/article5/50041.html?id=898" target="_blank" rel="noopener">Floyd最短路算法及javascript实现</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/dijkstra算法/" rel="tag"># dijkstra算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/11/04/experience-1/" rel="prev" title="移动端重构遇到的坑（长期更新）">
+      <i class="fa fa-chevron-left"></i> 移动端重构遇到的坑（长期更新）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/01/17/phpdemo/" rel="next" title="php学习笔记之实战小demo">
+      php学习笔记之实战小demo <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#需求"><span class="nav-number">2.</span> <span class="nav-text">需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dijkstra算法和Floyd算法"><span class="nav-number">3.</span> <span class="nav-text">Dijkstra算法和Floyd算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stra算法"><span class="nav-number">3.1.</span> <span class="nav-text">stra算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Floyd算法"><span class="nav-number">3.2.</span> <span class="nav-text">Floyd算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实现"><span class="nav-number">4.</span> <span class="nav-text">具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现思路"><span class="nav-number">4.1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要代码"><span class="nav-number">4.2.</span> <span class="nav-text">主要代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结合canvas做出小游戏"><span class="nav-number">5.</span> <span class="nav-text">结合canvas做出小游戏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-不足之处"><span class="nav-number">6.</span> <span class="nav-text">6 不足之处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-参考"><span class="nav-number">7.</span> <span class="nav-text">7 参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

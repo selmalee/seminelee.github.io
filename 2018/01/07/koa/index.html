@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="准备Koa是一种Web框架。由Express原班人马打造的koa，致力于成为一个更小、更健壮、更富有表现力的Web框架。使用koa编写web应用，通过组合不同的generator，可以免除重复繁琐的回调函数嵌套，并极大地提升常用错误处理效率。Koa没有捆绑任何中间件，它仅仅提供了一个轻量优雅的函数库，使得编写 Web 应用变得得心应手。  Koa is a new web framework de">
+<meta name="keywords" content="Koa,NodeJs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="koa学习笔记">
+<meta property="og:url" content="http://159.75.213.179/2018/01/07/koa/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="准备Koa是一种Web框架。由Express原班人马打造的koa，致力于成为一个更小、更健壮、更富有表现力的Web框架。使用koa编写web应用，通过组合不同的generator，可以免除重复繁琐的回调函数嵌套，并极大地提升常用错误处理效率。Koa没有捆绑任何中间件，它仅仅提供了一个轻量优雅的函数库，使得编写 Web 应用变得得心应手。  Koa is a new web framework de">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2018/01/cascading.png">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.106Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="koa学习笔记">
+<meta name="twitter:description" content="准备Koa是一种Web框架。由Express原班人马打造的koa，致力于成为一个更小、更健壮、更富有表现力的Web框架。使用koa编写web应用，通过组合不同的generator，可以免除重复繁琐的回调函数嵌套，并极大地提升常用错误处理效率。Koa没有捆绑任何中间件，它仅仅提供了一个轻量优雅的函数库，使得编写 Web 应用变得得心应手。  Koa is a new web framework de">
+<meta name="twitter:image" content="http://159.75.213.179/static/2018/01/cascading.png">
+
+<link rel="canonical" href="http://159.75.213.179/2018/01/07/koa/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>koa学习笔记 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2018/01/07/koa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          koa学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-01-07 13:57:33" itemprop="dateCreated datePublished" datetime="2018-01-07T13:57:33+08:00">2018-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/后端知识/" itemprop="url" rel="index"><span itemprop="name">后端知识</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p><a href="http://koajs.com/" target="_blank" rel="noopener">Koa</a>是一种Web框架。<br>由Express原班人马打造的koa，致力于成为一个更小、更健壮、更富有表现力的Web框架。使用koa编写web应用，通过组合不同的generator，可以免除重复繁琐的回调函数嵌套，并极大地提升常用错误处理效率。Koa没有捆绑任何中间件，它仅仅提供了一个轻量优雅的函数库，使得编写 Web 应用变得得心应手。</p>
+<blockquote>
+<p>Koa is a new web framework designed by the team behind Express, which aims to be a smaller, more expressive, and more robust foundation for web applications and APIs. Through leveraging generators Koa allows you to ditch callbacks and greatly increase error-handling. Koa does not bundle any middleware within core, and provides an elegant suite of methods that make writing servers fast and enjoyable.</p>
+</blockquote>
+<a id="more"></a>
+<p>Koa需要node 7.6.0以上的版本，以支持ES6和<code>async</code>方法。</p>
+<h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><p>下面是官网的例子<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Koa = <span class="built_in">require</span>(<span class="string">'koa'</span>)</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 中间件</span></span><br><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  ctx.body = <span class="string">'Hello World'</span></span><br><span class="line">&#125;)</span><br><span class="line">app.listen(<span class="number">3000</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="Koa应用程序"><a href="#Koa应用程序" class="headerlink" title="Koa应用程序"></a>Koa应用程序</h2><p>在执行<code>new Koa()</code>时创建的对象被称为Koa应用对象。<br>应用对象是带有node http服务的Koa接口。它可以处理中间件的注册，将http请求分发到中间件，进行默认错误处理，以及应对上下文，请求和响应对象进行配置。<br>上面的代码架设了一个http服务，监听3000端口。</p>
+<h2 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h2><p>Koa 是一个中间件框架，可以采用两种不同的方法来实现中间件：</p>
+<ul>
+<li>async function</li>
+<li>common function</li>
+</ul>
+<p>上面的代码用的是async function(node v7.6+)。<br>中间件通常带有两个参数(ctx, next)，ctx是一个请求的上下文(context)，next是调用执行下游中间件的函数，在代码执行完成后通过<code>then</code>方法返回一个<code>Promise</code>。</p>
+<h3 id="级联代码"><a href="#级联代码" class="headerlink" title="级联代码"></a>级联代码</h3><p>Koa 中间件以一种非常传统的方式级联起来，如下面的例子，代码执行的顺序如注释。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Koa = <span class="built_in">require</span>(<span class="string">'koa'</span>)</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa()</span><br><span class="line"></span><br><span class="line"><span class="comment">// x-response-time</span></span><br><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="comment">// (1) 进入路由</span></span><br><span class="line">  <span class="keyword">const</span> start = <span class="built_in">Date</span>.now()</span><br><span class="line">  <span class="keyword">await</span> next()</span><br><span class="line">  <span class="comment">// (5) 再次进入 x-response-time 中间件，记录2次通过此中间件「穿越」的时间</span></span><br><span class="line">  <span class="keyword">const</span> ms = <span class="built_in">Date</span>.now() - start</span><br><span class="line">  ctx.set(<span class="string">'X-Response-Time'</span>, <span class="string">`<span class="subst">$&#123;ms&#125;</span>ms`</span>)</span><br><span class="line">  <span class="comment">// (6) 返回 ctx.body</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// logger</span></span><br><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="comment">// (2) 进入 logger 中间件</span></span><br><span class="line">  <span class="keyword">const</span> start = <span class="built_in">Date</span>.now()</span><br><span class="line">  <span class="keyword">await</span> next()</span><br><span class="line">  <span class="comment">// (4) 再次进入 logger 中间件，记录2次通过此中间件「穿越」的时间</span></span><br><span class="line">  <span class="keyword">const</span> ms = <span class="built_in">Date</span>.now() - start</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;ctx.method&#125;</span> <span class="subst">$&#123;ctx.url&#125;</span> - <span class="subst">$&#123;ms&#125;</span>`</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// response</span></span><br><span class="line">app.use(<span class="keyword">async</span> ctx =&gt; &#123;</span><br><span class="line">  <span class="comment">// (3) 进入 response 中间件，没有捕获到下一个符合条件的中间件，传递到 upstream</span></span><br><span class="line">  ctx.body = <span class="string">'Hello World'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>)</span><br></pre></td></tr></table></figure></p>
+<p>一开始，用户的请求通过x-response-time和logger中间件。这两个中间件记录了一些请求细节。然后“穿过”response 中间件一次，最终结束请求，返回“Hello World”。<br>当程序运行到<code>await next()</code>时，代码流会暂停执行这个中间件到剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换控制权的方式，被称为downstream，当没有下一个中间件执行downstream的时候，代码会逆序执行（回到<code>await next()</code>执行下一行）。</p>
+<p>“级联”这个词许多人也许在CSS中听说过，如果你不能理解为什么在这里使用这个词，可以将这种路由结构想象成LESS的继承嵌套书写方式。<br>下面的“洋葱”图更能形象地表达。用户的请求先后经过登陆管理，状态码重定向，错误处理，cache缓存中间件，session会话中间件，routes路由中间件，应用。响应逆向经过这些步骤传递出去。<br><img src="/static/2018/01/cascading.png" alt="级联模型"></p>
+<h2 id="Context-内容"><a href="#Context-内容" class="headerlink" title="Context(内容)"></a>Context(内容)</h2><p>每个中间件都接受一个Koa的<code>Context</code>对象。<code>Context</code>将 node 的<code>request</code>和<code>response</code>对象封装到单个对象中。<code>ctx</code>通常用作上下文对象的参数名称。</p>
+<h3 id="ctx-request"><a href="#ctx-request" class="headerlink" title="ctx.request"></a>ctx.request</h3><p>Koa提供了一个<code>Request</code>对象作为<code>Context</code>的<code>request</code>属性，即<code>ctx.request</code>。 Koa的<code>Request</code>对象提供了用于处理 http请求的方法，该请求委托给 node<code>http</code>模块的<a href="https://nodejs.org/api/http.html#http_class_http_incomingmessage" target="_blank" rel="noopener">IncomingMessage</a>。<br>下面是一个检查请求客户端xml支持的示例。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  ctx.assert(ctx.request.accepts(<span class="string">'xml'</span>), <span class="number">406</span>);</span><br><span class="line">  <span class="comment">// 相当于:</span></span><br><span class="line">  <span class="comment">// if (!ctx.request.accepts('xml')) ctx.throw(406);</span></span><br><span class="line">  <span class="keyword">await</span> next();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h3 id="ctx-response"><a href="#ctx-response" class="headerlink" title="ctx.response"></a>ctx.response</h3><p>Koa提供了一个<code>Response</code>对象作为<code>Context</code>的<code>response</code>属性，即<code>ctx.response</code>。 Koa的<code>Response</code>对象提供了用于处理<code>http</code>响应的方法，该响应委托给<a href="https://nodejs.org/api/http.html#http_class_http_serverresponse" target="_blank" rel="noopener">ServerResponse</a>。<br>下面是一个使用Koa的｀Response｀对象将文件作为响应体流式传输的示例（返回一个页面)。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> next()</span><br><span class="line">  ctx.response.type = <span class="string">'html'</span></span><br><span class="line">  ctx.response.body = fs.createReadStream(<span class="string">'index.html'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>更详细的API参阅<a href="https://github.com/demopark/koa-docs-Zh-CN/blob/master/api/request.md" target="_blank" rel="noopener">请求 API 参考</a>, <a href="https://github.com/demopark/koa-docs-Zh-CN/blob/master/api/response.md" target="_blank" rel="noopener">响应 API 参考</a>和<a href="https://github.com/koajs/koa/blob/master/docs/api/context.md" target="_blank" rel="noopener">上下文 API 参考</a>。</p>
+<h2 id="koa-router"><a href="#koa-router" class="headerlink" title="koa-router"></a>koa-router</h2><p><a href="https://www.npmjs.com/package/koa-router" target="_blank" rel="noopener">koa-router</a>是koa的路由中间件。<br>可以先看一下原生路由和<code>koa-router</code>的基本用法的对比。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 原生路由</span></span><br><span class="line">app.use(<span class="keyword">async</span> ctx =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (ctx.request.path !== <span class="string">'/'</span>) &#123;</span><br><span class="line">    ctx.response.type = <span class="string">'html'</span>;</span><br><span class="line">    ctx.response.body = <span class="string">'&lt;a href="/"&gt;Index Page&lt;/a&gt;'</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    ctx.response.body = <span class="string">'Hello World'</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// koa-route</span></span><br><span class="line"><span class="keyword">const</span> router = <span class="built_in">require</span>(<span class="string">'koa-router'</span>);</span><br><span class="line"></span><br><span class="line">router</span><br><span class="line">  .get(<span class="string">'/'</span>, ctx =&gt; &#123;</span><br><span class="line">    ctx.response.body = <span class="string">'Hello World'</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .get(<span class="string">'/about'</span>, ctx =&gt; &#123;</span><br><span class="line">    ctx.response.type = <span class="string">'html'</span></span><br><span class="line">    ctx.response.body = <span class="string">'&lt;a href="/"&gt;Index Page&lt;/a&gt;'</span></span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">app</span><br><span class="line">  .use(router.routes())</span><br><span class="line">  .use(router.allowedMethods())</span><br></pre></td></tr></table></figure>
+<h3 id="router-get-put-post-patch-delete-del-⇒-Router"><a href="#router-get-put-post-patch-delete-del-⇒-Router" class="headerlink" title="router.get|put|post|patch|delete|del ⇒ Router"></a>router.get|put|post|patch|delete|del ⇒ Router</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">router</span><br><span class="line">  .get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    ctx.body = <span class="string">'Hello World!'</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">  .post(<span class="string">'/users'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .put(<span class="string">'/users/:id'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .del(<span class="string">'/users/:id'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="comment">// router.all() can be used to match against all methods</span></span><br><span class="line">  .all(<span class="string">'/users/:id'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="多个中间件"><a href="#多个中间件" class="headerlink" title="多个中间件"></a>多个中间件</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">router.get(</span><br><span class="line">  <span class="string">'/users/:id'</span>,</span><br><span class="line">  <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> User.findOne(ctx.params.id).then(<span class="function"><span class="keyword">function</span>(<span class="params">user</span>) </span>&#123;</span><br><span class="line">      ctx.user = user;</span><br><span class="line">      <span class="keyword">return</span> next();</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="keyword">function</span> (<span class="params">ctx</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(ctx.user);</span><br><span class="line">    <span class="comment">// =&gt; &#123; id: 17, name: "Alex" &#125;</span></span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="嵌套路由"><a href="#嵌套路由" class="headerlink" title="嵌套路由"></a>嵌套路由</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> forums = <span class="keyword">new</span> Router()</span><br><span class="line"><span class="keyword">const</span> posts = <span class="keyword">new</span> Router()</span><br><span class="line">posts</span><br><span class="line">  .get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .get(<span class="string">'/:pid'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br><span class="line">forums.use(<span class="string">'/forums/:fid/posts'</span>, posts.routes(), posts.allowedMethods())</span><br><span class="line"></span><br><span class="line"><span class="comment">// responds to '/forums/123/posts' and '/forums/123/posts/123'</span></span><br><span class="line">app.use(forums.routes())</span><br></pre></td></tr></table></figure>
+<h3 id="路由前缀"><a href="#路由前缀" class="headerlink" title="路由前缀"></a>路由前缀</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> Router(&#123;</span><br><span class="line">  prefix: <span class="string">'/users'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">router.get(<span class="string">'/'</span>, ...) <span class="comment">// responds to '/users'</span></span><br><span class="line">router.get(<span class="string">'/:id'</span>, ...) <span class="comment">// responds to '/users/:id'</span></span><br></pre></td></tr></table></figure>
+<h3 id="URL参数"><a href="#URL参数" class="headerlink" title="URL参数"></a>URL参数</h3><p>命名的路由参数会被捕获，并被添加到<code>ctx.params</code>里<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">router.get(<span class="string">'/:category/:title'</span>, (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(ctx.params)</span><br><span class="line">  <span class="comment">// =&gt; &#123; category: 'programming', title: 'how-to-node' &#125;</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>关于<code>koa-router</code>更多介绍参阅<a href="https://www.npmjs.com/package/koa-router" target="_blank" rel="noopener">koa-router</a>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/demopark/koa-docs-Zh-CN" target="_blank" rel="noopener">koa中文文档</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2017/08/koa.html" target="_blank" rel="noopener">Koa 框架教程</a></li>
+<li><a href="https://www.npmjs.com/package/koa-router" target="_blank" rel="noopener">koa-router</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Koa/" rel="tag"># Koa</a>
+              <a href="/tags/NodeJs/" rel="tag"># NodeJs</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/12/16/promise-2/" rel="prev" title="JavaScript异步编程之promise与async">
+      <i class="fa fa-chevron-left"></i> JavaScript异步编程之promise与async
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/14/http/" rel="next" title="《Web性能权威指南》之读书笔记">
+      《Web性能权威指南》之读书笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备"><span class="nav-number">1.</span> <span class="nav-text">准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hello-World"><span class="nav-number">2.</span> <span class="nav-text">Hello World</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Koa应用程序"><span class="nav-number">3.</span> <span class="nav-text">Koa应用程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中间件"><span class="nav-number">4.</span> <span class="nav-text">中间件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#级联代码"><span class="nav-number">4.1.</span> <span class="nav-text">级联代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-内容"><span class="nav-number">5.</span> <span class="nav-text">Context(内容)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ctx-request"><span class="nav-number">5.1.</span> <span class="nav-text">ctx.request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ctx-response"><span class="nav-number">5.2.</span> <span class="nav-text">ctx.response</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#koa-router"><span class="nav-number">6.</span> <span class="nav-text">koa-router</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#router-get-put-post-patch-delete-del-⇒-Router"><span class="nav-number">6.1.</span> <span class="nav-text">router.get|put|post|patch|delete|del ⇒ Router</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个中间件"><span class="nav-number">6.2.</span> <span class="nav-text">多个中间件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#嵌套路由"><span class="nav-number">6.3.</span> <span class="nav-text">嵌套路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由前缀"><span class="nav-number">6.4.</span> <span class="nav-text">路由前缀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#URL参数"><span class="nav-number">6.5.</span> <span class="nav-text">URL参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

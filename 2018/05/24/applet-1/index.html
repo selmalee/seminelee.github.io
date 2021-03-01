@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="导言小程序的项目代码文件大致分为JSON配置文件、WXML模板文件、WXSS样式文件、JS脚本逻辑文件。小程序的框架MINA的核心是一个响应的数据绑定系统，也体现了MVVM的开发模式。小程序并不是“正宗”的MVVM，它是单向绑定的。">
+<meta name="keywords" content="小程序,Vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小程序学习笔记之代码构成与框架结构">
+<meta property="og:url" content="http://159.75.213.179/2018/05/24/applet-1/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="导言小程序的项目代码文件大致分为JSON配置文件、WXML模板文件、WXSS样式文件、JS脚本逻辑文件。小程序的框架MINA的核心是一个响应的数据绑定系统，也体现了MVVM的开发模式。小程序并不是“正宗”的MVVM，它是单向绑定的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2018/05/applet-wxss.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2018/05/applet-mvvm.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2018/05/applet-structure.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2018/05/applet-vue.jpeg">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.104Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小程序学习笔记之代码构成与框架结构">
+<meta name="twitter:description" content="导言小程序的项目代码文件大致分为JSON配置文件、WXML模板文件、WXSS样式文件、JS脚本逻辑文件。小程序的框架MINA的核心是一个响应的数据绑定系统，也体现了MVVM的开发模式。小程序并不是“正宗”的MVVM，它是单向绑定的。">
+<meta name="twitter:image" content="http://159.75.213.179/static/2018/05/applet-wxss.jpeg">
+
+<link rel="canonical" href="http://159.75.213.179/2018/05/24/applet-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>小程序学习笔记之代码构成与框架结构 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2018/05/24/applet-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          小程序学习笔记之代码构成与框架结构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-24 23:26:53" itemprop="dateCreated datePublished" datetime="2018-05-24T23:26:53+08:00">2018-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hybrid-app/" itemprop="url" rel="index"><span itemprop="name">hybrid app</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="导言"><a href="#导言" class="headerlink" title="导言"></a>导言</h2><p>小程序的项目代码文件大致分为JSON配置文件、WXML模板文件、WXSS样式文件、JS脚本逻辑文件。<br>小程序的框架MINA的核心是一个响应的数据绑定系统，也体现了MVVM的开发模式。小程序并不是“正宗”的MVVM，它是单向绑定的。<br><a id="more"></a></p>
+<h2 id="代码构成"><a href="#代码构成" class="headerlink" title="代码构成"></a>代码构成</h2><h3 id="项目目录"><a href="#项目目录" class="headerlink" title="项目目录"></a>项目目录</h3><p>官方提供的quickstart例子的项目目录如下<br>wx_quickstart<br>├── app.js<br>├── app.json<br>├── app.wxss<br>├── pages<br>│   ├── index<br>│   │   ├── index.js<br>│   │   ├── index.wxml<br>│   │   └── index.wxss<br>│   └── logs<br>│       ├── logs.js<br>│       ├── logs.json<br>│       ├── logs.wxml<br>│       └── logs.wxss<br>├── project.config.json<br>└── utils<br>    └── util.js<br>可以看到，文件大致分为这4种</p>
+<ol>
+<li>.json 后缀的 JSON 配置文件</li>
+<li>.wxml 后缀的 WXML 模板文件</li>
+<li>.wxss 后缀的 WXSS 样式文件</li>
+<li>.js 后缀的 JS 脚本逻辑文件</li>
+</ol>
+<h3 id="app-json"><a href="#app-json" class="headerlink" title="app.json"></a>app.json</h3><p>以下是一个包含了所有配置选项的app.json。<br>配置了页面文件的路径、窗口表现、设置网络超时时间、设置多tab等。<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"pages"</span>: [</span><br><span class="line">    <span class="string">"pages/index/index"</span>,</span><br><span class="line">    <span class="string">"pages/logs/index"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"window"</span>: &#123;</span><br><span class="line">    <span class="attr">"navigationBarTitleText"</span>: <span class="string">"Demo"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"tabBar"</span>: &#123;</span><br><span class="line">    <span class="attr">"list"</span>: [&#123;</span><br><span class="line">      <span class="attr">"pagePath"</span>: <span class="string">"pages/index/index"</span>,</span><br><span class="line">      <span class="attr">"text"</span>: <span class="string">"首页"</span></span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      <span class="attr">"pagePath"</span>: <span class="string">"pages/logs/logs"</span>,</span><br><span class="line">      <span class="attr">"text"</span>: <span class="string">"日志"</span></span><br><span class="line">    &#125;]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"networkTimeout"</span>: &#123;</span><br><span class="line">    <span class="attr">"request"</span>: <span class="number">10000</span>,</span><br><span class="line">    <span class="attr">"downloadFile"</span>: <span class="number">10000</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"debug"</span>: <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="wxml"><a href="#wxml" class="headerlink" title="wxml"></a>wxml</h3><p>wxml (WeiXin Markup Language)是框架设计的一套标签语言，结合基础组件、事件系统，可以构建出页面的结构。它的作用和<code>html</code>一样，都是负责页面的结构。<br>基础组件包括：视图容器、基础内容、表单组件、导航、媒体组件、地图、画布、开放能力等。详细可以看官方文档的<a href="https://developers.weixin.qq.com/miniprogram/dev/component/" target="_blank" rel="noopener">组件</a>介绍。<br>wxml的<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/" target="_blank" rel="noopener">能力</a>主要有以下几点：</p>
+<ol>
+<li>数据绑定<br>使用 Mustache 语法（双大括号）将变量包起来，可以在双大括号内进行简单的运算，如三元运算等</li>
+<li>列表渲染<br>在组件上使用<code>wx:for</code>控制属性绑定一个数组，即可使用数组中各项的数据重复渲染该组件。</li>
+<li>条件渲染<br>在框架中，使用<code>wx:if</code>来判断是否需要渲染该代码块</li>
+<li>模板<br>wxml提供模板（template），可以在模板中定义代码片段，然后在不同的地方调用。</li>
+<li>事件<br>wxml的冒泡事件有：<code>touchstart</code>、<code>tap</code> 、<code>longpress</code>、<code>transitionend</code>、<code>touchforcechange</code>等，触摸类事件支持捕获阶段。<br>可以在组件中绑定一个事件处理函数，事件绑定的写法以 key、value 的形式。key是<code>bind</code>则是普通的事件绑定，如<code>bindtap</code>或<code>bind:tap</code>；<code>catch</code>事件绑定可以阻止冒泡事件向上冒泡；<code>capture-bind</code>在捕获阶段监听事件；<code>capture-catch</code>则中断捕获阶段和取消冒泡阶段。</li>
+</ol>
+<h3 id="wxss"><a href="#wxss" class="headerlink" title="wxss"></a>wxss</h3><p>wxss (WeiXin Style Sheets)是一套样式语言，用于描述<code>WXML</code>的组件样式。它的作用和<code>css</code>一样，都是负责页面的样式。<br>与<code>css</code>相比，wxss的特性有</p>
+<ol>
+<li><p>尺寸单位<br>rpx（responsive pixel）: 可以根据屏幕宽度进行自适应。规定屏幕宽为750rpx (iphone6) 。即，以750rpx为基准，对于不同大小的屏幕放大或缩小。因此，设计师可以用 iPhone6 作为视觉稿的标准。<br><img src="/static/2018/05/applet-wxss.jpeg" alt="rpx"></p>
+</li>
+<li><p>样式导入<br>使用@import语句可以导入外联样式表。</p>
+</li>
+<li>选择器<br>比起<code>css</code>，只支持部分选择器，包括<code>.class</code>、<code>#id</code>、<code>element</code>、<code>element, element</code>、<code>::after</code>、<code>::before</code></li>
+<li>全局样式与局部样式<br>定义在 app.wxss 中的样式为全局样式，作用于每一个页面。在 page 的 wxss 文件中定义的样式为局部样式，只作用在对应的页面，并会覆盖 app.wxss 中相同的选择器。</li>
+<li>本地资源无法通过 css 获取<br>因此，在设置<code>background-image</code>属性时，可以使用网络图片，或者 base64，或者使用<image>标签代替；在设置<code>@font-face</code>的<code>src</code>属性时，需要把字体文件转换成base64，可以到<a href="https://transfonter.org/" target="_blank" rel="noopener">https://transfonter.org/</a>转换。</image></li>
+</ol>
+<h3 id="js"><a href="#js" class="headerlink" title="js"></a>js</h3><p>需要注意的一点是：小程序的js运行环境是JsCore，不是浏览器，不能使用window与document对象。<br><code>zepto</code>/<code>jquery</code>会使用到window对象和document对象，所以也无法使用。</p>
+<blockquote>
+<p>JsCore（JavaScriptCore）<br>对JS进行解析和提供执行环境。iOS7后苹果推出，极大地方便了我们对js的操作。我们可以脱离webview直接运行我们的js。JSCore 只是实现了标准 JavaScript 语言，所以也自然就没有浏览器对象（BOM）等。微信小程序框架的native端与js端通过JsCore来相互通信。</p>
+</blockquote>
+<h2 id="框架结构"><a href="#框架结构" class="headerlink" title="框架结构"></a>框架结构</h2><h3 id="MINA"><a href="#MINA" class="headerlink" title="MINA"></a>MINA</h3><p>小程序的框架MINA的核心是一个响应的数据绑定系统，也体现了MVVM的开发模式(例如 React, Vue)的思想。<br>下面就是MVVM的框架结构<br><img src="/static/2018/05/applet-mvvm.jpeg" alt="mvvm"></p>
+<ul>
+<li>View：视图</li>
+<li>ViewModel：与视图数据绑定；获取Model的变更，在必要时更新View</li>
+<li>Model：数据（与后端的沟通、AJAX请求以及对数据的处理）</li>
+</ul>
+<p>小程序的框架结构如下：<br><img src="/static/2018/05/applet-structure.jpeg" alt="structure"><br>渲染的过程是这样的：</p>
+<ol>
+<li>提供了JavsScript运行环境（JsCore），由JavaScript编写的业务代码完成逻辑层的处理</li>
+<li>通过数据传输接口（注册Page时的data属性及后续的setData方法调用）将逻辑层的数据传输给视图层。</li>
+<li>视图层由WXML语言编写的模板通过“数据绑定”与逻辑层传输过来的数据merge成展现结果并展现</li>
+<li>视图的样式控制由WXSS语言编写的样式规则进行配置</li>
+</ol>
+<h3 id="与Vue的区别"><a href="#与Vue的区别" class="headerlink" title="与Vue的区别"></a>与Vue的区别</h3><p>最大的区别就是，小程序并不是“正宗”的MVVM。在数据绑定上，它是单向绑定的。而vue是双向的。<br>如要实现一个提供一个输入框，并且把用户的输入同步显示到视图，如下图<br><img src="/static/2018/05/applet-vue.jpeg" alt="vue"><br>在vue中是这样实现的：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">  &#123;&#123; message &#125;&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> app = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">'#app'</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    message: <span class="string">'Hello Vue!'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>在小程序中是这样实现的<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">"section"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">"section__title"</span>&gt;</span>你输入的是：&#123;&#123;inputValue&#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span>  <span class="attr">bindinput</span>=<span class="string">"bindKeyInput"</span> <span class="attr">placeholder</span>=<span class="string">"输入同步到view中"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Page(&#123;</span><br><span class="line">  data: &#123;</span><br><span class="line">    inputValue: <span class="string">''</span></span><br><span class="line">  &#125;,</span><br><span class="line">  bindKeyInput: <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.setData(&#123;</span><br><span class="line">      inputValue: e.detail.value</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>因为，微信小程序的JS逻辑层与视图层分散在两个不同的上下文环境中（JS逻辑跑在JsCore中，视图层的渲染包括模板渲染、样式应用、事件派发却都在native环境中）。所以数据对象(view-model)在两层间没有共享，并且同步通信的成本太高。<br>因此，微信小程序在初始化之后，再对原来的数据对象进行任何更改，都始终不会生效，需要调用<code>setData</code>。以及，在事件冒泡的阻止上，微信小程序在监听时即决定是否阻止事件冒泡。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://developers.weixin.qq.com/miniprogram/dev/" target="_blank" rel="noopener">微信公众平台－小程序</a></li>
+<li><a href="https://www.zhihu.com/question/50920642?sort=created" target="_blank" rel="noopener">微信小程序底层的实现原理是怎样的？</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/小程序/" rel="tag"># 小程序</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/19/security/" rel="prev" title="web安全中常见攻击及防御小总结">
+      <i class="fa fa-chevron-left"></i> web安全中常见攻击及防御小总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/18/algorithms/" rel="next" title="《数据结构与算法JavaScript描述》算法部分学习心得">
+      《数据结构与算法JavaScript描述》算法部分学习心得 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#导言"><span class="nav-number">1.</span> <span class="nav-text">导言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码构成"><span class="nav-number">2.</span> <span class="nav-text">代码构成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#项目目录"><span class="nav-number">2.1.</span> <span class="nav-text">项目目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#app-json"><span class="nav-number">2.2.</span> <span class="nav-text">app.json</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wxml"><span class="nav-number">2.3.</span> <span class="nav-text">wxml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wxss"><span class="nav-number">2.4.</span> <span class="nav-text">wxss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#js"><span class="nav-number">2.5.</span> <span class="nav-text">js</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#框架结构"><span class="nav-number">3.</span> <span class="nav-text">框架结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MINA"><span class="nav-number">3.1.</span> <span class="nav-text">MINA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与Vue的区别"><span class="nav-number">3.2.</span> <span class="nav-text">与Vue的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

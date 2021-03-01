@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文是学习React Native与小程序官方开发指南的笔记与总结，以了解React Native和小程序的底层框架。">
+<meta name="keywords" content="小程序,hybrid app,React Native">
+<meta property="og:type" content="article">
+<meta property="og:title" content="了解React Native与小程序的底层框架">
+<meta property="og:url" content="http://159.75.213.179/2019/05/08/rn-miniprogram/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="本文是学习React Native与小程序官方开发指南的笔记与总结，以了解React Native和小程序的底层框架。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2019/07/hybrid-app-1.jpg">
+<meta property="og:image" content="http://159.75.213.179/static/2019/07/react-native.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2019/07/miniprogram.png">
+<meta property="og:image" content="http://159.75.213.179/static/2019/07/miniprogram-dom.png">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.108Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="了解React Native与小程序的底层框架">
+<meta name="twitter:description" content="本文是学习React Native与小程序官方开发指南的笔记与总结，以了解React Native和小程序的底层框架。">
+<meta name="twitter:image" content="http://159.75.213.179/static/2019/07/hybrid-app-1.jpg">
+
+<link rel="canonical" href="http://159.75.213.179/2019/05/08/rn-miniprogram/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>了解React Native与小程序的底层框架 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2019/05/08/rn-miniprogram/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          了解React Native与小程序的底层框架
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-08 11:23:19" itemprop="dateCreated datePublished" datetime="2019-05-08T11:23:19+08:00">2019-05-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hybrid-app/" itemprop="url" rel="index"><span itemprop="name">hybrid app</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文是学习React Native与小程序官方开发指南的笔记与总结，以了解React Native和小程序的底层框架。<br><a id="more"></a></p>
+<h1 id="Hybrid-App"><a href="#Hybrid-App" class="headerlink" title="Hybrid App"></a>Hybrid App</h1><p>在了解React Native与小程序前，我们先来了解一下Hybrid App。</p>
+<h2 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h2><p>Hybrid App（混合模式移动应用）是指介于web-app、native-app这两者之间的app，兼具“Native App良好用户交互体验的优势”和“Web App跨平台开发的优势”。</p>
+<blockquote>
+<p>Native App是一种基于智能手机本地操作系统如iOS、Android、WP并使用原生程式编写运行的第三方应用程序，也叫本地app。一般使用的开发语言为JAVA、C++、Objective-C。<br>Web App就是运行于网络和标准浏览器上，基于网页技术开发实现特定功能的应用。</p>
+</blockquote>
+<p>以下是与Web App和Native App的对比：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Web App</th>
+<th>Hybrid App</th>
+<th>Native App</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开发成本</td>
+<td>低</td>
+<td>中</td>
+<td>高</td>
+</tr>
+<tr>
+<td>维护更新</td>
+<td>简单</td>
+<td>简单</td>
+<td>复杂</td>
+</tr>
+<tr>
+<td>体验</td>
+<td>差</td>
+<td>优</td>
+<td>优</td>
+</tr>
+<tr>
+<td>安装</td>
+<td>不需要</td>
+<td>需要</td>
+<td>需要</td>
+</tr>
+<tr>
+<td>跨平台</td>
+<td>优</td>
+<td>优</td>
+<td>差</td>
+</tr>
+</tbody>
+</table>
+<h2 id="技术原理"><a href="#技术原理" class="headerlink" title="技术原理"></a>技术原理</h2><p>Hybrid App的本质，其实是在原生的 App 中，使用 WebView 作为容器直接承载 Web页面，也有人说成是“套壳”。<br>其中，最核心的点就是 Native端 与 H5端 之间的双向通讯层，也可以理解为我们需要一套跨语言通讯方案，来完成 Native(Java/Objective-c/…) 与 JavaScript 的通讯。这个方案就是 <strong>JSBridge</strong>，而实现的关键便是作为容器的 <strong>WebView</strong>，一切的原理都是基于 WebView 的机制。<br><img src="/static/2019/07/hybrid-app-1.jpg" alt="Hybrid App"></p>
+<blockquote>
+<p>WebView是一个基于webkit引擎、展现web页面的控件。</p>
+</blockquote>
+<h2 id="现有方案"><a href="#现有方案" class="headerlink" title="现有方案"></a>现有方案</h2><p>现在比较流行的混合方案主要有三种，主要是在UI渲染机制上的不同：</p>
+<ol>
+<li>基于 WebView UI 的基础方案，市面上大部分主流 App 都有采用，例如微信JS-SDK，通过 JSBridge 完成 H5 与 Native 的双向通讯，从而赋予H5一定程度的原生能力。</li>
+<li>基于 Native UI 的方案，例如 React-Native、Weex。在赋予 H5 原生API能力的基础上，进一步通过 JSBridge 将js解析成的虚拟节点树(Virtual DOM)传递到 Native 并使用 <strong>原生渲染</strong> 。</li>
+<li>另外还有近期比较流行的小程序方案，也是通过更加定制化的 JSBridge，并使用 <strong>双线程</strong> 的模式隔离了JS逻辑与UI渲染，形成了特殊的开发模式，提高了页面性能及开发体验。</li>
+</ol>
+<p>以上的三种方案，其实同样都是基于 JSBridge 完成的通讯层，第二三种方案，其实可以看做是在方案一的基础上，继续通过不同的新技术进一步提高了应用的混合程度。</p>
+<p>接下来，我们先看一下React Native的方案。</p>
+<h1 id="React-Native的底层框架"><a href="#React-Native的底层框架" class="headerlink" title="React Native的底层框架"></a>React Native的底层框架</h1><h2 id="总体框架"><a href="#总体框架" class="headerlink" title="总体框架"></a>总体框架</h2><p><img src="/static/2019/07/react-native.jpeg" alt="React Native"></p>
+<ul>
+<li>js层<br>该层提供了各种供开发者使用的组件以及一些工具库（事件分发等）。</li>
+<li>C++层<br>主要处理java/OC与js的通信（JSBridge）以及执行JavaScript（JS脚本引擎）。</li>
+<li>Native层（Object C/Java层）<br>主要包括UI渲染器、网络通信等工具库。根据不同操作系统有不同的实现。</li>
+</ul>
+<h2 id="UI渲染"><a href="#UI渲染" class="headerlink" title="UI渲染"></a>UI渲染</h2><p>因为React Native的底层为React框架，同样地也体现了虚拟DOM的思想</p>
+<ol>
+<li>首先Js层通过jsx编写的Virtual Dom来构建Component</li>
+<li>Native层将其转成真实DOM插入到原生 App 的页面中。</li>
+<li>当有变更，通过diff算法生成差异对象</li>
+<li>最终由 Native层将差异对象应用到原生App的页面元素上。</li>
+</ol>
+<blockquote>
+<p>虚拟DOM具体实现思路：</p>
+<ol>
+<li>用JS对象模拟DOM（虚拟DOM）</li>
+<li>把此虚拟DOM转成真实DOM并插入页面中（render）</li>
+<li>如果有事件发生修改了虚拟DOM，比较两棵虚拟DOM树的差异，得到差异对象（补丁数组）（diff）</li>
+<li>把差异对象（补丁数组）应用到真正的DOM树上（patch）<br>优点是能高效的改动DOM，避免了重新绘制DOM。</li>
+</ol>
+</blockquote>
+<h2 id="通信机制"><a href="#通信机制" class="headerlink" title="通信机制"></a>通信机制</h2><p>主要是使用JSCore实现JS和Object C/Java交互。<br>大致步骤如下：</p>
+<ul>
+<li>把JSX代码解析成javaScript代码</li>
+<li>读取JS文件，并利用利用JS脚本引擎执行</li>
+<li>返回一个数组，数组中会描述OC/Java对象，描述对象属性和所需要执行的方法，这样就能让这个对象设置属性，并且调用方法。</li>
+</ul>
+<blockquote>
+<p>JSCore，即JavaScriptCore，JS引擎的核心部分。<br>iOS使用的是内置的JavaScriptCore，Android使用的是 <a href="https://webkit.org" target="_blank" rel="noopener">https://webkit.org</a> 家的jsc.so。</p>
+</blockquote>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>RN既有Native的体验，又能使用前端开发者熟悉的React框架，并具有hybrid技术的优点，能跨平台开发，能远程更新代码，提高迭代频率和效率。<br>但还有以下不足：</p>
+<ul>
+<li>RN 所支持的样式是 CSS 的子集，会满足不了 Web 开发者日渐增长的需求；</li>
+<li>RN 现有能力下还存在的一些不稳定问题，比如性能、Bug等。</li>
+<li>RN 是把渲染工作全都交由客户端原生渲染，会有更接近原生的体验，但实际上一些简单的界面元素使用 Web 技术渲染完全能胜任。</li>
+</ul>
+<p>接下来，我们来看一下小程序的双线程的模式。</p>
+<h1 id="小程序的底层框架"><a href="#小程序的底层框架" class="headerlink" title="小程序的底层框架"></a>小程序的底层框架</h1><h2 id="双线程模型"><a href="#双线程模型" class="headerlink" title="双线程模型"></a>双线程模型</h2><p>如下图，小程序的运行环境分成渲染层和逻辑层，WXML 模板和 WXSS 样式工作在渲染层，JS 脚本工作在逻辑层。小程序的渲染层和逻辑层分别由2个线程管理：渲染层的界面使用了WebView 进行渲染；逻辑层采用JsCore线程运行JS脚本。<br>一个小程序存在多个界面，所以渲染层存在多个WebView线程。这使得小程序更贴近原生体验，也避免了单个WebView的任务过于繁重。<br>这两个线程的通信会经由微信客户端（Native）做中转，逻辑层发送网络请求也经由Native转发。<br><img src="/static/2019/07/miniprogram.png" alt="小程序双线程模型"></p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>小程序的渲染层和逻辑层分离主要有两个原因：</p>
+<ol>
+<li>UI渲染跟 JavaScript 的脚本执行分别在两个线程，从而避免一些逻辑任务抢占UI渲染的资源。</li>
+<li>为了解决管控与安全问题，提供一个沙箱环境来运行开发者的JavaScript 代码（逻辑层），从而阻止开发者使用一些浏览器提供的，诸如跳转页面、操作DOM、动态执行脚本的开放性接口。详情可以看官网的<a href="https://developers.weixin.qq.com/ebook?action=get_post_info&amp;docid=0006a2289c8bb0bb0086ee8c056c0a" target="_blank" rel="noopener">管控与安全</a>。</li>
+<li>渲染层和逻辑层的分离也给在不同的环境下（小程序与小程序开发者工具）运行提供了可能性。</li>
+</ol>
+<h2 id="UI渲染-1"><a href="#UI渲染-1" class="headerlink" title="UI渲染"></a>UI渲染</h2><p>与RN一样，小程序在页面渲染上也体现了虚拟DOM的思想。<br><img src="/static/2019/07/miniprogram-dom.png" alt="小程序页面渲染"></p>
+<ol>
+<li>首先，在渲染层，宿主环境会把WXML可以先转成JS对象，然后再渲染出真正的Dom树。</li>
+<li>在逻辑层发生数据变更的时候，我们需要通过宿主环境提供的setData方法把数据从逻辑层传递到渲染层，</li>
+<li>再经过对比前后差异，把差异应用在原来的Dom树上，渲染出正确的UI界面。</li>
+</ol>
+<p>在组件系统方面，小程序的大部分组件由Exparser组件框架实现，小部分原生组件由客户端参与组件的渲染，以提供更好的性能。<br>比如原生组件map<code>&lt;map latitude=&quot;39.92&quot; longtitude=&quot;116.46&quot;&gt;&lt;/map&gt;</code><br>在实际运行时，</p>
+<ol>
+<li>渲染层webview创建组件，插入到DOM树中后计算布局（位置与宽高）。</li>
+<li>通过通信机制通知Native，Native会根据布局插入一块原生区域并渲染。</li>
+<li>当webview得知位置或宽高发生变化时，通知Native做相应的调整。</li>
+</ol>
+<p>详细看<a href="https://developers.weixin.qq.com/ebook?action=get_post_info&amp;docid=000caab39b88b06b00863ab085b80a" target="_blank" rel="noopener">原生组件</a>。</p>
+<h2 id="通信原理"><a href="#通信原理" class="headerlink" title="通信原理"></a>通信原理</h2><p>那么，渲染层与逻辑层是怎么与Native通信的呢？<br>在视图层与客户端的交互通信（基本上只是原生组件会用到）方面，</p>
+<ul>
+<li>iOS 利用WKWebView 的提供 messageHandlers 特性；</li>
+<li>安卓则是往 WebView 的 window 对象注入一个原生方法，最终会封装成 WeiXinJSBridge 这样一个兼容层。</li>
+</ul>
+<p>在逻辑层与客户端原生通信机制方面，</p>
+<ul>
+<li>iOS平台可以往JavaScripCore框架注入一个全局的原生方法；</li>
+<li>安卓方面则是跟渲染层一致的。</li>
+</ul>
+<h2 id="开发者工具"><a href="#开发者工具" class="headerlink" title="开发者工具"></a>开发者工具</h2><p>上面有提到渲染层和逻辑层的分离也给在不同的环境下运行提供了可能性。在开发者工具中，逻辑层实际上是使用一个隐藏着的<webview>标签来模拟JSCore的。并通过将JSCore中不支持的BOM对象局部变量化，使得开发者无法在小程序代码中正常使用BOM，从而避免不必要的错误。<br>在通讯机制方面，开发者工具底层维护着一个WebSocket服务器，用于在WebView与开发者工具之间建立可靠的消息通讯链路，使得接口调用，事件通知，数据交换能够正常进行，从而使小程序模拟器成为一个统一的整体。<br>详细可看官网上的<a href="https://developers.weixin.qq.com/ebook?action=get_post_info&amp;docid=0000a24f9d0ac86b00867f43a5700a" target="_blank" rel="noopener">微信开发者工具</a></webview></p>
+<h2 id="小结-1"><a href="#小结-1" class="headerlink" title="小结"></a>小结</h2><p>小程序双线程模型中，渲染层和逻辑层分离，具有渲染快、加载快的优点；<br>但任何数据传递都是线程间的通信，也就是都会有一定的延时。这会使得各部分的运行时序变得复杂一些。详细可以看官网上的<a href="https://developers.weixin.qq.com/ebook?action=get_post_info&amp;docid=0006a2289c8bb0bb0086ee8c056c0a" target="_blank" rel="noopener">天生的延时</a></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="共同点"><a href="#共同点" class="headerlink" title="共同点"></a>共同点</h2><p>RN与小程序都具有hybrid技术的优点，兼具“Native App良好用户交互体验的优势”和“Web App跨平台开发的优势”。<br>从框架来说，都使用Web 相关技术来编写业务代码；都实现了一套跨语言通讯方案，来完成 Native(Java/Objective-c/…)端 与 JavaScript （小程序中分为渲染层和逻辑层）的通讯。</p>
+<h2 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h2><p>从渲染底层来看，小程序使用浏览器内核来渲染界面（小部分原生组件由客户端参与渲染），即界面主要由成熟的 Web 技术渲染，辅之以大量的接口提供丰富的客户端原生能力；而 RN 则是用客户端原生渲染的。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://zhuanlan.zhihu.com/p/54019800" target="_blank" rel="noopener">Hybrid App技术解析 – 原理篇</a></li>
+<li><a href="https://juejin.im/post/5a6460f8f265da3e4f0a446d" target="_blank" rel="noopener">React Native for Android 原理分析与实践：实现原理</a></li>
+<li><a href="https://www.jianshu.com/p/5cc61ec04b39" target="_blank" rel="noopener">【React Native】从源码一步一步解析它的实现原理</a></li>
+<li><a href="https://developers.weixin.qq.com/ebook?action=get_post_info&amp;docid=0004a2ef9b8f803b0086831c75140a" target="_blank" rel="noopener">小程序开发者文档</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/小程序/" rel="tag"># 小程序</a>
+              <a href="/tags/hybrid-app/" rel="tag"># hybrid app</a>
+              <a href="/tags/React-Native/" rel="tag"># React Native</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/04/react-hooks/" rel="prev" title="认识 react Hooks">
+      <i class="fa fa-chevron-left"></i> 认识 react Hooks
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/09/virtual-dom/" rel="next" title="虚拟DOM的简单实现">
+      虚拟DOM的简单实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Hybrid-App"><span class="nav-number">1.</span> <span class="nav-text">Hybrid App</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#优势"><span class="nav-number">1.1.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术原理"><span class="nav-number">1.2.</span> <span class="nav-text">技术原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#现有方案"><span class="nav-number">1.3.</span> <span class="nav-text">现有方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#React-Native的底层框架"><span class="nav-number">2.</span> <span class="nav-text">React Native的底层框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#总体框架"><span class="nav-number">2.1.</span> <span class="nav-text">总体框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UI渲染"><span class="nav-number">2.2.</span> <span class="nav-text">UI渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通信机制"><span class="nav-number">2.3.</span> <span class="nav-text">通信机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">2.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小程序的底层框架"><span class="nav-number">3.</span> <span class="nav-text">小程序的底层框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#双线程模型"><span class="nav-number">3.1.</span> <span class="nav-text">双线程模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">3.2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UI渲染-1"><span class="nav-number">3.3.</span> <span class="nav-text">UI渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通信原理"><span class="nav-number">3.4.</span> <span class="nav-text">通信原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发者工具"><span class="nav-number">3.5.</span> <span class="nav-text">开发者工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结-1"><span class="nav-number">3.6.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#共同点"><span class="nav-number">4.1.</span> <span class="nav-text">共同点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不同点"><span class="nav-number">4.2.</span> <span class="nav-text">不同点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

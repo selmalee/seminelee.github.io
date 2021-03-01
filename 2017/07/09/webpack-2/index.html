@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="webpack简介随着移动互联的浪潮到来，Webapp模式、SPA受到越来越多的关注。如何在开发环境中组织好碎片化、多格式的代码和资源，并保证他们在浏览器端快速、优雅地加载和更新需要一个模块化的系统。Webpack就是这样的模块化系统。它有以下几个特点：  分块传输，按需进行懒加载； 各种格式的资源都是JavaScript模块，可以用require加载； 对代码进行静态分析，分析各模块的类型和依赖">
+<meta name="keywords" content="Vue,Webpack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单总结vue-cli中的webpack配置">
+<meta property="og:url" content="http://159.75.213.179/2017/07/09/webpack-2/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="webpack简介随着移动互联的浪潮到来，Webapp模式、SPA受到越来越多的关注。如何在开发环境中组织好碎片化、多格式的代码和资源，并保证他们在浏览器端快速、优雅地加载和更新需要一个模块化的系统。Webpack就是这样的模块化系统。它有以下几个特点：  分块传输，按需进行懒加载； 各种格式的资源都是JavaScript模块，可以用require加载； 对代码进行静态分析，分析各模块的类型和依赖">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.111Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简单总结vue-cli中的webpack配置">
+<meta name="twitter:description" content="webpack简介随着移动互联的浪潮到来，Webapp模式、SPA受到越来越多的关注。如何在开发环境中组织好碎片化、多格式的代码和资源，并保证他们在浏览器端快速、优雅地加载和更新需要一个模块化的系统。Webpack就是这样的模块化系统。它有以下几个特点：  分块传输，按需进行懒加载； 各种格式的资源都是JavaScript模块，可以用require加载； 对代码进行静态分析，分析各模块的类型和依赖">
+
+<link rel="canonical" href="http://159.75.213.179/2017/07/09/webpack-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>简单总结vue-cli中的webpack配置 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2017/07/09/webpack-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          简单总结vue-cli中的webpack配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-09 11:38:01" itemprop="dateCreated datePublished" datetime="2017-07-09T11:38:01+08:00">2017-07-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/自动化构建工具/" itemprop="url" rel="index"><span itemprop="name">自动化构建工具</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="webpack简介"><a href="#webpack简介" class="headerlink" title="webpack简介"></a>webpack简介</h2><p>随着移动互联的浪潮到来，Webapp模式、SPA受到越来越多的关注。如何在开发环境中组织好碎片化、多格式的代码和资源，并保证他们在浏览器端快速、优雅地加载和更新需要一个模块化的系统。<br><a href="http://webpack.github.io/" target="_blank" rel="noopener">Webpack</a>就是这样的模块化系统。它有以下几个特点：</p>
+<ul>
+<li>分块传输，按需进行懒加载；</li>
+<li>各种格式的资源都是JavaScript模块，可以用<code>require</code>加载；</li>
+<li>对代码进行静态分析，分析各模块的类型和依赖关系并交给适合的加载器处理。<a id="more"></a>
+</li>
+</ul>
+<p>具体地说，Webpack的配置主要包括这几个方面：</p>
+<ul>
+<li>入口：指定我们代码的入口点。它的值是一个字符串或者一个对象（多个入口）。</li>
+<li>加载器：因为Webpack本身只能处理JavaScript模块，如果要处理其他类型的文件，就需要使用 loader(加载器)进行转换。加载器将资源转换成JavaScript模块，在打包之前提供预处理。</li>
+<li>插件：提供加载器无法做到的其他扩展功能。</li>
+<li>出口：包括打包后的文件放置的路径及它们的文件名称。</li>
+</ul>
+<h2 id="vue-cli版本"><a href="#vue-cli版本" class="headerlink" title="vue-cli版本"></a>vue-cli版本</h2><p>2.8.1<br>（没有使用ESLint，没有安装单元测试，e2e测试）</p>
+<h2 id="相关的配置文件目录"><a href="#相关的配置文件目录" class="headerlink" title="相关的配置文件目录"></a>相关的配置文件目录</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">├── ...</span><br><span class="line">├── build</span><br><span class="line">│   ├── build.js</span><br><span class="line">│   ├── check-versions.js</span><br><span class="line">│   ├── dev-client.js</span><br><span class="line">│   ├── dev-server.js</span><br><span class="line">│   ├── utils.js</span><br><span class="line">│   ├── vue-loader.conf.js</span><br><span class="line">│   ├── webpack.base.conf.js</span><br><span class="line">│   ├── webpack.dev.conf.js</span><br><span class="line">│   └── webpack.prod.conf.js</span><br><span class="line">├── config</span><br><span class="line">│   ├── dev.env.js</span><br><span class="line">│   ├── index.js</span><br><span class="line">│   └── prod.env.js</span><br><span class="line">├── ...</span><br><span class="line">├── package.json</span><br><span class="line">└── ...</span><br></pre></td></tr></table></figure>
+<h2 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="string">"scripts"</span>: &#123;</span><br><span class="line">        <span class="comment">// 开发环境</span></span><br><span class="line">        <span class="string">"dev"</span>: <span class="string">"node build/dev-server.js"</span>,</span><br><span class="line">        <span class="comment">// 生产环境</span></span><br><span class="line">        <span class="string">"build"</span>: <span class="string">"node build/build.js"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="string">"devDependencies"</span>: &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// 配置分离，将配置定义在config/下，然后合并成最终的配置，以避免webpack.config.js臃肿</span></span><br><span class="line">        <span class="string">"webpack-merge"</span>: <span class="string">"^2.6.1"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="基础配置"><a href="#基础配置" class="headerlink" title="基础配置"></a>基础配置</h2><h3 id="config-index-js"><a href="#config-index-js" class="headerlink" title="config/index.js"></a>config/index.js</h3><p>这个文件里是webpack的基础配置，描述了开发环境和生产环境的两个配置。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// see http://vuejs-templates.github.io/webpack for documentation.</span></span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// 生产环境</span></span><br><span class="line">  build: &#123;</span><br><span class="line">    env: <span class="built_in">require</span>(<span class="string">'./prod.env'</span>), <span class="comment">// 编译环境</span></span><br><span class="line">    index: path.resolve(__dirname, <span class="string">'../dist/index.html'</span>), <span class="comment">//  输入的文件</span></span><br><span class="line">    assetsRoot: path.resolve(__dirname, <span class="string">'../dist'</span>),  <span class="comment">// 本地系统上的路径，输出的目标文件夹</span></span><br><span class="line">    assetsSubDirectory: <span class="string">'static'</span>, <span class="comment">// 输出的二级文件夹(自动生成)</span></span><br><span class="line">    assetsPublicPath: <span class="string">'/'</span>, <span class="comment">// 发布资源的根目录，可配置为资源服务器url</span></span><br><span class="line">    productionSourceMap: <span class="literal">true</span>, <span class="comment">// 记录文件压缩前后的位置信息</span></span><br><span class="line">    <span class="comment">// 压缩 gzip模式下需要压缩的文件的扩展名</span></span><br><span class="line">    <span class="comment">// Gzip off by default as many popular static hosts such as</span></span><br><span class="line">    <span class="comment">// Surge or Netlify already gzip all static assets for you.</span></span><br><span class="line">    <span class="comment">// Before setting to `true`, make sure to:</span></span><br><span class="line">    <span class="comment">// npm install --save-dev compression-webpack-plugin</span></span><br><span class="line">    productionGzip: <span class="literal">false</span>,</span><br><span class="line">    productionGzipExtensions: [<span class="string">'js'</span>, <span class="string">'css'</span>],</span><br><span class="line">    <span class="comment">// Run the build command with an extra argument to</span></span><br><span class="line">    <span class="comment">// View the bundle analyzer report after build finishes:</span></span><br><span class="line">    <span class="comment">// `npm run build --report`</span></span><br><span class="line">    <span class="comment">// Set to `true` or `false` to always turn it on or off</span></span><br><span class="line">    bundleAnalyzerReport: process.env.npm_config_report</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 开发环境</span></span><br><span class="line">  dev: &#123;</span><br><span class="line">    env: <span class="built_in">require</span>(<span class="string">'./dev.env'</span>),</span><br><span class="line">    port: <span class="number">8080</span>, <span class="comment">// 监听的端口</span></span><br><span class="line">    autoOpenBrowser: <span class="literal">true</span>, <span class="comment">// 自动打开浏览器</span></span><br><span class="line">    assetsSubDirectory: <span class="string">'static'</span>, <span class="comment">// 输出的二级文件夹(自动生成)</span></span><br><span class="line">    assetsPublicPath: <span class="string">'/'</span>, <span class="comment">// 发布资源的根目录，可配置为资源服务器url</span></span><br><span class="line">    <span class="comment">// 如设置"/api": "http://localhost:3000"，则请求到 /api/users 现在会被代理到请求 http://localhost:3000/api/users</span></span><br><span class="line">    <span class="comment">// 需要proxyTable代理的接口(可跨域)</span></span><br><span class="line">    proxyTable: &#123;&#125;,</span><br><span class="line">    <span class="comment">// 记录文件压缩前后的位置信息</span></span><br><span class="line">    <span class="comment">// CSS Sourcemaps off by default because relative paths are "buggy"</span></span><br><span class="line">    <span class="comment">// with this option, according to the CSS-Loader README</span></span><br><span class="line">    <span class="comment">// (https://github.com/webpack/css-loader#sourcemaps)</span></span><br><span class="line">    <span class="comment">// In our experience, they generally work as expected,</span></span><br><span class="line">    <span class="comment">// just be aware of this issue when enabling this option.</span></span><br><span class="line">    cssSourceMap: <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="build-webpack-base-conf-js"><a href="#build-webpack-base-conf-js" class="headerlink" title="build/webpack.base.conf.js"></a>build/webpack.base.conf.js</h3><p>这个文件是开发环境和生产环境都会用到的基础配置<br>dev-server.js里引入了webpack.dev.conf.js，build.js里引入了webpack.prod.conf.js，而这两个文件(webpack.dev.conf.js和webpack.prod.conf.js)里都引入了webpack.base.conf.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>)</span><br><span class="line"><span class="keyword">var</span> utils = <span class="built_in">require</span>(<span class="string">'./utils'</span>)</span><br><span class="line"><span class="keyword">var</span> config = <span class="built_in">require</span>(<span class="string">'../config'</span>)</span><br><span class="line"><span class="keyword">var</span> vueLoaderConfig = <span class="built_in">require</span>(<span class="string">'./vue-loader.conf'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">resolve</span> (<span class="params">dir</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> path.join(__dirname, <span class="string">'..'</span>, dir)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// [[ 1. 配置webpack编译入口 ]]</span></span><br><span class="line">  entry: &#123;</span><br><span class="line">    app: <span class="string">'./src/main.js'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// [[ 2. 配置webpack输出路径和命名规则 ]]</span></span><br><span class="line">  output: &#123;</span><br><span class="line">    path: config.build.assetsRoot,</span><br><span class="line">    filename: <span class="string">'[name].js'</span>,</span><br><span class="line">    publicPath: process.env.NODE_ENV === <span class="string">'production'</span></span><br><span class="line">      ? config.build.assetsPublicPath</span><br><span class="line">      : config.dev.assetsPublicPath</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// [[ 3. 配置模块resolve规则 ]]</span></span><br><span class="line">  resolve: &#123;</span><br><span class="line">    extensions: [<span class="string">'.js'</span>, <span class="string">'.vue'</span>, <span class="string">'.json'</span>],</span><br><span class="line">    <span class="comment">// 创建路径别名</span></span><br><span class="line">    alias: &#123;</span><br><span class="line">      <span class="string">'vue$'</span>: <span class="string">'vue/dist/vue.esm.js'</span>,</span><br><span class="line">      <span class="string">'@'</span>: resolve(<span class="string">'src'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// [[ 4. 配置不同类型模块的处理规则 ]]</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.vue$/</span>,</span><br><span class="line">        loader: <span class="string">'vue-loader'</span>,</span><br><span class="line">        options: vueLoaderConfig</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.js$/</span>,</span><br><span class="line">        loader: <span class="string">'babel-loader'</span>,</span><br><span class="line">        include: [resolve(<span class="string">'src'</span>), resolve(<span class="string">'test'</span>)]</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif|svg)(\?.*)?$/</span>,</span><br><span class="line">        loader: <span class="string">'url-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          limit: <span class="number">10000</span>,</span><br><span class="line">          name: utils.assetsPath(<span class="string">'img/[name].[hash:7].[ext]'</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(woff2?|eot|ttf|otf)(\?.*)?$/</span>,</span><br><span class="line">        loader: <span class="string">'url-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          limit: <span class="number">10000</span>,</span><br><span class="line">          name: utils.assetsPath(<span class="string">'fonts/[name].[hash:7].[ext]'</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><h3 id="build-dev-server-js"><a href="#build-dev-server-js" class="headerlink" title="build/dev-server.js"></a>build/dev-server.js</h3><p>执行<code>npm run dev</code>首先运行dev-server.js这个文件。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// [[ 1. 检查node和npm的版本 ]]</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">'./check-versions'</span>)()</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 2. 引入相关插件和配置 ]]</span></span><br><span class="line"><span class="comment">// 获取配置，获取配置中设置的环境变量</span></span><br><span class="line"><span class="keyword">var</span> config = <span class="built_in">require</span>(<span class="string">'../config'</span>)</span><br><span class="line"><span class="keyword">if</span> (!process.env.NODE_ENV) &#123;</span><br><span class="line">  process.env.NODE_ENV = <span class="built_in">JSON</span>.parse(config.dev.env.NODE_ENV)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> opn = <span class="built_in">require</span>(<span class="string">'opn'</span>) <span class="comment">// 用于打开默认浏览器打开localhost:端口</span></span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>)</span><br><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>)</span><br><span class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>)</span><br><span class="line"><span class="keyword">var</span> proxyMiddleware = <span class="built_in">require</span>(<span class="string">'http-proxy-middleware'</span>) <span class="comment">// 一个express中间件，用于将http请求代理到其他服务器</span></span><br><span class="line"><span class="keyword">var</span> webpackConfig = <span class="built_in">require</span>(<span class="string">'./webpack.dev.conf'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置监听端口</span></span><br><span class="line"><span class="keyword">var</span> port = process.env.PORT || config.dev.port</span><br><span class="line"><span class="comment">// 设置是否自动打开浏览器</span></span><br><span class="line"><span class="keyword">var</span> autoOpenBrowser = !!config.dev.autoOpenBrowser</span><br><span class="line"><span class="comment">// 定义HTTP代理表</span></span><br><span class="line"><span class="comment">// https://github.com/chimurai/http-proxy-middleware</span></span><br><span class="line"><span class="keyword">var</span> proxyTable = config.dev.proxyTable</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 3. 创建express服务器和webpack编译器 ]]</span></span><br><span class="line"><span class="keyword">var</span> app = express()</span><br><span class="line"><span class="keyword">var</span> compiler = webpack(webpackConfig)</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 4. 配置开发中间件和热重载中间件 ]]</span></span><br><span class="line"><span class="keyword">var</span> devMiddleware = <span class="built_in">require</span>(<span class="string">'webpack-dev-middleware'</span>)(compiler, &#123;</span><br><span class="line">  publicPath: webpackConfig.output.publicPath,</span><br><span class="line">  quiet: <span class="literal">true</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> hotMiddleware = <span class="built_in">require</span>(<span class="string">'webpack-hot-middleware'</span>)(compiler, &#123;</span><br><span class="line">  log: <span class="function"><span class="params">()</span> =&gt;</span> &#123;&#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 当html-webpack-plugin模版文件发生改变，强制页面重载</span></span><br><span class="line">compiler.plugin(<span class="string">'compilation'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">compilation</span>) </span>&#123;</span><br><span class="line">  compilation.plugin(<span class="string">'html-webpack-plugin-after-emit'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">data, cb</span>) </span>&#123;</span><br><span class="line">    hotMiddleware.publish(&#123; <span class="attr">action</span>: <span class="string">'reload'</span> &#125;)</span><br><span class="line">    cb()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 5. 挂载代理服务和中间件 ]]</span></span><br><span class="line"><span class="built_in">Object</span>.keys(proxyTable).forEach(<span class="function"><span class="keyword">function</span> (<span class="params">context</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> options = proxyTable[context]</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> options === <span class="string">'string'</span>) &#123;</span><br><span class="line">    options = &#123; <span class="attr">target</span>: options &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  app.use(proxyMiddleware(options.filter || context, options))</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 重定向不存在的URL</span></span><br><span class="line">app.use(<span class="built_in">require</span>(<span class="string">'connect-history-api-fallback'</span>)())</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用开发中间件，即把webpack编译后输出到内存中的文件资源挂到express服务器上</span></span><br><span class="line">app.use(devMiddleware)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 挂载热重载</span></span><br><span class="line">app.use(hotMiddleware)</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 6. 配置静态资源 ]]</span></span><br><span class="line"><span class="keyword">var</span> staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)</span><br><span class="line">app.use(staticPath, express.static(<span class="string">'./static'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 7. 启动服务器监听特定端口]]</span></span><br><span class="line"><span class="keyword">var</span> uri = <span class="string">'http://localhost:'</span> + port</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _resolve</span><br><span class="line"><span class="keyword">var</span> readyPromise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">  _resolve = resolve</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 8. 打开默认浏览器打开localhost:端口 ]]</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'&gt; Starting dev server...'</span>)</span><br><span class="line">devMiddleware.waitUntilValid(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'&gt; Listening at '</span> + uri + <span class="string">'\n'</span>)</span><br><span class="line">  <span class="comment">// when env is testing, don't need open it</span></span><br><span class="line">  <span class="keyword">if</span> (autoOpenBrowser &amp;&amp; process.env.NODE_ENV !== <span class="string">'testing'</span>) &#123;</span><br><span class="line">    opn(uri)</span><br><span class="line">  &#125;</span><br><span class="line">  _resolve()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听端口</span></span><br><span class="line"><span class="keyword">var</span> server = app.listen(port)</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  ready: readyPromise,</span><br><span class="line">  close: <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    server.close()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="其他配置文件"><a href="#其他配置文件" class="headerlink" title="其他配置文件"></a>其他配置文件</h3><ul>
+<li>build/webpack.dev.conf.js：在webpack.base.conf的基础上完善了开发环境中需要的配置，如合并配置文件、更友好地输出webpack的警告信息等</li>
+<li>build/utils.js：配置静态资源路径，pei z样式的加载器cssLoaders和styleLoaders</li>
+<li>build/vue.loader.conf.js：配置了css加载器和编译css之后自动添加前缀(autoprefixer)</li>
+</ul>
+<h2 id="生产环境"><a href="#生产环境" class="headerlink" title="生产环境"></a>生产环境</h2><h3 id="build-build-js"><a href="#build-build-js" class="headerlink" title="build/build.js"></a>build/build.js</h3><p>执行<code>npm run build</code>首先运行build.js这个文件。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// [[ 1. 检查NodeJS和npm的版本 ]]</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">'./check-versions'</span>)()</span><br><span class="line"></span><br><span class="line">process.env.NODE_ENV = <span class="string">'production'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> ora = <span class="built_in">require</span>(<span class="string">'ora'</span>) <span class="comment">// 用于开启loading动画</span></span><br><span class="line"><span class="keyword">var</span> rm = <span class="built_in">require</span>(<span class="string">'rimraf'</span>)</span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>)</span><br><span class="line"><span class="keyword">var</span> chalk = <span class="built_in">require</span>(<span class="string">'chalk'</span>)</span><br><span class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>)</span><br><span class="line"><span class="keyword">var</span> config = <span class="built_in">require</span>(<span class="string">'../config'</span>)</span><br><span class="line"><span class="keyword">var</span> webpackConfig = <span class="built_in">require</span>(<span class="string">'./webpack.prod.conf'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 2. 开启loading动画 ]]</span></span><br><span class="line"><span class="keyword">var</span> spinner = ora(<span class="string">'building for production...'</span>)</span><br><span class="line">spinner.start()</span><br><span class="line"></span><br><span class="line"><span class="comment">// [[ 3. 删除创建打包的目标文件夹]]</span></span><br><span class="line">rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">  <span class="comment">// [[ 4. webpack编译 ]]</span></span><br><span class="line">  webpack(webpackConfig, <span class="function"><span class="keyword">function</span> (<span class="params">err, stats</span>) </span>&#123;</span><br><span class="line">    spinner.stop()</span><br><span class="line">    <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">    <span class="comment">// 输出相关信息</span></span><br><span class="line">    process.stdout.write(stats.toString(&#123;</span><br><span class="line">      colors: <span class="literal">true</span>,</span><br><span class="line">      modules: <span class="literal">false</span>,</span><br><span class="line">      children: <span class="literal">false</span>,</span><br><span class="line">      chunks: <span class="literal">false</span>,</span><br><span class="line">      chunkModules: <span class="literal">false</span></span><br><span class="line">    &#125;) + <span class="string">'\n\n'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">console</span>.log(chalk.cyan(<span class="string">'  Build complete.\n'</span>))</span><br><span class="line">    <span class="built_in">console</span>.log(chalk.yellow(</span><br><span class="line">      <span class="string">'  Tip: built files are meant to be served over an HTTP server.\n'</span> +</span><br><span class="line">      <span class="string">'  Opening index.html over file:// won\'t work.\n'</span></span><br><span class="line">    ))</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h3 id="其他配置文件-1"><a href="#其他配置文件-1" class="headerlink" title="其他配置文件"></a>其他配置文件</h3><ul>
+<li>build/webpack.prod.conf.js：在webpack.base.conf的基础上完善了生产环境中需要的配置，如合并基础的webpack配置、配置webpack的输出、丑化压缩代码、抽离css文件等</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://zhaoda.gitbooks.io/webpack/content/" target="_blank" rel="noopener">webpack中文指南</a></li>
+<li><a href="https://github.com/hehongwei44/my-blog/issues/205" target="_blank" rel="noopener">vue-cli的webpack模板项目配置文件分析</a></li>
+</ul>
+<h2 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h2><p>评论系统换成了最近颇受关注的<a href="https://imsun.net/posts/gitment-introduction/" target="_blank" rel="noopener">Gitment</a> 目前看来很赞^ ^</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/10/vue-2/" rel="prev" title="Vue.js学习笔记二：vue-router2.0快速建构SPA项目">
+      <i class="fa fa-chevron-left"></i> Vue.js学习笔记二：vue-router2.0快速建构SPA项目
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/07/23/webpack-1/" rel="next" title="理解webpack中间件">
+      理解webpack中间件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack简介"><span class="nav-number">1.</span> <span class="nav-text">webpack简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vue-cli版本"><span class="nav-number">2.</span> <span class="nav-text">vue-cli版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关的配置文件目录"><span class="nav-number">3.</span> <span class="nav-text">相关的配置文件目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#package-json"><span class="nav-number">4.</span> <span class="nav-text">package.json</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础配置"><span class="nav-number">5.</span> <span class="nav-text">基础配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#config-index-js"><span class="nav-number">5.1.</span> <span class="nav-text">config/index.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#build-webpack-base-conf-js"><span class="nav-number">5.2.</span> <span class="nav-text">build/webpack.base.conf.js</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发环境"><span class="nav-number">6.</span> <span class="nav-text">开发环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#build-dev-server-js"><span class="nav-number">6.1.</span> <span class="nav-text">build/dev-server.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他配置文件"><span class="nav-number">6.2.</span> <span class="nav-text">其他配置文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生产环境"><span class="nav-number">7.</span> <span class="nav-text">生产环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#build-build-js"><span class="nav-number">7.1.</span> <span class="nav-text">build/build.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他配置文件-1"><span class="nav-number">7.2.</span> <span class="nav-text">其他配置文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题外话"><span class="nav-number">9.</span> <span class="nav-text">题外话</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

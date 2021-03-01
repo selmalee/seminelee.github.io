@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="模块实现步骤：">
+<meta name="keywords" content="NodeJs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《深入浅出nodejs》学习总结之模块机制">
+<meta property="og:url" content="http://159.75.213.179/2020/02/01/nodejs-modules/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="模块实现步骤：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/2/1/16fff891e1381541?w=864&h=862&f=png&s=99119">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/2/1/16fff89c26dfe60d?w=1058&h=562&f=png&s=59670">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.106Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《深入浅出nodejs》学习总结之模块机制">
+<meta name="twitter:description" content="模块实现步骤：">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2020/2/1/16fff891e1381541?w=864&h=862&f=png&s=99119">
+
+<link rel="canonical" href="http://159.75.213.179/2020/02/01/nodejs-modules/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《深入浅出nodejs》学习总结之模块机制 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2020/02/01/nodejs-modules/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《深入浅出nodejs》学习总结之模块机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-01 14:09:10" itemprop="dateCreated datePublished" datetime="2020-02-01T14:09:10+08:00">2020-02-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/后端知识/" itemprop="url" rel="index"><span itemprop="name">后端知识</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="模块实现"><a href="#模块实现" class="headerlink" title="模块实现"></a>模块实现</h1><p>步骤：</p>
+<a id="more"></a>
+<ol>
+<li><p>路径分析</p>
+<p>优先级：核心模块的缓存检查&gt;文件模块的缓存检查&gt;核心模块&gt;文件模块</p>
+<p>文件模块中，相对路径&gt;绝对路径&gt;非路径形式的文件模块（第三方文件模块，即node_modules中的模块）</p>
+</li>
+<li><p>文件定位</p>
+<p>文件扩展名分析：如果没有文件扩展名，按.js,.json,.node的次序补足</p>
+<blockquote>
+<p>优化点：如果是.node和.json文件，在传递给<code>require()</code>时带上扩展名，会加快一点速度</p>
+</blockquote>
+</li>
+<li><p>编译执行</p>
+<p>新建一个模块对象，根据路径载入并编译</p>
+<ul>
+<li><p>.js文件：通过fs模块同步读取文件后编译执行，编译过程中，Node对js文件内容进行头尾包装：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">exports, reuire, module, __filename, __dirname</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 文件内容</span></span><br><span class="line">  <span class="comment">// 引入依赖</span></span><br><span class="line">  <span class="keyword">var</span> math = <span class="built_in">require</span>(<span class="string">'math'</span>)</span><br><span class="line">  <span class="comment">// 输出</span></span><br><span class="line">  exports.area = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>.node文件：这是用C/C++编写的扩展模块文件，不需要编译，直接通过<code>process.dlopen()</code>方法加载最后编译生成的文件然后执行。<code>dlopen()</code>方法在windows和 <em>nix 平台有不同的实现，通过libuv兼容层进行了封装，实际上在windows编译成.dll文件，在 </em>nix编译成.so文件，但为了看起来更自然一点所以扩展名统一为.node。</p>
+</li>
+<li><p>.json文件：通过fs模块同步读取文件后，用<code>JSON.parse()</code>解析返回结果</p>
+</li>
+<li><p>其余扩展名文件被当作.js文件处理</p>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="模块分类"><a href="#模块分类" class="headerlink" title="模块分类"></a>模块分类</h1><p>模块分为两类：</p>
+<ul>
+<li>一类是Node提供的模块，即<strong>核心模块</strong></li>
+<li>另一类是用户编写的模块，即<strong>文件模块</strong></li>
+</ul>
+<h2 id="核心模块"><a href="#核心模块" class="headerlink" title="核心模块"></a>核心模块</h2><p>核心模块在Node源代码的编译过程中，编译进了二进制执行文件。在Node进程启动时，部分核心模块就被直接加载进内存中，比普通的文件模块从磁盘中一处一处查找要快很多。所以核心模块引入时，文件定位和编译执行这两步骤可以省略掉，并且在路径分析中优先判断，所以加载速度是最快的</p>
+<p>核心模块分成两部分：</p>
+<p><strong>1. 内建模块（C/C++编写的）</strong></p>
+<p>在Node项目的<a href="https://github.com/nodejs/node/tree/master/src" target="_blank" rel="noopener">src</a>目录下，下面称为内建模块。性能上优于脚本语言。</p>
+<ul>
+<li>编译：预先被编译进二进制文件。<code>node_extensions.h</code>文件将这些散列的内建模块统一放进了一个叫<code>node_module_list</code>的数组中。</li>
+<li>加载：使用<code>get_builtin_module()</code>方法从<code>node_module_list</code>中取出，执行</li>
+</ul>
+<p><strong>2. js核心模块（js编写的）</strong></p>
+<p>在Node项目的<a href="https://github.com/nodejs/node/tree/master/lib" target="_blank" rel="noopener">lib</a>目录下。一类是作为C/C++内建模块的封装层和桥接层；一类是纯粹的功能模块，它不用跟底层打交道，但是又十分重要。</p>
+<ul>
+<li><p>编译：Node采用V8附带的js2c.py，将所有js核心模块转换成C++的字符串数组（字符串即js核心模块文件内容），生成<code>node_natives.h</code>头文件。如上面所说编译.js文件的过程中经历了头尾包装，与2.2.2说的文件模块的区别在于：获取源代码的方式（核心模块从内存中加载）以及缓存执行结果的位置。</p>
+</li>
+<li><p>加载：通过<code>process.binding(&#39;natives&#39;)</code>取出上述的字符串数组放置在<code>nativeModule._source</code>。加载时直接从内存中加载，执行。 <em>[P25]</em></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nativeModule._source = process.binding(<span class="string">'natives'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="核心模块的引入流程"><a href="#核心模块的引入流程" class="headerlink" title="核心模块的引入流程"></a>核心模块的引入流程</h2><p>在核心模块中，有些模块全部由C/C++编写；有些模块则由C/C++完成核心部分，其他部分由js实现包装或向外导出，以满足性能需求（脚本语言如js的开发速度优于静态语言如C/C++，但其性能弱于静态语言），如<code>buffer</code>、<code>crypto</code>、<code>fs</code>、<code>os</code>等。</p>
+<p>即存在一种依赖层关系，文件模块可能依赖核心模块（Js），核心模块可能依赖内建模块（C/C++）。下面是引入<code>os</code>原生模块的流程。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/2/1/16fff891e1381541?w=864&amp;h=862&amp;f=png&amp;s=99119" alt="P25"></p>
+<h2 id="文件模块"><a href="#文件模块" class="headerlink" title="文件模块"></a>文件模块</h2><p>在运行时动态加载，包括了上述完整的路径分析、文件定位、编译执行这些过程，速度比核心模块慢。</p>
+<ul>
+<li>编译：如上面所说编译.js文件的过程中经历了头尾包装</li>
+<li>加载：在运行时动态加载</li>
+</ul>
+<p>由开发者编写，包括普通JS模块和C/C++扩展模块。主要调用方向为普通JS模块调用C/C++扩展模块。</p>
+<p><strong>C/C++扩展模块</strong></p>
+<p>C/C++扩展模块属于文件模块的一类。主要提升性能，如js只有double型的数据类型，而进行位运算需要把double型转为int型，所以js层面做位运算效率不高。这时就需要C/C++扩展模块。</p>
+<ul>
+<li><p>编译：编译成.node文件</p>
+</li>
+<li><p>加载：通过<code>process.dlopen()</code>方法加载最后编译生成的文件然后执行。</p>
+</li>
+</ul>
+<h2 id="模块调用栈"><a href="#模块调用栈" class="headerlink" title="模块调用栈"></a>模块调用栈</h2><p><img src="https://user-gold-cdn.xitu.io/2020/2/1/16fff89c26dfe60d?w=1058&amp;h=562&amp;f=png&amp;s=59670" alt="P33"></p>
+<p>文件模块包括：JS模块和C/C++扩展模块；核心模块包括：js核心模块和C/C++内建模块。</p>
+<p>文件模块中JS模块可能调用C/C++扩展模块，文件模块同时也可能调用js核心模块，js核心模块可能依赖C/C++内建模块。文件模块同时也可能直接调用C/C++内建模块。</p>
+<h2 id="第三方文件模块（npm依赖包）"><a href="#第三方文件模块（npm依赖包）" class="headerlink" title="第三方文件模块（npm依赖包）"></a>第三方文件模块（npm依赖包）</h2><p>基本同普通文件模块，除了路径分析上的不同。</p>
+<h1 id="前后端共用模块"><a href="#前后端共用模块" class="headerlink" title="前后端共用模块"></a>前后端共用模块</h1><ul>
+<li><p>CommonJS规范：<code>Node.JS</code>遵循<code>CommonJS</code>的规范。 <code>module.exports = xxx</code>导出， <code>require()</code>引入。同步加载模块。</p>
+</li>
+<li><p>AMD：Requirejs对模块定义的规范化产出，异步模块定义，模块的加载不影响它后面语句的运行，依赖前置。<code>define</code>定义，<code>require</code>引入。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>([<span class="string">'clock'</span>],<span class="function"><span class="keyword">function</span>(<span class="params">clock</span>)</span>&#123;</span><br><span class="line">  clock.start();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CMD：Seajs对模块定义的规范化产出，同步模块定义，依赖就近。<code>define</code>定义，<code>require</code>引入。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">define(<span class="function"><span class="keyword">function</span>(<span class="params">require, exports, module</span>) </span>&#123;</span><br><span class="line">   <span class="keyword">var</span> clock = <span class="built_in">require</span>(<span class="string">'clock'</span>);</span><br><span class="line">   clock.start();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>es6规范：<code>export</code>导出，<code>import</code>引入</p>
+</li>
+</ul>
+<h2 id="兼容多种模块规范"><a href="#兼容多种模块规范" class="headerlink" title="兼容多种模块规范"></a>兼容多种模块规范</h2><p>在目前的项目中，一般的做法是：</p>
+<p>babel将es6代码转成es5（CommonJS规范）。webpack做浏览器兼容CommonJS。</p>
+<p>参考Nodejs，webpack主要实现<code>exports</code>和<code>require</code>函数（<code>__webpack_require__</code>），并传入<code>module</code>、<code>exports</code>和<code>__webpack_require__</code>参数。详细可看<a href="https://segmentfault.com/a/1190000010349749" target="_blank" rel="noopener">webpack模块化原理-commonjs</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p> - 《深入浅出nodejs》</p>
+<p> - <a href="https://segmentfault.com/a/1190000010349749" target="_blank" rel="noopener">webpack模块化原理-commonjs</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NodeJs/" rel="tag"># NodeJs</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/14/https/" rel="prev" title="密码登录实现与https基本原理">
+      <i class="fa fa-chevron-left"></i> 密码登录实现与https基本原理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/07/react-hooks-useeffect/" rel="next" title="解决useEffect重复调用问题">
+      解决useEffect重复调用问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#模块实现"><span class="nav-number">1.</span> <span class="nav-text">模块实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模块分类"><span class="nav-number">2.</span> <span class="nav-text">模块分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#核心模块"><span class="nav-number">2.1.</span> <span class="nav-text">核心模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心模块的引入流程"><span class="nav-number">2.2.</span> <span class="nav-text">核心模块的引入流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件模块"><span class="nav-number">2.3.</span> <span class="nav-text">文件模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模块调用栈"><span class="nav-number">2.4.</span> <span class="nav-text">模块调用栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三方文件模块（npm依赖包）"><span class="nav-number">2.5.</span> <span class="nav-text">第三方文件模块（npm依赖包）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前后端共用模块"><span class="nav-number">3.</span> <span class="nav-text">前后端共用模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#兼容多种模块规范"><span class="nav-number">3.1.</span> <span class="nav-text">兼容多种模块规范</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

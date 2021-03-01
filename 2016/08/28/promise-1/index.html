@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文译自https://davidwalsh.name/promises">
+<meta name="keywords" content="JavaScript,Es6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript Promise API">
+<meta property="og:url" content="http://159.75.213.179/2016/08/28/promise-1/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="本文译自https://davidwalsh.name/promises">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.107Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript Promise API">
+<meta name="twitter:description" content="本文译自https://davidwalsh.name/promises">
+
+<link rel="canonical" href="http://159.75.213.179/2016/08/28/promise-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JavaScript Promise API | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2016/08/28/promise-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript Promise API
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-08-28 11:01:57" itemprop="dateCreated datePublished" datetime="2016-08-28T11:01:57+08:00">2016-08-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文译自<a href="https://davidwalsh.name/promises" target="_blank" rel="noopener">https://davidwalsh.name/promises</a><br><a id="more"></a><br>虽然同步代码更容易跟踪和调试，但是异步的性能和灵活性通常更好。为什么在你可以立刻发起多个请求，然后在每个都准备好了的时候处理它们时，要停下来等呢？Promises正在成为JavaScript世界的一个重要组成部分，有许多新的API正在与Promise理念来实施。下面让我们来看看promise及其API是如何使用的！</p>
+<h2 id="在自然环境下的Promises"><a href="#在自然环境下的Promises" class="headerlink" title="在自然环境下的Promises"></a><strong>在自然环境下的Promises</strong></h2><p>XMLHttpRequest API是异步的，但<em>不</em>使用Promises API。然而，现在有一些原生API使用promises：</p>
+<ul>
+<li><a href="https://davidwalsh.name/javascript-battery-api" target="_blank" rel="noopener">Battery API</a></li>
+<li><a href="https://davidwalsh.name/fetch" target="_blank" rel="noopener">fetch API</a>(用来代替XHR)</li>
+<li>ServiceWorker API (还没有该API文章)</li>
+</ul>
+<p>Promises只会变得更加普遍，它很重要，所有的前端开发人员都应该熟悉它。另外值得一提的是，Node.js的是Promises的另一个平台（显然，Promises是一个核心的语言功能）。</p>
+<p><em>测试promises比你想象的更简单，因为<code>setTimeout</code>可以作为你的异步”任务”！</em></p>
+<h2 id="Promise的基本用法"><a href="#Promise的基本用法" class="headerlink" title="Promise的基本用法"></a><strong>Promise的基本用法</strong></h2><p><code>new Promise()</code>构造函数应该只用于传统异步任务，如<code>setTimeout</code>或<code>XMLHttpRequest</code>的用法。即，用关键字<code>new</code>创建一个新的Promise对象，该promise对象提供<code>resolve</code>和<code>reject</code>两个回调函数：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// Do an async task async task and then...</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(<span class="comment">/* good condition */</span>) &#123;</span><br><span class="line">		resolve(<span class="string">'Succes!'</span>;)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		reject(<span class="string">'Failure!'</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">p.then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="comment">/* do something with the result */</span></span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="comment">/* error :( */</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>这取决于开发者异步任务执行的结果，在回调函数中手动调用<code>resolve</code>或<code>reject</code>。一个典型的例子是，转换XMLHttpRequest成基于promise的任务：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// From Jake Archibald's Promises and Back:</span></span><br><span class="line"><span class="comment">// http://www.html5rocks.com/en/tutorials/es6/promises/#toc-promisifying-xmlhttprequest</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params">url</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// Return a new promise.</span></span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">		<span class="comment">// Do the usual XHR stuff</span></span><br><span class="line">		<span class="keyword">var</span> req = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">		req.open(<span class="string">'GET'</span>, url);</span><br><span class="line"></span><br><span class="line">		req.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">			<span class="comment">// This is called even on 404 etc</span></span><br><span class="line">			<span class="comment">// so check the status</span></span><br><span class="line">			<span class="keyword">if</span> (req.status == <span class="number">200</span>) &#123;</span><br><span class="line">				<span class="comment">// Resolve the promise with the response text</span></span><br><span class="line">				resolve(req.response);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="comment">// Otherwise reject with the status text</span></span><br><span class="line">				<span class="comment">// which will hopefully be meaningful error</span></span><br><span class="line">				reject(<span class="built_in">Error</span>(req.statusText));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Handle network errors</span></span><br><span class="line">		req.onerror = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">			reject(<span class="built_in">Error</span>(<span class="string">"Network Error"</span>));</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Make the request</span></span><br><span class="line">		req.send();</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Use it!</span></span><br><span class="line"><span class="keyword">get</span>('story.json').then(function(response) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"success!"</span>, response);</span><br><span class="line">&#125;, fucntion(error) &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"Failed!"</span>, error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>有时候,你并不<em>需要</em>在promise内执行一个异步任务————但是，如果可能执行一个异步任务，返回一个promise对象将是最好的做法，这样，你只需要给定结果处理函数就可以了。在这种情况下，不需要使用关键字<code>new</code>你只需要简单地调用<code>Promise.resolve()</code>或<code>Promise.reject()</code>就可以了。 例如：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> userCache = &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getUserDetail</span>(<span class="params">username</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// In both cases, cached or not, a promise will be returned</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (userCache[username]) &#123;</span><br><span class="line">		<span class="comment">// Return a promise without the "new" keyword</span></span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">Promise</span>.resolve(userCache[username]);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Use the fetch API to get the information</span></span><br><span class="line">	<span class="comment">// fetch return a promise</span></span><br><span class="line">	<span class="keyword">return</span> fetch(<span class="string">'users/'</span> + username + <span class="string">'.json'</span>)</span><br><span class="line">		.then(<span class="function"><span class="keyword">function</span>(<span class="params">result</span>) </span>&#123;</span><br><span class="line">			userCache[username] = result;</span><br><span class="line">			<span class="keyword">return</span> result;</span><br><span class="line">		&#125;)</span><br><span class="line">		.catch(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Could not find user: '</span> + username);</span><br><span class="line">		&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因为总是返回一个promise，你可以在它的返回值上随时使用<code>then</code>和<code>catch</code>方法！</p>
+<p>##then##<br>所有promise实例有一个<code>then</code>方法，用来处理执行结果。第一个<code>then</code>方法回调接收<code>resolve()</code>调用的结果作为参数：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// A mock async acton using setTimeout</span></span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		resolve(<span class="number">10</span>);</span><br><span class="line">	&#125;, <span class="number">3000</span>);</span><br><span class="line">&#125;)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">result</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(result);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// From the console</span></span><br><span class="line"><span class="comment">// 10</span></span><br></pre></td></tr></table></figure></p>
+<p>当promise的resolve触发，<code>then</code>回调函数被触发。你也可以使用链式的<code>then</code>回调方法：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		resolve(<span class="number">10</span>);</span><br><span class="line">	&#125;, <span class="number">3000</span>)</span><br><span class="line">&#125;)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'first then: '</span>, num);</span><br><span class="line">	<span class="keyword">return</span> num * <span class="number">2</span>;</span><br><span class="line">&#125;)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'second then: '</span>, num);</span><br><span class="line">	<span class="keyword">return</span> num * <span class="number">2</span>;</span><br><span class="line">&#125;)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'last then: '</span>, num);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// From the console</span></span><br><span class="line"><span class="comment">// first then: 10</span></span><br><span class="line"><span class="comment">// second then: 20</span></span><br><span class="line"><span class="comment">//last then: 40</span></span><br></pre></td></tr></table></figure></p>
+<p>每个<code>then</code>接收之前的<code>then</code>返回值的结果。</p>
+<p>如果一个promise的resolve已经触发，但之后<code>then</code>再次被调用，回调将立即触发。如果promise被拒绝，你被拒绝后调用<code>then</code>的话，回调不会被调用。</p>
+<h2 id="catch"><a href="#catch" class="headerlink" title="catch"></a><strong>catch</strong></h2><p>当<code>promise</code>被拒绝时，<code>catch</code>回调函数就会被执行：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// A mock async action using setTimeout</span></span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		reject(<span class="string">'Done!'</span>);</span><br><span class="line">	&#125;, <span class="number">3000</span>);</span><br><span class="line">&#125;)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'done'</span>, e);</span><br><span class="line">&#125;)</span><br><span class="line">.catch(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'catch: '</span>, e);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Frome the console:</span></span><br><span class="line"><span class="comment">// 'catch: Done!'</span></span><br></pre></td></tr></table></figure></p>
+<p>传入<code>reject</code>方法的参数由你决定。一般来说是传入一个<code>Error</code> 对象`：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reject(<span class="built_in">Error</span>(<span class="string">'Data could not be found'</span>));</span><br></pre></td></tr></table></figure></p>
+<h2 id="Promise-all"><a href="#Promise-all" class="headerlink" title="Promise.all"></a>Promise.all</h2><p>想想JavaScript加载器的情形：有些时候你触发多个异步交互，但只希望在他们都完成后才作出响应————这就是<code>Promise.all</code>的用处所在。<code>Promise.all</code>方法接受一个promise数组，一旦他们的resolve都触发之后就执行一个回调函数：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.all([promise1, promise2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// Both promises resolved</span></span><br><span class="line">&#125;)</span><br><span class="line">.catch(<span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// One or more promises was rejected</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>Promise.all</code>的最佳示例是（通过<code>fetch</code>）同时发起多个 AJAX请求时:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> request1 = fetch(<span class="string">'/user.json'</span>);</span><br><span class="line"><span class="keyword">var</span> request2 = fetch(<span class="string">'./articles.json'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.all([request1, request2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// Both promises done!</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>你可以结合API像<code>fetch</code>和Battery API，因为它们都返回promises：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.all([fetch(<span class="string">'./users.json'</span>), navigator.getBattery()])</span><br><span class="line">	.then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</span><br><span class="line">		<span class="comment">// Both promises done!</span></span><br><span class="line">	&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>处理拒绝(rejection)当然是复杂的。如果任何promise被reject，<code>catch</code>将会被第一个拒绝(rejection)所触发。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> req1 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// A mock async action using setTimeout</span></span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		resolve(<span class="string">'First!'</span>);</span><br><span class="line">	&#125;, <span class="number">4000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> req2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// A mock async action using setTimeout</span></span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		reject(<span class="string">'Second!'</span>);</span><br><span class="line">	&#125;, <span class="number">3000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">Promise</span>.all([req1, req2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'Then: '</span>, results);</span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'Catch: '</span>, err);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// From the console:</span></span><br><span class="line"><span class="comment">// Catch: Second!</span></span><br></pre></td></tr></table></figure></p>
+<p>随着越来越多API支持promises，<code>Promise.all</code>将会变得十分有用。</p>
+<h2 id="Promise-race"><a href="#Promise-race" class="headerlink" title="Promise.race"></a>Promise.race</h2><p><code>Promise.race</code>是一个有趣的函数————一旦数组中任何一个Promise被解决或者拒绝，<code>Promise.race</code>就会触发，而不会等待所有的promise对象被解决或者拒绝。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> req1 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// A mock async action using setTimeout</span></span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		resolve(<span class="string">'First!'</span>);</span><br><span class="line">	&#125;, <span class="number">4000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> req2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// A mock async action using setTimeout</span></span><br><span class="line">	setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		reject(<span class="string">'Second!'</span>);</span><br><span class="line">	&#125;, <span class="number">3000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">Promise</span>.race([req1, req2]).then(<span class="function"><span class="keyword">function</span>(<span class="params">results</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'Then: '</span>, results);</span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">one, two</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'Catch: '</span>, err);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// From the console:</span></span><br><span class="line"><span class="comment">// Then: Second!</span></span><br></pre></td></tr></table></figure></p>
+<p>用例可发起一个请求到主站资源和备用资源（以防主站和备用之一不可用）。</p>
+<h2 id="熟悉Promise"><a href="#熟悉Promise" class="headerlink" title="熟悉Promise"></a>熟悉Promise</h2><p>Promise在过去的几年里（或者在过去10年，如果你是一个Dojo Toolkit的用户）一直是热议的话题，他们已经从JavaScript框架的一部分变成一个JavaScript语言的主要部分。很有可能，你将看到大多数的新的JavaScript API都将基于promise实现…</p>
+<p>……这是一个伟大的事情！开发人员能够避免回调地狱，而且异步交互可以像任何其他变量那样来传递。Promise还需要一段时间来普及，现在是学习他们的时候了！</p>
+<blockquote>
+<p><strong>结束语</strong><br>我觉得翻译带给我的好处是<br>让我不停思考、认认真真地看第一手资料，而且可以慢慢看得懂其他前沿文章。<br>想了解我更多的作品，请点击菜单<a href="https://seminelee.github.io/works/" target="_blank" rel="noopener">关于</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Es6/" rel="tag"># Es6</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/24/safeframe1/" rel="prev" title="SafeFrames v1.1">
+      <i class="fa fa-chevron-left"></i> SafeFrames v1.1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/29/bfcache/" rel="next" title="BFCache相关">
+      BFCache相关 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#在自然环境下的Promises"><span class="nav-number">1.</span> <span class="nav-text">在自然环境下的Promises</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise的基本用法"><span class="nav-number">2.</span> <span class="nav-text">Promise的基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#catch"><span class="nav-number">3.</span> <span class="nav-text">catch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-all"><span class="nav-number">4.</span> <span class="nav-text">Promise.all</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-race"><span class="nav-number">5.</span> <span class="nav-text">Promise.race</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#熟悉Promise"><span class="nav-number">6.</span> <span class="nav-text">熟悉Promise</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1 介绍webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle。">
+<meta name="keywords" content="Webpack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="了解webpack的基本流程和一些重要概念">
+<meta property="og:url" content="http://159.75.213.179/2020/04/23/webpack-3/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="1 介绍webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/9/2/16cf203824359397?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.111Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="了解webpack的基本流程和一些重要概念">
+<meta name="twitter:description" content="1 介绍webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle。">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2019/9/2/16cf203824359397?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+
+<link rel="canonical" href="http://159.75.213.179/2020/04/23/webpack-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>了解webpack的基本流程和一些重要概念 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2020/04/23/webpack-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          了解webpack的基本流程和一些重要概念
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-23 20:59:57" itemprop="dateCreated datePublished" datetime="2020-04-23T20:59:57+08:00">2020-04-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/自动化构建工具/" itemprop="url" rel="index"><span itemprop="name">自动化构建工具</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1 介绍"></a>1 介绍</h2><p><em>webpack</em> 是一个现代 JavaScript 应用程序的<em>静态模块打包器(module bundler)</em>。当 webpack 处理应用程序时，它会递归地构建一个<em>依赖关系图(dependency graph)</em>，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 <em>bundle</em>。<br><a id="more"></a></p>
+<p>四个<a href="https://www.webpackjs.com/concepts/" target="_blank" rel="noopener"><strong>核心概念</strong></a>：</p>
+<ul>
+<li>入口(entry)<br>构建其内部<em>依赖图</em>的开始</li>
+<li>输出(output)<br>在哪里输出它所创建的 <em>bundles</em>，以及如何命名这些文件</li>
+<li>loader<br>让 webpack 能够去处理那些非 JavaScript 文件（webpack 自身只理解 JavaScript），将文件从不同的语言（如 TypeScript）转换为 JavaScript，或将内联图像转换为 data URL。</li>
+<li>插件(plugins) 插件可以用来处理各种各样的任务，包括：打包优化（tree-shaking）、压缩、重新定义环境中的变量。</li>
+</ul>
+<h2 id="2-基本流程"><a href="#2-基本流程" class="headerlink" title="2 基本流程"></a>2 基本流程</h2><h3 id="2-1-基本流程"><a href="#2-1-基本流程" class="headerlink" title="2.1 基本流程"></a>2.1 基本流程</h3><ol>
+<li><code>entry-option</code> 初始化option</li>
+<li><code>run</code> 开始编译</li>
+<li><code>make</code> 从entry开始递归的分析依赖，对每个依赖模块进行build</li>
+<li><code>before-resolve</code> - <code>after-resolve</code> 对其中一个模块位置进行解析</li>
+<li><code>build-module</code> 开始构建 (build) 这个module,这里将使用文件对应的loader加载</li>
+<li><code>normal-module-loader</code> 对用loader加载完成的module(是一段js代码)进行编译,用 <a href="https://github.com/ternjs/acorn" target="_blank" rel="noopener">acorn</a> 编译,生成ast抽象语法树。</li>
+<li><code>program</code> 开始对ast进行遍历，当遇到require等一些调用表达式时，触发<code>call require</code>事件的handler执行，收集依赖，并。如：AMDRequireDependenciesBlockParserPlugin等</li>
+<li><code>seal</code> 所有依赖build完成，下面将开始对chunk进行优化，比如合并,抽取公共模块,加hash</li>
+<li><code>bootstrap</code> 生成启动代码</li>
+<li><code>emit</code> 把各个chunk输出到结果文件</li>
+</ol>
+<p>详细事件流可看<a href="https://juejin.im/entry/576b7aeda633bd0064065c74" target="_blank" rel="noopener">webpack 源码解析</a>。</p>
+<h3 id="2-2-内部依赖图"><a href="#2-2-内部依赖图" class="headerlink" title="2.2 内部依赖图"></a>2.2 内部依赖图</h3><p>进入入口起点后，webpack 会找出有哪些模块和库是入口起点（直接和间接）依赖的。<br>如何查找这些<code>require</code> 语句？<br>用正则？如果<code>require</code>写在注释里也会匹配到；<code>require(&#39;a&#39;+&#39;b&#39;)</code>类似的表达式正则难以处理。<br>因此，使用js代码解析工具<strong>（</strong>如<code>esprima</code>或者<code>acorn</code>，webpack<a href="https://github.com/webpack/webpack/blob/master/lib/Parser.js" target="_blank" rel="noopener">Parser.js</a>用的是<a href="https://github.com/acornjs/acorn" target="_blank" rel="noopener"><code>acorn</code></a>。），将JS代码转换成抽象语法树（AST），再对AST进行遍历，找出<code>require</code>表达式，收集依赖，构造依赖图。</p>
+<blockquote>
+<p>js引擎也是使用js代码解析工具构建抽象语法树的，比如JavaScriptCore、V8。过程是：<br>源代码=&gt;抽象语法树=&gt;字节码<br>P.S. V8之前是直接转成机器码的，因为内存问题，在2019年又改成了转成字节码。</p>
+</blockquote>
+<p>github上找到的一个webpack伪码<a href="https://github.com/youngwind/fake-webpack/blob/1bfcd0edf1/lib/parse.js" target="_blank" rel="noopener">parse.js</a></p>
+<h3 id="2-3-模块解析-module-resolution"><a href="#2-3-模块解析-module-resolution" class="headerlink" title="2.3 模块解析(module resolution)"></a>2.3 模块解析(module resolution)</h3><p>resolver 是一个库(library)，用于帮助找到模块的绝对路径。<br>resolver 帮助 webpack 找到 bundle 中需要引入的模块代码，这些代码在包含在每个 <code>require</code> 语句中。<br>当打包模块时，<code>webpack</code> 使用 <a href="https://github.com/webpack/enhanced-resolve" target="_blank" rel="noopener">enhanced-resolve</a> 来解析文件路径（绝对路径/相对路径/模块路径）。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> resolve = <span class="built_in">require</span>(<span class="string">"enhanced-resolve"</span>);</span><br><span class="line"></span><br><span class="line">resolve(<span class="string">"/some/path/to/folder"</span>, <span class="string">"module/dir"</span>, (err, result) =&gt; &#123;</span><br><span class="line">	result; <span class="comment">// === "/some/path/node_modules/module/dir/index.js"</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>相对路径</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'../src/file1'</span></span><br></pre></td></tr></table></figure>
+<p>在这种情况下，使用 <code>import</code> 或 <code>require</code> 的资源文件所在的目录，被认为是上下文目录(context directory)。在 <code>import/require</code> 中给定的相对路径，会拼接此上下文路径(context path)，以产生模块的绝对路径。</p>
+</li>
+<li><p>模块路径</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'module'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'module/lib/file'</span>;</span><br></pre></td></tr></table></figure>
+<p>模块将在 <a href="https://webpack.docschina.org/configuration/resolve/#resolve-modules" target="_blank" rel="noopener"><code>resolve.modules</code></a> 中指定的所有目录内搜索。 你可以替换初始模块路径，此替换路径通过使用 <a href="https://webpack.docschina.org/configuration/resolve/#resolve-alias" target="_blank" rel="noopener"><code>resolve.alias</code></a> 配置选项来创建一个别名。</p>
+</li>
+</ul>
+<h2 id="2-manifest"><a href="#2-manifest" class="headerlink" title="2 manifest"></a>2 manifest</h2><p>在使用 webpack 构建的典型应用程序或站点中，有三种主要的代码类型：</p>
+<ul>
+<li>你或你的团队编写的源码。</li>
+<li>你的源码会依赖的任何第三方的 library 或 “vendor” 代码。</li>
+<li>webpack 的 runtime 和 manifest，管理所有模块的交互。</li>
+</ul>
+<p>使用<code>CommonsChunkPlugin</code>可以分离vender和manifest，以充分利用缓存。</p>
+<h3 id="2-1-Runtime"><a href="#2-1-Runtime" class="headerlink" title="2.1 Runtime"></a>2.1 Runtime</h3><p>runtime，以及伴随的 manifest 数据，主要是指：在浏览器运行时，webpack 用来连接模块化的应用程序的所有代码。runtime 包含：在模块交互时，连接模块所需的加载和解析逻辑。包括浏览器中的已加载模块的连接，以及懒加载模块的执行逻辑。</p>
+<p>实现加载和解析模块，主要是实现 <code>__webpack_require__</code>方法。<code>__webpack_require__</code>可以理解成webpack参考Nodejs实现的<code>require</code>方法，以使用 CommonJS模块。</p>
+<h3 id="2-2-Manifest"><a href="#2-2-Manifest" class="headerlink" title="2.2 Manifest"></a>2.2 Manifest</h3><p>当编译器(compiler)开始执行、解析和映射应用程序时，它会保留所有模块的详细要点。这个数据集合称为 “Manifest”。</p>
+<p>当完成打包并发送到浏览器时，会在运行时通过 Manifest 来解析和加载模块。无论你选择哪种模块语法（es6/CommonJS），那些 import 或 require 语句现在都已经转换为 <strong>webpack_require</strong> 方法，此方法指向模块标识符(module identifier)。通过使用 manifest 中的数据，runtime 将能够查询模块标识符，检索出背后对应的模块。</p>
+<p>比如，在一个SPA应用中，点击一个链接，跳转到另一个路由，你会发现浏览器自动下载这个模块对应的chunk文件。这些文件就是通过使用manifest中的数据得知的。</p>
+<h2 id="3-模块热替换-hot-module-replacement"><a href="#3-模块热替换-hot-module-replacement" class="headerlink" title="3 模块热替换(hot module replacement)"></a>3 模块热替换(hot module replacement)</h2><h3 id="3-1-概念"><a href="#3-1-概念" class="headerlink" title="3.1 概念"></a>3.1 概念</h3><p><a href="https://www.webpackjs.com/concepts/hot-module-replacement/" target="_blank" rel="noopener">模块热替换</a>(HMR - Hot Module Replacement)功能会在应用程序运行过程中替换、添加或删除<a href="https://www.webpackjs.com/concepts/modules/" target="_blank" rel="noopener">模块</a>，而无需重新加载整个页面（区别于live reload）。主要是通过以下几种方式，来显著加快开发速度：</p>
+<ul>
+<li>保留在完全重新加载页面时丢失的应用程序状态。</li>
+<li>只更新变更内容，以节省宝贵的开发时间。</li>
+<li>调整样式更加快速 - 几乎相当于在浏览器调试器中更改样式。</li>
+</ul>
+<h3 id="3-2-基本流程"><a href="#3-2-基本流程" class="headerlink" title="3.2 基本流程"></a>3.2 基本流程</h3><p><img src="https://user-gold-cdn.xitu.io/2019/9/2/16cf203824359397?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt><br>主要过程如下：</p>
+<ol>
+<li><code>webpack-dev-server</code>启动本地服务，和客户端使用websocket实现长连接，客户端请求初始资源。</li>
+<li><code>webpack-dev-server</code>监听代码文件变化，当开发者修改了代码并保存，webpack会重新编译，生成新文件包括：<ul>
+<li>hash值</li>
+<li>更新后的 <a href="https://www.webpackjs.com/concepts/manifest" target="_blank" rel="noopener">manifest</a>(JSON)。manifest 包括新的编译 hash 和所有的待更新 chunk 目录。</li>
+<li>一个或多个更新后的 chunk (JavaScript)。</li>
+</ul>
+</li>
+<li>服务端通过websocket向客户端推送当前编译的hash戳。</li>
+<li>客户端的websocket监听到有文件改动推送过来的hash戳，会和上一次对比。一致则走缓存，不一致则判断是否支持热更新，如果支持的话发射webpackHotUpdate事件，如果不支持则直接刷新浏览器。</li>
+<li>webpack相关模块会监听webpackHotUpdate事件，调用module.hot.check方法。HMR runtime请求Manifest和chunk文件。</li>
+<li><p>HMR runtime调用hotAddUpdateChunk动态更新模块代码，然后调用hotApply方法进行热更新。</p>
+<blockquote>
+<p>webpack-dev-server是一个小型的Node.js Express服务器，它使用webpack-dev-middleware来服务于webpack的包。在实际操作中，它将在localhost:8080(或其他端口)启动一个express静态资源web服务器，并且以监听模式自动运行webpack，并通过socket.io服务实时监听资源的变化并自动刷新页面（热更新）。<br>在开发过程中，可以将 HMR 作为 LiveReload 的替代。webpack-dev-server 支持 hot 模式，在试图重新加载整个页面之前，热模式会尝试使用 HMR 来更新。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="4-代码分割"><a href="#4-代码分割" class="headerlink" title="4 代码分割"></a>4 代码分割</h2><p>常用的代码分离方法有三种：</p>
+<ul>
+<li>入口起点：使用 entry 配置手动地分离代码。</li>
+<li>防止重复：使用<code>CommonsChunkPlugin</code>去重和分离 chunk。<br><code>optimization.splitChunks.maxSize</code>配置可以解决某个chunk特别大的问题。<blockquote>
+<p><code>CommonsChunkPlugin</code>用于避免它们之间重复的依赖关系，但是无法进行进一步的优化。从webpack v4开始，<code>CommonsChunkPlugin</code>被删除，转而使用了optimization.splitChunks。</p>
+</blockquote>
+</li>
+<li>动态导入：通过模块中的内联函数调用来分离代码。(使用<code>react-loadable</code> 动态加载组件实现组件懒加载）</li>
+</ul>
+<h3 id="4-1-dllPlugin和external插件"><a href="#4-1-dllPlugin和external插件" class="headerlink" title="4.1 dllPlugin和external插件"></a>4.1 dllPlugin和external插件</h3><p>webpack中<a href="https://www.webpackjs.com/plugins/dll-plugin/" target="_blank" rel="noopener"><code>DllPlugin</code></a>和<a href="https://www.webpackjs.com/configuration/externals/" target="_blank" rel="noopener"><code>externals</code></a>在本质上其实是解决的同一个问题：避免将某些外部依赖库打包进我们的业务代码，而是在运行时提供这些依赖。</p>
+<p>DllPlugin</p>
+<ul>
+<li>符合前端模块化的要求</li>
+<li>webpack配置上稍微复杂一些，需要预打包所需的dll资源，并在构建时配置相应的plugin</li>
+<li>使用dll的前提是，这些外部依赖一般不需要发生变更。所以，如果某天发生了变更，那就需要将项目重新构建，比较麻烦。</li>
+<li>注意<code>manifest.json</code>命名冲突</li>
+</ul>
+<p>external</p>
+<ul>
+<li>不太符合前端的模块化思想，所需要的外部库需要在浏览器全局环境下可访问</li>
+<li>外部库升级的话，如果兼容之前的API，不需要项目重新构建，只需要更新链接</li>
+<li>webpack配置上稍微简单些，但是同样需要将所需的外部库打包为所需要的格式，并在运行态下引用（如果module有提供cdn地址可以直接使用）</li>
+</ul>
+<h2 id="5-tree-shaking"><a href="#5-tree-shaking" class="headerlink" title="5 tree shaking"></a>5 tree shaking</h2><p><a href="https://www.webpackjs.com/guides/tree-shaking/" target="_blank" rel="noopener"><em>tree shaking</em></a> 是一个术语，通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。它依赖于 ES2015 模块系统中的<a href="http://exploringjs.com/es6/ch_modules.html#static-module-structure" target="_blank" rel="noopener">静态结构特性</a>，例如 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import" target="_blank" rel="noopener"><code>import</code></a> 和 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export" target="_blank" rel="noopener"><code>export</code></a>。</p>
+<p>新的 webpack 4 正式版本，扩展了这个检测能力，通过 <code>package.json</code> 的 <code>&quot;sideEffects&quot;</code> 属性作为标记，向 compiler 提供提示，表明项目中的哪些文件是 “pure(纯的 ES2015 模块)”，由此可以安全地删除文件中未使用的部分。</p>
+<p>要使用tree-shaking，需要做到以下：</p>
+<ul>
+<li>使用 ES2015 模块语法（即 <code>import</code> 和 <code>export</code>）。</li>
+<li>确保没有 compiler 将 ES2015 模块语法转换为 CommonJS 模块（这也是流行的 Babel preset 中 @babel/preset-env 的默认行为 - 更多详细信息请查看 <a href="https://babel.docschina.org/docs/en/babel-preset-env#modules" target="_blank" rel="noopener">文档</a>）。</li>
+<li>在项目 <code>package.json</code> 文件中，添加一个 “sideEffects” 属性。<br>如果所有代码都不包含副作用，我们就可以简单地将该属性标记为 <code>false</code>。如果有则可以提供一个数组，如antd的package.json<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="attr">"sideEffects"</span>: [</span><br><span class="line">    <span class="string">"dist/*"</span>,</span><br><span class="line">    <span class="string">"es/**/style/*"</span>,</span><br><span class="line">    <span class="string">"lib/**/style/*"</span>,</span><br><span class="line">    <span class="string">"*.less"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>「副作用」的定义是，在导入时会执行特殊行为的代码，而不是仅仅暴露一个 export 或多个 export。举例说明，例如 polyfill，它影响全局作用域，并且通常不提供 export。</p>
+<ul>
+<li>通过将 <code>mode</code> 选项设置为 <a href="https://webpack.docschina.org/concepts/mode/#mode-production" target="_blank" rel="noopener"><code>production</code></a>，启用 minification(代码压缩) 和 tree shaking。</li>
+</ul>
+</blockquote>
+<h2 id="6-优化策略"><a href="#6-优化策略" class="headerlink" title="6 优化策略"></a>6 优化策略</h2><p>webpack可以做到的：</p>
+<ul>
+<li>代码压缩（uglify）</li>
+<li>code splitting（分入口多页应用、splitChunks防止重复、动态导入）</li>
+<li>tree shaking</li>
+<li>将不常更新的模块单独打包（dllPlugin），或者放到cdn（externals）</li>
+</ul>
+<p>其他方法：</p>
+<ul>
+<li>代码优化：<code>&lt;link&gt;</code>样式文件放在头部，<code>&lt;script&gt;</code>放在<body>底部等</body></li>
+<li>减少请求、合并请求</li>
+<li>Nginx配置gzip </li>
+<li>SSR（服务端渲染）</li>
+</ul>
+<h2 id="7-参考"><a href="#7-参考" class="headerlink" title="7 参考"></a>7 参考</h2><ul>
+<li><a href="https://www.webpackjs.com/concepts/" target="_blank" rel="noopener">概念 ｜ webpack 中文网</a></li>
+<li><a href="https://juejin.im/entry/576b7aeda633bd0064065c74" target="_blank" rel="noopener">webpack 源码解析</a></li>
+<li><a href="https://juejin.im/post/5d6d0ee5f265da03f66ddba9" target="_blank" rel="noopener">搞懂webpack热更新原理</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/07/react-hooks-useeffect/" rel="prev" title="解决useEffect重复调用问题">
+      <i class="fa fa-chevron-left"></i> 解决useEffect重复调用问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/03/site-architecture/" rel="next" title="《大型网站技术架构》学习笔记">
+      《大型网站技术架构》学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-介绍"><span class="nav-number">1.</span> <span class="nav-text">1 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-基本流程"><span class="nav-number">2.</span> <span class="nav-text">2 基本流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-基本流程"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 基本流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-内部依赖图"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 内部依赖图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-模块解析-module-resolution"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 模块解析(module resolution)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-manifest"><span class="nav-number">3.</span> <span class="nav-text">2 manifest</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Runtime"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 Runtime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Manifest"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 Manifest</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-模块热替换-hot-module-replacement"><span class="nav-number">4.</span> <span class="nav-text">3 模块热替换(hot module replacement)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-概念"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-基本流程"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 基本流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-代码分割"><span class="nav-number">5.</span> <span class="nav-text">4 代码分割</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-dllPlugin和external插件"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 dllPlugin和external插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-tree-shaking"><span class="nav-number">6.</span> <span class="nav-text">5 tree shaking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-优化策略"><span class="nav-number">7.</span> <span class="nav-text">6 优化策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-参考"><span class="nav-number">8.</span> <span class="nav-text">7 参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

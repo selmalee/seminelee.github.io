@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="PWA与AMP-移动Web的现在与未来比起native app，移动web的优势有这些：  跨平台 reach更多的用户 即时更新 更灵活 有错误也可以补救 native app要为不同平台设计与开发 移动web工作量小一点  如今在移动互联网中，手机流量远胜于Desktop，而且比起移动Web更集中于Apps，并且是Top3的App。如何尝试扭转这个趋势呢？">
+<meta name="keywords" content="imweb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="imweb2017会议个人总结">
+<meta property="og:url" content="http://159.75.213.179/2017/09/17/imweb/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="PWA与AMP-移动Web的现在与未来比起native app，移动web的优势有这些：  跨平台 reach更多的用户 即时更新 更灵活 有错误也可以补救 native app要为不同平台设计与开发 移动web工作量小一点  如今在移动互联网中，手机流量远胜于Desktop，而且比起移动Web更集中于Apps，并且是Top3的App。如何尝试扭转这个趋势呢？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.105Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="imweb2017会议个人总结">
+<meta name="twitter:description" content="PWA与AMP-移动Web的现在与未来比起native app，移动web的优势有这些：  跨平台 reach更多的用户 即时更新 更灵活 有错误也可以补救 native app要为不同平台设计与开发 移动web工作量小一点  如今在移动互联网中，手机流量远胜于Desktop，而且比起移动Web更集中于Apps，并且是Top3的App。如何尝试扭转这个趋势呢？">
+
+<link rel="canonical" href="http://159.75.213.179/2017/09/17/imweb/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>imweb2017会议个人总结 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2017/09/17/imweb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          imweb2017会议个人总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-09-17 22:07:53" itemprop="dateCreated datePublished" datetime="2017-09-17T22:07:53+08:00">2017-09-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/会议/" itemprop="url" rel="index"><span itemprop="name">会议</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="PWA与AMP-移动Web的现在与未来"><a href="#PWA与AMP-移动Web的现在与未来" class="headerlink" title="PWA与AMP-移动Web的现在与未来"></a>PWA与AMP-移动Web的现在与未来</h2><p>比起native app，移动web的优势有这些：</p>
+<ol>
+<li>跨平台 reach更多的用户</li>
+<li>即时更新 更灵活 有错误也可以补救</li>
+<li>native app要为不同平台设计与开发 移动web工作量小一点</li>
+</ol>
+<p>如今在移动互联网中，手机流量远胜于Desktop，而且比起移动Web更集中于Apps，并且是Top3的App。如何尝试扭转这个趋势呢？</p>
+<a id="more"></a>
+<h3 id="AMP-Accelerated-Mobile-Pages"><a href="#AMP-Accelerated-Mobile-Pages" class="headerlink" title="AMP(Accelerated Mobile Pages)"></a>AMP(Accelerated Mobile Pages)</h3><p>AMP是一个Github上开源的项目，它的目的是加速移动网络的网页加载从而提升体验。<br>它主要包括这三个方面：</p>
+<ul>
+<li>AMP runtime。它新定义了一套HTML标签，如amp-img, amp-video。使用这些tag可以确保加载的顺滑。同时amp也负责管理资源何时加载，避免不必要的流量。</li>
+<li>AMP validator 是一个校验器。为了确保网页能够达到所要求的极速，AMP对网页里能使用的东西做了严格的限制。比如不允许使用自己的JS，不允许外部加载CSS。校验器是为了帮助你检查你的网页是否达到了这些要求。</li>
+<li>Google AMP cache 提供了第三方的缓存。这样从Google的搜索结果里进入AMP网页就可以做到预加载甚至预渲染，从来带来极速体验，就像前面的范例视频那样。当然，任何第三方都可以提供自己的缓存。</li>
+</ul>
+<p>同时，由于这些限制，AMP目前主要针对静态内容的页面，如交互少，对JS依赖也少的新闻网站、博客等。</p>
+<h3 id="PWA-Progressive-Web-Apps"><a href="#PWA-Progressive-Web-Apps" class="headerlink" title="PWA(Progressive Web Apps)"></a>PWA(Progressive Web Apps)</h3><p>PWA是Google 提出的用前沿的 Web 技术为网页提供 App 般使用体验的一系列方案。<br>一个PWA应用首先是一个网页。可以通过Web技术编写出一个网页应用，随后添加上 App Manifest 和 Service Worker来实现PWA的安装和离线等功能。<br>为了让 PWA 应用被添加到主屏幕, 使用 manifest.json 定义应用的名称, 图标等等信息。然后在 HTML 文件当中引入配置。<br>Service Worker主要是解决离线应用的问题。Service Worker 可以使你的应用先访问本地缓存资源，所以在离线状态时，在没有通过网络接收到更多的数据前，仍可以提供基本的功能。它的生命周期大致如下：</p>
+<ol>
+<li>register 注册</li>
+<li>install 安装</li>
+<li>activated 抓取资源写入缓存，激活</li>
+<li>idle 空闲</li>
+<li>active 监听activate事件，遍历cache，如果有更新，清除旧缓存，更新资源</li>
+<li>terminate 销毁</li>
+</ol>
+<p>详细API可在<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API/Using_Service_Workers" target="_blank" rel="noopener">MDN</a>上查看。详细例子可看github上google给的<a href="https://github.com/GoogleChrome/samples/tree/gh-pages/service-worker/basic" target="_blank" rel="noopener">sample</a></p>
+<h2 id="TypeScript和BuckleScript"><a href="#TypeScript和BuckleScript" class="headerlink" title="TypeScript和BuckleScript"></a>TypeScript和BuckleScript</h2><h3 id="TypeScript-高效可扩展的JavaScript"><a href="#TypeScript-高效可扩展的JavaScript" class="headerlink" title="TypeScript-高效可扩展的JavaScript"></a>TypeScript-高效可扩展的JavaScript</h3><p>TypeScript是JavaScript的一个超集，而且本质上向这个语言添加了可选的静态类型和基于类的面向对象编程。</p>
+<h3 id="BuckleScript"><a href="#BuckleScript" class="headerlink" title="BuckleScript"></a>BuckleScript</h3><p>BuckleScript是把已经存在将近30年的语言 OCaml 编译成可读的 JS编译成可读的JavaScript的很好的编译器。它具有闪电一样的编译速度，且比TypeScript有更好的类型安全（能够保证一旦编译通过就不会有类型错误）。</p>
+<h2 id="从HTTP到Socket，深入浅出现代前端抓包技术"><a href="#从HTTP到Socket，深入浅出现代前端抓包技术" class="headerlink" title="从HTTP到Socket，深入浅出现代前端抓包技术"></a>从HTTP到Socket，深入浅出现代前端抓包技术</h2><p>代理本地抓包只能适用于双网卡和同一wifi环境下的情况，因此尝试在node.js接入层抓包</p>
+<h2 id="框架工具"><a href="#框架工具" class="headerlink" title="框架工具"></a>框架工具</h2><ul>
+<li>Tree-Shaking 删除冗余，包括dead code、无用的模块。webpack2 也引入了tree-shaking 的能力</li>
+</ul>
+<h2 id="面向未来的直播技术－WebRTC"><a href="#面向未来的直播技术－WebRTC" class="headerlink" title="面向未来的直播技术－WebRTC"></a>面向未来的直播技术－WebRTC</h2><p>目前的直播技术</p>
+<ul>
+<li>HLS协议 移动兼容性高，但延迟高</li>
+<li>Flv.js b站开源的视频播放器，原理是通过media source Extensions实现，在PC端兼容性高，但是在移动端兼容性差</li>
+<li>WebRTC(Web Real-Time Communication) 兼容主流的PC端浏览器，延迟低,但移动端兼容性不好。</li>
+</ul>
+<h2 id="XSS魅影危机之从编码说起"><a href="#XSS魅影危机之从编码说起" class="headerlink" title="XSS魅影危机之从编码说起"></a>XSS魅影危机之从编码说起</h2><ul>
+<li>服务层 ngnix、apache等等防御模块</li>
+<li>浏览器层 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener">X-XSS-Protection</a>、<a href="https://www.w3.org/TR/CSP/" target="_blank" rel="noopener">CSP</a></li>
+<li>代码层 encoder、filter</li>
+<li>底线 HttpOnly(为Cookie提供了一个新属性，用以阻止客户端脚本访问Cookie)、域分离</li>
+</ul>
+<h3 id="encoder"><a href="#encoder" class="headerlink" title="encoder"></a>encoder</h3><ul>
+<li>过滤参数，转义”、&lt;、&gt;等，进行html属性编码、js编码</li>
+<li>encodeurl url编码</li>
+</ul>
+<h3 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h3><p>需要特殊字符的情况，如富文本编辑器等<br>黑白名单过滤原则</p>
+<h2 id="WebAssembly"><a href="#WebAssembly" class="headerlink" title="WebAssembly"></a>WebAssembly</h2><p>Javascript 一开始就是解释性语言，后来引入了JIT技术（即时编译），但由于弱类型等编译速度较慢。<br>WebAssembly是用来编写高性能的、浏览器无关的 Web 组件的一种字节码规范。它通过静态类型变量实现性能提升，并且允许任何语言编译到它制定的AST tree。更适合用于写模块，承接各种复杂的计算，如图像处理、3D运算、语音识别、视音频编码解码这种工作</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.zhihu.com/question/36380698/answer/105498519" target="_blank" rel="noopener">如何评价AMP (Accelerated Mobile Pages) Project？</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/25459319" target="_blank" rel="noopener">PWA 入门: 写个非常简单的 PWA 页面</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/imweb/" rel="tag"># imweb</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/09/03/rem/" rel="prev" title="基于js+rem的移动端自适应方案小总结">
+      <i class="fa fa-chevron-left"></i> 基于js+rem的移动端自适应方案小总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/11/05/react-1/" rel="next" title="react学习笔记之入门">
+      react学习笔记之入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PWA与AMP-移动Web的现在与未来"><span class="nav-number">1.</span> <span class="nav-text">PWA与AMP-移动Web的现在与未来</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AMP-Accelerated-Mobile-Pages"><span class="nav-number">1.1.</span> <span class="nav-text">AMP(Accelerated Mobile Pages)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PWA-Progressive-Web-Apps"><span class="nav-number">1.2.</span> <span class="nav-text">PWA(Progressive Web Apps)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TypeScript和BuckleScript"><span class="nav-number">2.</span> <span class="nav-text">TypeScript和BuckleScript</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TypeScript-高效可扩展的JavaScript"><span class="nav-number">2.1.</span> <span class="nav-text">TypeScript-高效可扩展的JavaScript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BuckleScript"><span class="nav-number">2.2.</span> <span class="nav-text">BuckleScript</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从HTTP到Socket，深入浅出现代前端抓包技术"><span class="nav-number">3.</span> <span class="nav-text">从HTTP到Socket，深入浅出现代前端抓包技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#框架工具"><span class="nav-number">4.</span> <span class="nav-text">框架工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面向未来的直播技术－WebRTC"><span class="nav-number">5.</span> <span class="nav-text">面向未来的直播技术－WebRTC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS魅影危机之从编码说起"><span class="nav-number">6.</span> <span class="nav-text">XSS魅影危机之从编码说起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#encoder"><span class="nav-number">6.1.</span> <span class="nav-text">encoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#filter"><span class="nav-number">6.2.</span> <span class="nav-text">filter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebAssembly"><span class="nav-number">7.</span> <span class="nav-text">WebAssembly</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

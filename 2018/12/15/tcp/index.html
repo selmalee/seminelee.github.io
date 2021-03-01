@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言了解网络的全貌，对于经常和网络技术打交道的人来说，还是很有必要的。最近看了《网络是怎么连接的》，记录一下读书笔记。现在就让我们开启从浏览器中输入网址到网页显示的探索之旅吧！">
+<meta name="keywords" content="tcp,HTTP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从浏览器中输入网址到网页显示的探索之旅">
+<meta property="og:url" content="http://159.75.213.179/2018/12/15/tcp/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="前言了解网络的全貌，对于经常和网络技术打交道的人来说，还是很有必要的。最近看了《网络是怎么连接的》，记录一下读书笔记。现在就让我们开启从浏览器中输入网址到网页显示的探索之旅吧！">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/http.png">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/dns.png">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/app-tcp.png">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/netstat.png">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/tcp.jpg">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/tcp-2.jpg">
+<meta property="og:image" content="http://159.75.213.179/static/2018/12/route-print.png">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.110Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从浏览器中输入网址到网页显示的探索之旅">
+<meta name="twitter:description" content="前言了解网络的全貌，对于经常和网络技术打交道的人来说，还是很有必要的。最近看了《网络是怎么连接的》，记录一下读书笔记。现在就让我们开启从浏览器中输入网址到网页显示的探索之旅吧！">
+<meta name="twitter:image" content="http://159.75.213.179/static/2018/12/http.png">
+
+<link rel="canonical" href="http://159.75.213.179/2018/12/15/tcp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>从浏览器中输入网址到网页显示的探索之旅 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2018/12/15/tcp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从浏览器中输入网址到网页显示的探索之旅
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-15 14:15:13" itemprop="dateCreated datePublished" datetime="2018-12-15T14:15:13+08:00">2018-12-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络知识/" itemprop="url" rel="index"><span itemprop="name">网络知识</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>了解网络的全貌，对于经常和网络技术打交道的人来说，还是很有必要的。最近看了《网络是怎么连接的》，记录一下读书笔记。<br>现在就让我们开启从浏览器中输入网址到网页显示的探索之旅吧！<br><a id="more"></a></p>
+<h2 id="浏览器生成消息"><a href="#浏览器生成消息" class="headerlink" title="浏览器生成消息"></a>浏览器生成消息</h2><h3 id="对URI进行解析"><a href="#对URI进行解析" class="headerlink" title="对URI进行解析"></a>对URI进行解析</h3><p>用户在浏览器中输入网址后，浏览器的第一步工作就是对URI进行解析。<br>比如通过对<a href="http://www.wxample.com/dir1/file1.html" target="_blank" rel="noopener">http://www.wxample.com/dir1/file1.html</a> 进行拆分，解析，就能知道要访问的是 <a href="http://www.example.com" target="_blank" rel="noopener">www.example.com</a> 这个web服务器上路径是/dir1/file1.html的文件了。</p>
+<h3 id="生成HTTP请求消息"><a href="#生成HTTP请求消息" class="headerlink" title="生成HTTP请求消息"></a>生成HTTP请求消息</h3><p>确定了web服务器和文件名后，浏览器就根据这些信息来生成HTTP请求消息了。<br>http协议定义了客户端和服务器之间交互的消息内容和步骤。根据http协议的规定，请求消息和响应消息是这样的：<br><img src="/static/2018/12/http.png" alt="http消息"></p>
+<h3 id="向DNS服务器查询Web服务器的IP地址"><a href="#向DNS服务器查询Web服务器的IP地址" class="headerlink" title="向DNS服务器查询Web服务器的IP地址"></a>向DNS服务器查询Web服务器的IP地址</h3><p>生成HTTP消息之后，浏览器还需要根据域名查询IP地址，才能委托操作系统发送消息。<br>我们的计算机的操作系统的socket库（socket库是用于调用网络功能的程序组件集合）中，存在DNS解析器。浏览器程序中调用解析器后，会委托给操作系统的协议栈执行发送消息的操作，然后通过网卡将消息发送给DNS服务器。然后DNS服务器会返回响应消息，其中就包含查询到的IP地址。解析器会取出IP地址，并将其写入浏览器指定的内存地址中。如下图：<br><img src="/static/2018/12/dns.png" alt="DNS解析"><br>那DNS服务器是怎么查询ip地址的呢？<br>DNS服务器中的所有信息都是按照域名以分层次的结构来保存的，最顶层为根域。比如，查询<code>www.example.com</code>对应的ip地址，客户端会先访问最近的一台DNS服务器，该服务器会在保存的记录中查找与查询的域名匹配的记录，如果有，就返回给客户端。如果没有，则从根域开始向下查找。根域DNS服务器中没有<code>www.example.com</code>这个域名，根据域名结构知道是属于com域的，则返回com域的DNS服务器的ip地址，以此类推，最后返回<code>www.example.com</code>的ip地址。</p>
+<h3 id="委托协议栈发送消息"><a href="#委托协议栈发送消息" class="headerlink" title="委托协议栈发送消息"></a>委托协议栈发送消息</h3><p>知道了ip地址后，浏览器就可以委托操作系统的协议栈向目标ip发送消息了。浏览器将按照指定的顺序来调用Socket库中的程序组件。</p>
+<ol>
+<li>创建套接字 <code>&lt;描述符&gt; = socket(&lt;使用IPv4&gt;, ...);</code></li>
+<li>将管道连接到服务器端的套接字上 <code>connect(&lt;描述符&gt;, &lt;服务器的IP地址和端口号&gt;, ...);</code></li>
+<li>收发数据 <code>write(&lt;描述符&gt;, &lt;发送数据&gt;, ...);</code> <code>&lt;接收数据长度&gt; = read(&lt;描述符&gt;, ...);</code></li>
+<li>断开管道并删除套接字 <code>close(&lt;描述符&gt;);</code></li>
+</ol>
+<p>那协议栈具体是怎么工作的呢？我们来继续探索。</p>
+<h2 id="协议栈通过TCP协议发送消息"><a href="#协议栈通过TCP协议发送消息" class="headerlink" title="协议栈通过TCP协议发送消息"></a>协议栈通过TCP协议发送消息</h2><p><img src="/static/2018/12/app-tcp.png" alt="消息收发操作"></p>
+<blockquote>
+<p>浏览器、邮件等一般应用程序收发数据时用TCP<br>DNS查询等收发较短的控制数据时用UDP</p>
+</blockquote>
+<h3 id="创建套接字"><a href="#创建套接字" class="headerlink" title="创建套接字"></a>创建套接字</h3><p>套接字的实体就是通信控制信息。在协议栈的内部有一块用于存放控制信息的内存空间，例如通信对象的IP地址、端口号、通信操作的进行状态等。这个内存空间就是套接字的实体。可以用<code>netstat</code>命令显示套接字内容，如下图<br><img src="/static/2018/12/netstat.png" alt="nestat"><br>创建套接字的过程就是：</p>
+<ol>
+<li>协议栈收到应用程序创建套接字的申请</li>
+<li>分配用于存放套接字的内存空间</li>
+<li>在内存空间中写入初始状态的控制信息</li>
+<li>把表示这个套接字的描述符返回给应用程序</li>
+</ol>
+<p>而远方的服务器在系统启动时就创建了套接字，等待客户端连接。</p>
+<h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p>因为套接字中只有初始状态的控制信息，浏览器调用socket库的<code>connect</code>时需要把服务器的IP地址和端口号等控制信息告知协议栈，客户端再将我们客户端的IP地址和端口号等信息（TCP头部）告知服务器。这个交换控制信息的过程就建立了连接。这个过程也就是TCP的“三次握手”。<br><img src="/static/2018/12/tcp.jpg" alt="三次握手"></p>
+<p>这个过程具体是这样的：</p>
+<ol>
+<li><p>客户端创建TCP头部。<br>客户端创建包含控制信息的头部（TCP头部），其中就有客户端和服务器的端口号。有了端口号，客户端的套接字就知道应该连接服务器的哪个套接字。并把头部中的控制位字段的 <strong>SYN比特设置为1</strong>，以表示连接。</p>
+<p>以下为TCP头部主要字段，字段具体的设置将会在下面章节提及。</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>发送方端口号</td>
+<td>发送网络包的程序的端口号</td>
+</tr>
+<tr>
+<td>接收方端口号</td>
+<td>网络包的接收方程序的端口号</td>
+</tr>
+<tr>
+<td>序号</td>
+<td>发送数据的顺序编号，发送方告诉接收方 这是所有发送数据的第几个字节</td>
+</tr>
+<tr>
+<td>ACK号</td>
+<td>接收数据的顺序编号，接受方告诉发送方 已经收到了所有发送数据的第几个字节</td>
+</tr>
+<tr>
+<td>控制位</td>
+<td>该字段的每个比特分别为：URG、ACK（接收有效，通常表示已收到数据）、PSH、RST（异常中断）、SYN（连接）、FIN（断开连接）</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<ol start="2">
+<li>客户端将信息传递给IP模块并委托它发送，到达服务器后服务器返回响应。<br>通过网络到达服务器后，服务器的IP模块会把数据传递给TCP模块，TCP模块会根据头部的信息（端口号）找到对应的套接字，套接字会写入相关信息。然后，服务器的TCP模块返回响应，与步骤1的客户端一样在TCP头部设置端口号和 <strong>SYN比特</strong>，此外，还 <strong>设置ACK号并将ACK控制位设为1</strong>，表示已经接收到网络包。</li>
+<li>客户端收到响应的网络包。<br>网络包通过IP模块到达TCP模块，并通过TCP头部信息（控制位SYN比特是否为1）确认连接服务器是否成功。如果成功，则在套接字中写入服务器的IP地址、端口号等，并将状态（state）改为连接完毕（established）。然后客户端 <strong>设置ACK号并将ACK比特设为1</strong>，返回给服务器，表示已经收到网络包。服务器收到这个网络包后，连接操作就完成了。</li>
+</ol>
+<h3 id="收发数据"><a href="#收发数据" class="headerlink" title="收发数据"></a>收发数据</h3><p>当控制流程从<code>connect</code>返回到应用程序的时候，接下来就是调用socket库的<code>write</code>将要发送的数据交给协议栈，协议栈收到数据后执行发送操作。</p>
+<ol>
+<li>发送的时机。<br>协议栈并不是一收到数据就发送出去的，而是会将数据存放在内部的发送缓冲区，直到一定量才会发送。这个数值根据两个因素决定：每个网络包能容纳的数据长度；应用程序发送数据的频率。这个值在不同操作系统上的设置是不同的。如果长度优先，则效率高，而延迟长；如果时间优先，则效率降低，延迟减少。此外，应用程序还可以指定选项，比如浏览器一般会使用不等待填满缓冲区直接发送的选项。</li>
+<li>对较大的数据进行拆分<br>当HTTP请求消息很长（如提交表单数据的POST请求），超过MSS长度时，发送缓冲区中的数据会被以MSS长度为单位拆分，添加TCP头部，放进单独的网络包中。<blockquote>
+<p>MTU：一个网络包的最大长度，以太网中一般为1500字节<br>MSS：数据包的最大长度，理论上为MTU除去头部长度</p>
+</blockquote>
+</li>
+<li>使用ACK号确认是否收到网络包<br>确认的原理是这样的：<br>在建立连接的第一次握手时，在将SYN设为1的同时，设置序号字段的值（序号的初始值）。<br>TCP在拆分数据时，会计算这块数据相当于所有数据中的第几个字节（从初始值开始计算），并把这个数写到TCP头部的序号字段中。接收方收到网络包时，会计算数据长度(数据长度 ＝ 网络包长度 - 头部长度)，并把目前收到的数据总长度写入TCP头部的ACK号字段中返回给发送方。<br>这样，接收方就能这样检查：上次接收到第n字节，这次如果收到序号为n+1的包，则没有遗漏。发送方也能确认接收方目前接收到n个数据，这次应该发送序号为n+1的包了。<br>另外，发送过的包都会保存在发送缓冲区中，如果对方没有返回对应的ACK号，就会重新发送这些包。</li>
+<li>接收HTTP响应消息<br>浏览器在发送请求消息后，会调用<code>read</code>来委托协议栈获取响应消息。像上面说过的接收方，协议栈在接收到所有数据后会检查数据块是否丢失，如果没有就返回ACK号，并将数据块按顺序连接起来，最后交给应用程序。</li>
+</ol>
+<h3 id="断开"><a href="#断开" class="headerlink" title="断开"></a>断开</h3><p>收发数据完毕后，服务器和客户端都可以先发起断开，这里以从服务器断开管道并删除套接字为例子说明。断开的过程也就是TCP的“四次挥手”。<br><img src="/static/2018/12/tcp-2.jpg" alt="四次挥手"></p>
+<ol>
+<li>服务器的应用程序调用socket库的<code>close</code>程序，协议栈会生成包含断开信息的TCP头部，即将控制位中的<strong>FIN比特设为1</strong>，委托IP模块向客户端发送数据。同时服务器的套接字中也会记录断开操作（改变state等）。</li>
+<li>客户端收到FIN为1的TCP头部，客户端的协议栈会将套接字的state设为断开，然后<strong>返回一个ACK号</strong>，告诉服务器已经收到了。之后就等待应用程序来获取数据。</li>
+<li>应用程序如上面“接收HTTP响应消息”所述调用<code>read</code>来读取数据，如果协议栈已经收到所有数据了就能马上读取了，否则则继续等待协议栈。</li>
+<li>最后，应用程序调用<code>close</code>来结束操作。这时协议栈会跟步骤1中的服务器一样，<strong>生成FIN比特为1</strong>的包，通过IP模块发送。服务器收到之后<strong>返回ACK号</strong>。到这里就结束了。</li>
+</ol>
+<p>和服务器的通信结束后，客户端等待一段时间就可以删除该套接字了。</p>
+<h2 id="IP与以太网的包收发操作"><a href="#IP与以太网的包收发操作" class="headerlink" title="IP与以太网的包收发操作"></a>IP与以太网的包收发操作</h2><p>喝杯茶继续。<br>接下来我们来探索IP与以太网是怎么进行包收发操作的。<br>我们在上面的章节中经常提及协议栈的IP模块，IP模块到底做了什么工作呢？IP模块负责给包添加两个头部：</p>
+<ol>
+<li>IP头部：IP用的头部，包含IP地址</li>
+<li>MAC头部：以太网用的头部，包括MAC地址</li>
+</ol>
+<h3 id="生成IP头部"><a href="#生成IP头部" class="headerlink" title="生成IP头部"></a>生成IP头部</h3><p>主要字段如下</p>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标志</td>
+<td>表示是否允许分片，以及当前包是否为分片包</td>
+</tr>
+<tr>
+<td>协议号</td>
+<td>表示协议的类型，如TCP：06，UDP：11</td>
+</tr>
+<tr>
+<td>发送方IP地址</td>
+<td>网络包发送方的IP地址</td>
+</tr>
+<tr>
+<td>接收方IP地址</td>
+<td>网络包接收方的IP地址</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>其中，接收方IP地址就是TCP模块告知的，而发送方IP地址则需要通过判断发送所使用的网卡，并填写该网卡的IP地址。那如何确定使用哪一个网卡发送呢？IP模块会根据路由表来确定把包交给哪块网卡。在我们可以通过<code>route print</code>显示路由表。</p>
+<p><img src="/static/2018/12/route-print.png" alt="路由表"><br>首先，会对套接字中的目的地ip与Network Destination进行比较，找到匹配的那一行；然后查看该行，Gateway即要转发到的下一个路由器（最近的网络转发设备）的ip地址，Interface就是使用的网卡的ip地址。这样，我们就知道该用哪个网卡发送包，即IP头部的发送方ip地址字段了。</p>
+<h3 id="生成MAC头部"><a href="#生成MAC头部" class="headerlink" title="生成MAC头部"></a>生成MAC头部</h3><p>以太网在判断网络包目的地时和TCP/IP的方式不同，需要知道MAC地址才能在以太网中将包发往目的地。因此还需要加上MAC头部。<br>MAC头部主要字段</p>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>接收方MAC地址</td>
+<td>网络包接收方的MAC地址</td>
+</tr>
+<tr>
+<td>发送方MAC地址</td>
+<td>网络包发送方的MAC地址</td>
+</tr>
+<tr>
+<td>以太类型</td>
+<td>使用的协议类型，如0800：IP协议、0806ARP协议等</td>
+</tr>
+</tbody>
+</table>
+<p>刚刚说到通过查路由表可以知道要转发到的下一个路由器的ip地址和使用的网卡ip地址，我们根据这两个ip地址查询得到的MAC地址就是接收方的MAC地址和发送方的MAC地址。这里我们需要使用ARP。<br>具体是这样的，在以太网中，我们可以通过广播的方法把包发给同一个子网中的所有设备。ARP就是利用广播向所有设备提问：“这个IP地址xxx.xxx.xxx.xxx是谁的？请把你的MAC地址告诉我。”然后就会有设备回答：“这个IP地址是我的，我的MAC地址是XX-XX-XX-XX-XX-XX。”这样，我们就能得到对应的MAC地址了。</p>
+<h3 id="网卡把包转换成电-光信号发送出去"><a href="#网卡把包转换成电-光信号发送出去" class="headerlink" title="网卡把包转换成电/光信号发送出去"></a>网卡把包转换成电/光信号发送出去</h3><p>网卡接收到网络包之后，就会把IP模块生成的网络包转换成电或光信号，这样就在网线上传输了。这里就不详细说了。</p>
+<h3 id="路由器的包转发操作"><a href="#路由器的包转发操作" class="headerlink" title="路由器的包转发操作"></a>路由器的包转发操作</h3><p>包到达路由器后，路由器会根据路由表再一次判断要转发到的下一个路由器的ip地址，改写MAC头部中的接收方MAC地址，然后转发到下一个路由器。这个过程不断重复，最终网络包就会被送到目的地了。<br>在转发前，当包的长度大于输出端口的MTU（一个包能传输的最大数据长度）时，且IP头部的标志字段显示可以分片，路由器会使用分片功能拆分大网络包，并更新IP头部。如果包过大且不允许分包，路由器会丢弃这个包，并通过ICMP消息通知对方。</p>
+<h2 id="请求到达服务器，响应返回浏览器"><a href="#请求到达服务器，响应返回浏览器" class="headerlink" title="请求到达服务器，响应返回浏览器"></a>请求到达服务器，响应返回浏览器</h2><p>在到达服务器前，可能网络包还会经过防火墙，又或者是经过缓存服务器时直接从缓存服务器中读出数据，这里就不详细说了。</p>
+<h3 id="服务器的接收操作"><a href="#服务器的接收操作" class="headerlink" title="服务器的接收操作"></a>服务器的接收操作</h3><ol>
+<li>到达服务器后，服务器的网卡将接收到的信号转换成数字信息，校验信号是否失真，检查包的MAC头部的接收方MAC地址。检查完成后，网卡会通过中断将网络包到达的事件通知到CPU。然后网卡驱动会根据MAC头部的协议类型把包交给相应的协议栈。</li>
+<li>协议栈IP模块会先检查IP头部，检查包是否分片。如果是分片的包，则把包暂存在内存，等所有分片的包全部到达后再还原成原始包。然后检查IP头部的协议号字段，把包交给相应的模块。</li>
+<li>TCP模块会先检查包的TCP头部，然后根据发送方IP、发送方端口号、接收方IP及接收方端口号找到对应的套接字。如果能找到相应的套接字则返回ACK号（第二次握手），最后建立连接（完成三次握手）。建立连接之后收到的包，TCP模块会检查TCP头部的序号，如果正常则把包放进缓冲区，最后还原成原始包。<blockquote>
+<p>我们在3.1有提到，服务器在启动时就创建套接字等待连接。每次有新的客户端发起连接（第一次握手）时，服务端开始接收连接操作。协议栈会给等待连接的套接字复制一个副本，然后将控制信息写入这个新的套接字中。这个套接字与等待连接的套接字的端口号是一样的，所以还需要其他信息来做区别。</p>
+</blockquote>
+</li>
+<li>在TCP完成所有数据的接收操作后，控制流程会转移到服务器程序，对收到的数据进行处理。</li>
+<li>当数据收发完成后，便进行断开操作。</li>
+</ol>
+<h3 id="浏览器接受响应消息"><a href="#浏览器接受响应消息" class="headerlink" title="浏览器接受响应消息"></a>浏览器接受响应消息</h3><p>服务器发送的响应消息到达客户端后，经过网卡、协议栈，最后到达浏览器。<br>接下来，浏览器会根据http头部的Content-Type字段、文件扩展名等判断数据类型，然后将数据显示出来就可以了。不同类型等数据显示操作的过程不一样，这里就不探讨了。<br>浏览器显示网页内容成功！用户访问完成！</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《网络是怎么连接的》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/tcp/" rel="tag"># tcp</a>
+              <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/21/vue-3/" rel="prev" title="Vue实现原理——实现双向绑定mvvm 学习笔记">
+      <i class="fa fa-chevron-left"></i> Vue实现原理——实现双向绑定mvvm 学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/26/event-loop/" rel="next" title="理解浏览器与Nodejs中的event loop">
+      理解浏览器与Nodejs中的event loop <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器生成消息"><span class="nav-number">2.</span> <span class="nav-text">浏览器生成消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对URI进行解析"><span class="nav-number">2.1.</span> <span class="nav-text">对URI进行解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成HTTP请求消息"><span class="nav-number">2.2.</span> <span class="nav-text">生成HTTP请求消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向DNS服务器查询Web服务器的IP地址"><span class="nav-number">2.3.</span> <span class="nav-text">向DNS服务器查询Web服务器的IP地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#委托协议栈发送消息"><span class="nav-number">2.4.</span> <span class="nav-text">委托协议栈发送消息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#协议栈通过TCP协议发送消息"><span class="nav-number">3.</span> <span class="nav-text">协议栈通过TCP协议发送消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建套接字"><span class="nav-number">3.1.</span> <span class="nav-text">创建套接字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连接"><span class="nav-number">3.2.</span> <span class="nav-text">连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#收发数据"><span class="nav-number">3.3.</span> <span class="nav-text">收发数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#断开"><span class="nav-number">3.4.</span> <span class="nav-text">断开</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP与以太网的包收发操作"><span class="nav-number">4.</span> <span class="nav-text">IP与以太网的包收发操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成IP头部"><span class="nav-number">4.1.</span> <span class="nav-text">生成IP头部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成MAC头部"><span class="nav-number">4.2.</span> <span class="nav-text">生成MAC头部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网卡把包转换成电-光信号发送出去"><span class="nav-number">4.3.</span> <span class="nav-text">网卡把包转换成电/光信号发送出去</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由器的包转发操作"><span class="nav-number">4.4.</span> <span class="nav-text">路由器的包转发操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求到达服务器，响应返回浏览器"><span class="nav-number">5.</span> <span class="nav-text">请求到达服务器，响应返回浏览器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器的接收操作"><span class="nav-number">5.1.</span> <span class="nav-text">服务器的接收操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器接受响应消息"><span class="nav-number">5.2.</span> <span class="nav-text">浏览器接受响应消息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

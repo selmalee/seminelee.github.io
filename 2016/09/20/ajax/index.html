@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="最近想整理一下ajax与跨域方面的知识。首先，我来复习一下ajax的写法，大神们自行绕过。">
+<meta name="keywords" content="Ajax,JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ajax与跨域">
+<meta property="og:url" content="http://159.75.213.179/2016/09/20/ajax/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="最近想整理一下ajax与跨域方面的知识。首先，我来复习一下ajax的写法，大神们自行绕过。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.104Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ajax与跨域">
+<meta name="twitter:description" content="最近想整理一下ajax与跨域方面的知识。首先，我来复习一下ajax的写法，大神们自行绕过。">
+
+<link rel="canonical" href="http://159.75.213.179/2016/09/20/ajax/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ajax与跨域 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2016/09/20/ajax/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ajax与跨域
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-09-20 21:00:02" itemprop="dateCreated datePublished" datetime="2016-09-20T21:00:02+08:00">2016-09-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web安全/" itemprop="url" rel="index"><span itemprop="name">Web安全</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近想整理一下ajax与跨域方面的知识。<br>首先，我来复习一下ajax的写法，大神们自行绕过。<br><a id="more"></a></p>
+<h2 id="ajax"><a href="#ajax" class="headerlink" title="ajax"></a>ajax</h2><p>AJAX = Asynchronous JavaScript and XML（异步的 JavaScript 和 XML）。它是在不重新加载整个页面的情况下，与服务器交换数据并更新部分网页的艺术。</p>
+<h3 id="基本写法"><a href="#基本写法" class="headerlink" title="基本写法"></a>基本写法</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = createXHR();</span><br><span class="line">xhr.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (xhr.readyState == <span class="number">4</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span>((xhr.status &gt;= <span class="number">200</span> &amp;&amp; xhr.status &lt; <span class="number">300</span>) || xhr.status == <span class="number">304</span>) &#123;</span><br><span class="line">			alert(xhr.responseText);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			alert(<span class="string">"request was unsuccesful: "</span> + xhr.status);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">xhr.open(<span class="string">"post"</span>, <span class="string">"postexample.php"</span>, <span class="literal">true</span>);</span><br><span class="line">xhr.setRequestHeader(<span class="string">"Content-Type"</span>, <span class="string">"application/x-www-form-urlencoded"</span>);</span><br><span class="line"><span class="keyword">var</span> form = <span class="built_in">document</span>.getElementById(<span class="string">"user-info"</span>);</span><br><span class="line">xhr.send(serialize(form));</span><br><span class="line"></span><br><span class="line"><span class="comment">// xhr.open("get", url);</span></span><br><span class="line"><span class="comment">// xhr.send(null);</span></span><br></pre></td></tr></table></figure>
+<h3 id="jquery-ajax-常用写法"><a href="#jquery-ajax-常用写法" class="headerlink" title="jquery ajax 常用写法"></a>jquery ajax 常用写法</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">	method: <span class="string">"POST"</span>,</span><br><span class="line">	url: <span class="string">"example.php"</span>,</span><br><span class="line">	<span class="comment">// method: "GET",</span></span><br><span class="line">	<span class="comment">// url: "example.php?number=" + $("#keyword").val(),</span></span><br><span class="line">	dataType: <span class="string">"json"</span>,</span><br><span class="line">	data: &#123;</span><br><span class="line">		name:$(<span class="string">"#name"</span>).val(),</span><br><span class="line">		number:$(<span class="string">"#number"</span>).val(),</span><br><span class="line">		sex:$(<span class="string">"#sex"</span>).val(),</span><br><span class="line">		job:$(<span class="string">"#job"</span>).val()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;).done(<span class="function"><span class="keyword">function</span>(<span class="params">msg</span>) </span>&#123;</span><br><span class="line">	alert(<span class="string">"Data saved:"</span> + msg);</span><br><span class="line">&#125;).fail(<span class="function"><span class="keyword">function</span>(<span class="params">jqXHR, textStatus</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"Request failed: "</span>+ textStatus);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="Promise对象实现Ajax"><a href="#Promise对象实现Ajax" class="headerlink" title="Promise对象实现Ajax"></a>Promise对象实现Ajax</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> getJSON = <span class="function"><span class="keyword">function</span>(<span class="params">url</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">		<span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">		xhr.open(<span class="string">"get"</span>, url);</span><br><span class="line">		xhr.onreadystatechange = handler;</span><br><span class="line">		xhr.responseType = <span class="string">"json"</span>;</span><br><span class="line">		xhr.setRequestHeader(<span class="string">"Accept"</span>, <span class="string">"application/json"</span>);</span><br><span class="line">		xhr.send();</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">function</span> <span class="title">handler</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(xhr.onreadyState !== <span class="number">4</span>) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(xhr.status === <span class="number">200</span>) &#123;</span><br><span class="line">				resolve(<span class="keyword">this</span>.response);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				reject(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="keyword">this</span>.statusText));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> promise;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">getJSON(<span class="string">"/example.json"</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">json</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'Contenes: '</span> + json); <span class="comment">// success</span></span><br><span class="line">&#125;), <span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"出错了"</span>, error); <span class="comment">// failure</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="跨域"><a href="#跨域" class="headerlink" title="跨域"></a>跨域</h2><h3 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h3><p>什么是跨域？什么是同源策略(same-origin policy)？<br>浏览器的同源策略，限制了来自不同源的”document”或脚本，是浏览器为安全性考虑实施的安全策略。URL由协议、域名、端口和路径组成，如果两个URL的协议、域名和端口相同，则表示他们同源。如果协议、域名和端口其中有一个不同，就被当作是跨域。</p>
+<h3 id="同源策略的限制"><a href="#同源策略的限制" class="headerlink" title="同源策略的限制"></a>同源策略的限制</h3><ul>
+<li>Cookie、LoalStorage无法读取</li>
+<li>DOM无法获得</li>
+<li>Ajax请求不能发送</li>
+</ul>
+<p>如何打破这些限制呢？</p>
+<ul>
+<li>document.domain：两个网页一级域名相同、二级域名不同则可设置相同的document.domain共享cookie。</li>
+<li>window.name：通过在子窗口（iframe窗口、window.open打开的窗口）将信息写入window.name，跳回父窗口，父窗口读取window.name，则可获取对方的DOM。</li>
+<li>window.postMessage：HTML5的跨文档通信 API（Cross-document messaging），允许跨窗口通信，包括读写localDtorage</li>
+</ul>
+<p>以上不作细说，以下细说ajax跨域的方法：</p>
+<h2 id="Ajax跨域的常用方法"><a href="#Ajax跨域的常用方法" class="headerlink" title="Ajax跨域的常用方法"></a>Ajax跨域的常用方法</h2><h3 id="JSONP"><a href="#JSONP" class="headerlink" title="JSONP"></a>JSONP</h3><p>JSON with padding（填充式JSON/参数式JSON），即被包含在函数调用中的JSON。JSONP由回调函数和数据组成。<br>它的基本思想是，由于<code>&lt;img&gt;</code>、<code>&lt;script&gt;</code>都能不受限制地从其他域加载资源，网页通过添加一个<code>&lt;script&gt;</code>元素，向服务器请求JSON数据，这种做法不受同源政策限制。服务器收到请求后，将数据放在一个指定名字的回调函数里传回来。<br>JS代码如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addScriptTag</span>(<span class="params">src</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> script = <span class="built_in">document</span>.createElement(<span class="string">"script"</span>);</span><br><span class="line">	script.setAttribute(<span class="string">"type"</span>,<span class="string">"text/javascript"</span>);</span><br><span class="line">	script.src = src;</span><br><span class="line">	<span class="built_in">document</span>.body.appendChild(script);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'success:'</span> + data.msg);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	addScriptTag(<span class="string">"http://119.29.142.213/static/201609/demo.php?callback=foo"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>也可以用jQuery实现：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">	type: <span class="string">"GET"</span>,</span><br><span class="line">	<span class="comment">//jsonp方式只支持GET请求</span></span><br><span class="line">	url: <span class="string">"http://119.29.142.213/static/201609/demo.php"</span>,</span><br><span class="line">	dataType: <span class="string">"jsonp"</span>,</span><br><span class="line">	jsonp: <span class="string">"callback"</span>,</span><br><span class="line">	success: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(data.success)&#123;</span><br><span class="line">			<span class="built_in">console</span>.log(data.msg);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="built_in">console</span>.log(<span class="string">"出现错误："</span> + data.msg);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	error: <span class="function"><span class="keyword">function</span>(<span class="params">jqXHR</span>)</span>&#123;</span><br><span class="line">		alert(<span class="string">"发生错误:"</span> + jqXHR.status)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>php代码如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$jsonp = $_GET[<span class="string">"callback"</span>];</span><br><span class="line">	$result = $jsonp . <span class="string">'(&#123;"success":true,"msg":"msg from server"&#125;)'</span>;</span><br><span class="line">	<span class="keyword">echo</span> $result;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="CORS-Cross-Origin-Resource-Share"><a href="#CORS-Cross-Origin-Resource-Share" class="headerlink" title="CORS(Cross Origin Resource Share)"></a>CORS(Cross Origin Resource Share)</h3><p>CORS需要浏览器和服务器同时支持。目前，所有浏览器都支持该功能，IE浏览器不能低于IE10。整个CORS通信过程，都是浏览器自动完成，不需要用户参与。只需要服务器实现CORS接口就可以了。<br>我尝试用php实现CORS接口，加入如下代码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$origin=<span class="keyword">isset</span>($_SERVER[<span class="string">'HTTP_ORIGIN'</span>])?$_SERVER[<span class="string">'HTTP_ORIGIN'</span>]:<span class="string">''</span>;</span><br><span class="line"><span class="comment">/************** 获取客户端的Origin域名 **************/</span></span><br><span class="line">header(<span class="string">'Access-Control-Allow-Origin:'</span>.$origin);</span><br></pre></td></tr></table></figure></p>
+<p>过程是这样的：urlA上的页面获取urlB上的资源，浏览器会检查服务器B的HTTP头(HEAD请求)，如果Access-Control-Allow-Origin中有urlA，或者是通配符*，浏览器就会允许跨域。<br>跨域请求成功的请求头如下。浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。因为是我本地文件发出的，所以这里是file://。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Accept:*/*</span><br><span class="line">Accept-Encoding:gzip, deflate, sdch</span><br><span class="line">Accept-Language:zh-CN,zh;q=0.8</span><br><span class="line">Cache-Control:max-age=0</span><br><span class="line">Connection:keep-alive</span><br><span class="line">Host:119.29.142.213</span><br><span class="line">Origin:file://</span><br><span class="line">User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36</span><br></pre></td></tr></table></figure></p>
+<p>回应头如下，Access-Control-Allow-Origin的值要么是请求时Origin字段的值，要么是一个*，表示接受任意域名的请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin:file://</span><br><span class="line">Connection:keep-alive</span><br><span class="line">Content-Length:12</span><br><span class="line">Content-Type:text/html</span><br><span class="line">Date:Wed, 21 Sep 2016 13:53:41 GMT</span><br><span class="line">Server:nginx/1.0.15</span><br><span class="line">Vary:Accept-Encoding</span><br><span class="line">X-Powered-By:PHP/5.2.17p1</span><br></pre></td></tr></table></figure></p>
+<p>非简单请求（非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。）这里不再细述，<a href="http://www.ruanyifeng.com/blog/2016/04/cors.html" target="_blank" rel="noopener">阮一峰的跨域资源共享 CORS 详解</a>有更详细的解释。</p>
+<h3 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h3><p>WebSocket使用ws://（非加密）和wss://（加密）作为协议前缀。该协议不实行同源政策，只要服务器支持，就可以通过它进行跨源通信。这种协议专门为快速传输小数据设计，适合用于移动端。<br>JS代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> socket = <span class="keyword">new</span> WebSocket(<span class="string">"ws://127.0.0.1:8888/"</span>);</span><br><span class="line"><span class="keyword">var</span> message = &#123;</span><br><span class="line">	time: <span class="keyword">new</span> <span class="built_in">Date</span>(),</span><br><span class="line">	text: <span class="string">"Hello from my file"</span></span><br><span class="line">&#125;</span><br><span class="line">socket.onopen = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	socket.send(<span class="built_in">JSON</span>.stringify(message));</span><br><span class="line">&#125;</span><br><span class="line">socket.onmessage = <span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(event.data);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>用NodeJS搭建本地服务器<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"><span class="keyword">var</span> ws = <span class="built_in">require</span>(<span class="string">'ws'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> app = http</span><br><span class="line">	.createServer(<span class="function"><span class="keyword">function</span>(<span class="params">req,res</span>)</span>&#123;</span><br><span class="line">		res.writeHead(<span class="number">200</span>, &#123;<span class="string">'Content-Type'</span>: <span class="string">'text/plain'</span>&#125;);</span><br><span class="line">		res.write(<span class="string">'Hello WebSocket from server'</span>);</span><br><span class="line">		res.end();</span><br><span class="line">	&#125;)</span><br><span class="line">	.listen(<span class="number">8888</span>);</span><br><span class="line"><span class="keyword">var</span> WebSocketServer = <span class="built_in">require</span>(<span class="string">'ws'</span>).Server,</span><br><span class="line">    wss = <span class="keyword">new</span> WebSocketServer( &#123; <span class="attr">server</span> : app &#125; );</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Server running at http://127.0.0.1:8888'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>请求头如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">GET ws://127.0.0.1:8888/ HTTP/1.1</span><br><span class="line">Host: 127.0.0.1:8888</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Pragma: no-cache</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Origin: file://</span><br><span class="line">Sec-WebSocket-Version: 13</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36</span><br></pre></td></tr></table></figure></p>
+<p>回应头如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 101 Switching Protocols</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Sec-WebSocket-Accept: wUpcqQA/Kzv80w5vM90HFf3WN10=</span><br><span class="line">Sec-WebSocket-Extensions: permessage-deflate</span><br></pre></td></tr></table></figure></p>
+<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
+<li>JSONP只支持GET请求，但优势在于支持老式浏览器，以及可以向不支持CORS的网站请求数据。</li>
+<li>CORS支持所有类型的HTTP请求。</li>
+<li>WebSocket的特别之处是它是双向通信的，</li>
+</ul>
+<h2 id="XSS与CRSF攻击"><a href="#XSS与CRSF攻击" class="headerlink" title="XSS与CRSF攻击"></a>XSS与CRSF攻击</h2><p>在这里顺带一提XSS与CSRF攻击</p>
+<h3 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h3><p>XSS（Cross-site scripting，跨站脚本），是注入攻击的一种。即攻击者的输入没有经过严格的控制进入了数据库，最终显示给来访的用户，导致可以在来访用户的浏览器里执行这些代码。例如发布评论，提交含有 JavaScript 的内容文本。这时服务器端如果没有过滤或转义掉这些脚本，作为内容发布到了页面上，其他用户访问这个页面的时候就会运行这些脚本。<br>可能是无聊恶意的<code>&lt;script&gt;alert(哈哈哈你关不掉我的~)&lt;/script&gt;</code>，也可能是恶意修改站点原数据，甚至通过跨域请求直接加载恶意站点以窃取cookie和登录信息等，例如，建立一个收集信息的恶意网站，然后在评论中写入获取cookie、对恶意网站发起请求的代码，从而把包含了用户的帐号和其他隐私的信息发送到收集服务器上。<br>一些防御措施：</p>
+<ul>
+<li>对输入进行处理、过滤，把<code>&lt;</code>转换成<code>&amp;lt;</code>等等<br>CSRF（Cross-site request forgery，跨站请求伪造）。</li>
+<li>设置HttpOnly属性，防止劫取Cookie，js只能读到带有HttpOnly属性的Cookie</li>
+</ul>
+<h3 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h3><p>XSS 是实现 CSRF 的诸多途径中的一条。CRSF（Cross-site request forgery，跨站请求伪造），是伪造请求，冒充用户在站内的正常操作。即用户登录受信任网站A，并在本地生成Cookie。然后在不登出A的情况下，访问危险网站B。<br>例如，银行网站A，它以GET请求来完成银行转账的操作，如：<code>http://www.mybank.com/Transfer.php?toBankId=11&amp;money=1000</code>。危险网站B利用<code>&lt;img&gt;</code>能不受限制地从其他域加载资源，写入代码<code>&lt;img src=http://www.mybank.com/Transfer.php?toBankId=11&amp;money=1000&gt;</code>。这样，你的浏览器会带上你的银行网站A的Cookie发出Get请求，结果银行网站服务器收到请求后，认为这是一个更新资源操作（转账操作），所以就立刻进行转账操作。如果网站用的是POST请求，还可以利用XSS注入JS代码发送POST请求等等。<br>一些防御措施：</p>
+<ul>
+<li>判断 referer：在HTTP头中有一个字段叫Referer，它记录了该HTTP请求的来源地址。网站可以对每一个请求验证其Referer值，如果Referer是其他网站的话就拒绝该请求。但是也有侵入者手动改变了referer值的可能。</li>
+<li>在请求地址中添加token并验证：系统开发者可以在HTTP请求中以参数的形式加入一个随机产生的token，并在服务器端建立一个拦截器来验证这个token，如果请求中没有token或者token内容不正确，则认为可能是CSRF攻击而拒绝该请求。如果放到地址不够安全，也可以把token放到HTTP头中自定义的属性并验证。</li>
+</ul>
+<p>详细解释请看参考文章<a href="http://www.cnblogs.com/imwtr/p/4763457.html" target="_blank" rel="noopener">XSS 和 CSRF 攻击</a>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html" target="_blank" rel="noopener">浏览器同源政策及其规避方法</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html" target="_blank" rel="noopener">跨域资源共享 CORS 详解</a></li>
+<li><a href="http://www.cnblogs.com/imwtr/p/4763457.html" target="_blank" rel="noopener">XSS 和 CSRF 攻击</a></li>
+<li><a href="https://blog.tonyseek.com/post/introduce-to-xss-and-csrf/" target="_blank" rel="noopener">总结 XSS 与 CSRF 两种跨站攻击</a></li>
+<li>《JavaScript 高级程序设计》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Ajax/" rel="tag"># Ajax</a>
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/29/bfcache/" rel="prev" title="BFCache相关">
+      <i class="fa fa-chevron-left"></i> BFCache相关
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/11/04/experience-1/" rel="next" title="移动端重构遇到的坑（长期更新）">
+      移动端重构遇到的坑（长期更新） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ajax"><span class="nav-number">1.</span> <span class="nav-text">ajax</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本写法"><span class="nav-number">1.1.</span> <span class="nav-text">基本写法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jquery-ajax-常用写法"><span class="nav-number">1.2.</span> <span class="nav-text">jquery ajax 常用写法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Promise对象实现Ajax"><span class="nav-number">1.3.</span> <span class="nav-text">Promise对象实现Ajax</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跨域"><span class="nav-number">2.</span> <span class="nav-text">跨域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#同源策略"><span class="nav-number">2.1.</span> <span class="nav-text">同源策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同源策略的限制"><span class="nav-number">2.2.</span> <span class="nav-text">同源策略的限制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ajax跨域的常用方法"><span class="nav-number">3.</span> <span class="nav-text">Ajax跨域的常用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JSONP"><span class="nav-number">3.1.</span> <span class="nav-text">JSONP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CORS-Cross-Origin-Resource-Share"><span class="nav-number">3.2.</span> <span class="nav-text">CORS(Cross Origin Resource Share)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WebSocket"><span class="nav-number">3.3.</span> <span class="nav-text">WebSocket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#区别"><span class="nav-number">3.4.</span> <span class="nav-text">区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS与CRSF攻击"><span class="nav-number">4.</span> <span class="nav-text">XSS与CRSF攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS"><span class="nav-number">4.1.</span> <span class="nav-text">XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSRF"><span class="nav-number">4.2.</span> <span class="nav-text">CSRF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

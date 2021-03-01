@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言经常用php写cgi，但是发现自己并不理解它的运行原理，所以学习一下。 PHP是什么PHP是一种适用于Web开发的动态语言，是一个用C语言实现，包含大量组件的软件框架。">
+<meta name="keywords" content="NodeJs,PHP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记之php的运行机制与原理">
+<meta property="og:url" content="http://159.75.213.179/2017/11/19/php/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="前言经常用php写cgi，但是发现自己并不理解它的运行原理，所以学习一下。 PHP是什么PHP是一种适用于Web开发的动态语言，是一个用C语言实现，包含大量组件的软件框架。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2017/12/php.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2017/12/php-1.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2017/12/php-2.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2017/12/php-3.jpeg">
+<meta property="og:image" content="http://159.75.213.179/static/2017/12/php-4.png">
+<meta property="og:image" content="http://159.75.213.179/static/2017/12/php-5.png">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.106Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="学习笔记之php的运行机制与原理">
+<meta name="twitter:description" content="前言经常用php写cgi，但是发现自己并不理解它的运行原理，所以学习一下。 PHP是什么PHP是一种适用于Web开发的动态语言，是一个用C语言实现，包含大量组件的软件框架。">
+<meta name="twitter:image" content="http://159.75.213.179/static/2017/12/php.jpeg">
+
+<link rel="canonical" href="http://159.75.213.179/2017/11/19/php/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>学习笔记之php的运行机制与原理 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2017/11/19/php/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          学习笔记之php的运行机制与原理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-11-19 22:42:09" itemprop="dateCreated datePublished" datetime="2017-11-19T22:42:09+08:00">2017-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/后端知识/" itemprop="url" rel="index"><span itemprop="name">后端知识</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>经常用php写cgi，但是发现自己并不理解它的运行原理，所以学习一下。</p>
+<h2 id="PHP是什么"><a href="#PHP是什么" class="headerlink" title="PHP是什么"></a>PHP是什么</h2><p>PHP是一种适用于Web开发的动态语言，是一个用C语言实现，包含大量组件的软件框架。<br><a id="more"></a></p>
+<ul>
+<li><p>多进程模型：PHP是多进程模型。不同请求间互不干涉，即一个请求挂掉不会对全盘服务造成影响。（使用进程控制函数，创建子进程，执行程序，处理信号等）。PHP也能支持多线程模型。</p>
+<blockquote>
+<p>进程拥有一个完整的虚拟地址空间，不依赖于线程而独立存在；线程是进程的一部分，没有自己的地址空间，与进程内的其他线程一起共享分配给该进程的所有资源。<br>区别：<br>（1）进程具有独立的空间地址，一个进程崩溃后，在保护模式下不会对其它进程产生影响。<br>（2）线程只是一个进程的不同执行路径，线程有自己的堆栈和局部变量，但线程之间没有单独的地址空间，一个线程死掉就等于整个进程死掉。</p>
+</blockquote>
+</li>
+<li><p>弱类型语言：和C、C++、C#、Java等不同，PHP是一种弱类型的语言。即一个变量的类型并不是一开始就确定不变的，运行中才会确定并可能发生隐式或显示的类型转换。</p>
+</li>
+<li>引擎(Zend) + 组件(ext)的模式降低内部耦合</li>
+<li>中间层(sapi)隔绝web server和PHP</li>
+<li>语法简单灵活，没有太多规范</li>
+</ul>
+<h2 id="PHP的核心架构"><a href="#PHP的核心架构" class="headerlink" title="PHP的核心架构"></a>PHP的核心架构</h2><p><img src="/static/2017/12/php.jpeg" alt="PHP的核心架构"><br>从下向上如下：</p>
+<ol>
+<li>Zend引擎：Zend整体用C语言实现，是PHP的内核部分。它将PHP代码翻译，实现了基本的数据结构，内存分配机制及管理，提供了相应的api供外部调用，是一切的核心。</li>
+<li>Extensions：围绕Zend引擎，extensions通过组件式的方式提供各种基础服务，我们常见的各种内置函数、标准库等都是通过extension来实现，用户也可以根据需要实现自己的extension。</li>
+<li>Sapi：Aerver Application Programming Interface，即服务端应用编程接口，是PHP和web server的中间层。Sapi通过钩子函数，使PHP能和外部交互数据，这也将PHP和上层应用解耦。</li>
+<li>上层应用：就是我们平时编写的PHP程序，通过不同的sapi方式得到各种各样的应用模式</li>
+</ol>
+<h3 id="Sapi"><a href="#Sapi" class="headerlink" title="Sapi"></a>Sapi</h3><p>我们常见的Sapi有：</p>
+<ol>
+<li>apache2handler：以apache作为webserver，采用mod_PHP模式运行时候的处理方式，也是现在应用最广泛的一种。</li>
+<li>fast-cgi：这是webserver和PHP直接的另一种交互方式，也就是大名鼎鼎的fastcgi协议，在最近fastcgi+PHP得到越来越多的应用，也是异步webserver所唯一支持的方式。nginx就是通过php-fpm(fast-cgi)来解析php的。</li>
+<li>cli：命令行调用的应用模式</li>
+</ol>
+<h3 id="php-apache和php-nginx的区别"><a href="#php-apache和php-nginx的区别" class="headerlink" title="php+apache和php+nginx的区别"></a>php+apache和php+nginx的区别</h3><p>apache是通过mod_php来解析php的；nginx是通过php-fpm(fast-cgi)来解析php的。</p>
+<ol>
+<li>PHP解释器是否嵌入Web服务器进程内部执行<br>mod_php通过嵌入PHP解释器到Apache进程中，只能与Apache配合使用。这种方式的弊端是内存占用大，如处理CSS、JS等静态文件完全没有必要加载解释器；而cgi和fast-cgi以独立的进程的形式出现，只要对应的Web服务器实现cgi或者fast-cgi协议，就能够处理PHP请求。</li>
+<li>单个进程处理的请求数量<br>mod_php和fast_cgi的模式在每个进程的生命周期内能够处理多个请求，而cgi 的模式处理一个请求就马上销毁进程，在高并发的场景下cgi 的性能非常糟糕。而fast-cgi也有启动多个进程，占用内存的缺点。<blockquote>
+<p>cgi和fast-cgi是通信协议V1.0和V2.0，而php-cgi和php-fpm是实现了这种协议的程序。所以处理具体请求的是php-cgi或php-fpm，它们遵循fast-cgi协议。</p>
+</blockquote>
+</li>
+</ol>
+<p>综上，如果对性能有极高的要求，可以将静态请求和动态请求分开，这时Nginx+php-fpm是比较好的选择。</p>
+<h2 id="PHP的执行流程"><a href="#PHP的执行流程" class="headerlink" title="PHP的执行流程"></a>PHP的执行流程</h2><p><img src="/static/2017/12/php-1.jpeg" alt="PHP的核心架构"><br>拿到一段代码后，经过词法解析、语法解析等阶段后，源程序会被翻译成一个个指令（opcodes）,然后ZEND虚拟机顺次执行这些指令完成操作。PHP本身是用C实现的，因此最终调用的也是C的函数，实际上，我们可以把PHP看做一个C开发的软件。</p>
+<h2 id="PHP变量"><a href="#PHP变量" class="headerlink" title="PHP变量"></a>PHP变量</h2><p>PHP是一门弱类型语言，本身不严格区分变量的类型。PHP变量可以分为简单类型(int、string、boolean)、集合类型(array、resource、object)和常量(const)。所有变量在底层都是同一种结构zval。<br>zval主要由三部分组成：</p>
+<ul>
+<li>type：指定变量的类型</li>
+<li>refcount&amp;is_ref：用来实现引用计数</li>
+<li>value：存储变量的实际数据(核心)。因为要存储多种类型，所以zvalue是一个union，也由此实现了弱类型。</li>
+</ul>
+<h2 id="和node-js比较"><a href="#和node-js比较" class="headerlink" title="和node.js比较"></a>和node.js比较</h2><h3 id="多进程和单进程"><a href="#多进程和单进程" class="headerlink" title="多进程和单进程"></a>多进程和单进程</h3><p> 上面有提到，PHP是多进程模型。因此，如果PHP代码损坏，不会拖垮整个服务器。 PHP代码只运行在自己的进程范围中，当某个请求显示错误时，它只对特定的请求产生影响；而在Node.js环境中，所有的请求均在单一的进程服务中，当某个请求导致未知错误时，整个服务器都会受到影响。<br>以下是PHP和Node.js对处理Http请求时的模型。<br>php+apache模型<br><img src="/static/2017/12/php-2.jpeg" alt="PHP_apache"><br>node.js模型<br><img src="/static/2017/12/php-3.jpeg" alt="node.js"></p>
+<h3 id="多线程和单线程"><a href="#多线程和单线程" class="headerlink" title="多线程和单线程"></a>多线程和单线程</h3><p> Node.js 他用的是JavaScript引擎，那么注定它是单线程 ，使用异步方法开辟多个任务，无需像php等待上个任务线程使用结束之后给下个使用；PHP也是单线程但是它借用Apache服务器提供多线程服务。<br> <img src="/static/2017/12/php-4.png" alt="运行机制对比"></p>
+<h3 id="在高并发、大数据量时处理方式不同"><a href="#在高并发、大数据量时处理方式不同" class="headerlink" title="在高并发、大数据量时处理方式不同"></a>在高并发、大数据量时处理方式不同</h3><p> php： 优化sql，用组件，用缓存，为了让线程尽快结束，进行下一次任务（上下衔接依次执行）；<br> node：单线程、异步、事件驱动。因为运行速度很快并不会等待，所以如果后面用到前面返回的结果，就需要把后面的封装起来，作为一个回调函数执行。<br> <img src="/static/2017/12/php-5.png" alt="高并发时处理对比"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NodeJs/" rel="tag"># NodeJs</a>
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/11/05/react-1/" rel="prev" title="react学习笔记之入门">
+      <i class="fa fa-chevron-left"></i> react学习笔记之入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/12/16/promise-2/" rel="next" title="JavaScript异步编程之promise与async">
+      JavaScript异步编程之promise与async <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP是什么"><span class="nav-number">2.</span> <span class="nav-text">PHP是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP的核心架构"><span class="nav-number">3.</span> <span class="nav-text">PHP的核心架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Sapi"><span class="nav-number">3.1.</span> <span class="nav-text">Sapi</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-apache和php-nginx的区别"><span class="nav-number">3.2.</span> <span class="nav-text">php+apache和php+nginx的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP的执行流程"><span class="nav-number">4.</span> <span class="nav-text">PHP的执行流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP变量"><span class="nav-number">5.</span> <span class="nav-text">PHP变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#和node-js比较"><span class="nav-number">6.</span> <span class="nav-text">和node.js比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多进程和单进程"><span class="nav-number">6.1.</span> <span class="nav-text">多进程和单进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程和单线程"><span class="nav-number">6.2.</span> <span class="nav-text">多线程和单线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在高并发、大数据量时处理方式不同"><span class="nav-number">6.3.</span> <span class="nav-text">在高并发、大数据量时处理方式不同</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

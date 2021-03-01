@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="异步编程我们知道，JavaScript语言的执行环境是“单线程”。这种模式的坏处是只要有一个任务耗时很长，后面的任务都必须排队等待。常见的浏览器无响应往往就是因为某一段JS代码长时间运行导致整个页面卡在这个地方，其他任务无法执行。">
+<meta name="keywords" content="JavaScript,Es6,Es7">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript异步编程之promise与async">
+<meta property="og:url" content="http://159.75.213.179/2017/12/16/promise-2/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="异步编程我们知道，JavaScript语言的执行环境是“单线程”。这种模式的坏处是只要有一个任务耗时很长，后面的任务都必须排队等待。常见的浏览器无响应往往就是因为某一段JS代码长时间运行导致整个页面卡在这个地方，其他任务无法执行。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.107Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript异步编程之promise与async">
+<meta name="twitter:description" content="异步编程我们知道，JavaScript语言的执行环境是“单线程”。这种模式的坏处是只要有一个任务耗时很长，后面的任务都必须排队等待。常见的浏览器无响应往往就是因为某一段JS代码长时间运行导致整个页面卡在这个地方，其他任务无法执行。">
+
+<link rel="canonical" href="http://159.75.213.179/2017/12/16/promise-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JavaScript异步编程之promise与async | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2017/12/16/promise-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript异步编程之promise与async
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-12-16 20:50:42" itemprop="dateCreated datePublished" datetime="2017-12-16T20:50:42+08:00">2017-12-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="异步编程"><a href="#异步编程" class="headerlink" title="异步编程"></a>异步编程</h2><p>我们知道，JavaScript语言的执行环境是“单线程”。这种模式的坏处是只要有一个任务耗时很长，后面的任务都必须排队等待。常见的浏览器无响应往往就是因为某一段JS代码长时间运行导致整个页面卡在这个地方，其他任务无法执行。<br><a id="more"></a><br>为了解决这个问题，JavaScript语言将任务的执行模式分成：同步(Synchronous)和异步(Asynchronous)。同步模式就是上面讲到的模式。异步模式则是：每一个任务有一个或多个回调函数(callback)。前一个任务结束后，不是执行后一个任务，而是执行回调函数。后一个任务则是不等前一个任务结束就执行。执行顺序与任务的排列顺序是不一致的、异步的。比如Ajax操作，异步执行http请求。</p>
+<h2 id="常见的几种“异步模式”编程"><a href="#常见的几种“异步模式”编程" class="headerlink" title="常见的几种“异步模式”编程"></a>常见的几种“异步模式”编程</h2><h3 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h3><p>这是异步编程最基本的方法。如果f1是一个很耗时的任务，可以考虑改写f1，把依赖f1返回结果的f2写成f1的回调函数。如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f1</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// f1 code</span></span><br><span class="line">        callback()</span><br><span class="line">    &#125;, <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// f2 code</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">f1(f2)</span><br></pre></td></tr></table></figure></p>
+<p>优点：简单、容易理解和部署；<br>缺点：各个部分高度耦合，流程很混乱；每个任务只能制定一个回调函数。</p>
+<h3 id="事件监听"><a href="#事件监听" class="headerlink" title="事件监听"></a>事件监听</h3><p>事件监听：任务的执行不取决于代码的顺序，而取决于某个事件是否发生。用这种方法修改上面的写法：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// jQuery的写法</span></span><br><span class="line">f1.on(<span class="string">'done'</span>, f2)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// f1 code</span></span><br><span class="line">        f1.trigger(<span class="string">'done'</span>)</span><br><span class="line">    &#125;, <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>优点：容易理解；可以绑定多个事件，每个事件可以指定多个回调函数；有利于实现模块化<br>缺点：整个程序都要变成事件驱动型，运行流程不清晰</p>
+<h3 id="发布-订阅"><a href="#发布-订阅" class="headerlink" title="发布/订阅"></a>发布/订阅</h3><p>发布/订阅模式(观察者模式)：假设存在一个信号中心，某个任务执行完成，就像信号中心发布一个信号(事件)，其他任务可以向信号中心订阅这个信号(事件)，从而知道什么时候自己可以开始执行。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// f1 code</span></span><br><span class="line">        jQuery.publish(<span class="string">'done'</span>) <span class="comment">// 发布</span></span><br><span class="line">    &#125;, <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">jQuery.subscribe(<span class="string">'done'</span>, f2) <span class="comment">// 订阅</span></span><br><span class="line"><span class="comment">// jQuery.unsubscribe('done', f2) // 取消订阅</span></span><br></pre></td></tr></table></figure></p>
+<p>与事件监听类似，但优于事件监听。优点：可以通过查看信息中心，了解存在多少信号、每个信号有多少订阅者，从而监控程序的运行。</p>
+<h3 id="Promise对象"><a href="#Promise对象" class="headerlink" title="Promise对象"></a>Promise对象</h3><p>Promises对象是CommonJS工作组提出的一种规范，Es6将其写进了语言标准，原生提供了<code>Promise</code>对象。Promise接受一个函数作为参数，该函数的两个参数分别是resolve和reject。这两个函数就是就是回调函数。</p>
+<ul>
+<li>resolve函数：在异步操作成功时调用，并将异步操作的结果，作为参数传递出去；</li>
+<li>reject函数：在异步操作失败时调用，并将异步操作报出的错误，作为参数传递出去。<br>Promise实例生成以后，可以用<code>then</code>方法指定<code>resolved</code>状态和<code>reject</code>状态的回调函数。<br>如：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">const f1 = new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">    if (/* 异步操作成功 */) &#123;</span><br><span class="line">        resolve(&apos;success&apos;)</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        reject(&apos;fail&apos;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line">f1.then(f2)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>优点：回调函数变成了链式写法，使程序流程变得很清楚；如果一个任务已经完成，再添加回调函数，该回调函数会立即执行，所以不用担心是否错过了某个事件或信号。</p>
+<h2 id="Promise基本API和常见问题"><a href="#Promise基本API和常见问题" class="headerlink" title="Promise基本API和常见问题"></a>Promise基本API和常见问题</h2><h3 id="then"><a href="#then" class="headerlink" title=".then()"></a>.then()</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.prototype.then(onFulfilled, onRejected)</span><br><span class="line"></span><br><span class="line">promise.then(f2).then(f3)</span><br></pre></td></tr></table></figure>
+<p>对Promise添加<code>onFulfilled</code>和<code>onRejected</code>回调，并返回的是一个新的Promise实例，且返回值将作为参数传入这个新Promise的<code>resolve</code>函数。因此我们可以使用链式写法。如上面的例子。</p>
+<h3 id="catch"><a href="#catch" class="headerlink" title=".catch()"></a>.catch()</h3><p>该方法用于指定发生错误时的回调函数。<br><code>reject</code>方法的作用，等同于抛错。<code>promise</code>对象的错误，会一直向后传递，直到被捕获。即错误总会被下一个<code>catch</code>所捕获。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.prototype.catch(onRejected)</span><br><span class="line"></span><br><span class="line">promise.then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data)</span><br><span class="line">&#125;).catch(<span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(e)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>如果没有使用<code>catch</code>方法指定处理错误的回调函数，<code>Promise</code>对象抛出的错误不会传递到外层代码，即不会有任何反应（Chrome会抛错），这是<code>Promise</code>的另一个缺点。</p>
+<h3 id="all"><a href="#all" class="headerlink" title=".all()"></a>.all()</h3><p>该方法用于将多个Promise实例，包装成一个新的Promise实例。Promise.all方法接受一个数组（或具有Iterator接口）作参数，数组中的对象（p1、p2、p3）均为promise实例。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> p = <span class="built_in">Promise</span>.all([p1, p2, p3])</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>当p1, p2, p3状态都变为fulfilled，p的状态才会变为fulfilled，并将三个promise返回的结果，按参数的顺序（而不是 resolved的顺序）存入数组，传给p的回调函数。</li>
+<li>当p1, p2, p3其中之一状态变为rejected，p的状态也会变为rejected，并把第一个被reject的promise的返回值，传给p的回调函数。<h3 id="race"><a href="#race" class="headerlink" title=".race()"></a>.race()</h3>该方法同样是将多个Promise实例，包装成一个新的Promise实例<br>不同于<code>all</code>的是：当p1, p2, p3中有一个实例的状态发生改变（变为fulfilled或rejected），p的状态就跟着改变。并把第一个改变状态的promise的返回值，传给p的回调函数。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> p = <span class="built_in">Promise</span>.all([p1, p2, p3])</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="一些常见的问题"><a href="#一些常见的问题" class="headerlink" title="一些常见的问题"></a>一些常见的问题</h3><ol>
+<li>reject 和 catch 的区别</li>
+</ol>
+<ul>
+<li>promise.then(onFulfilled, onRejected)<br>在onFulfilled中发生异常的话，在onRejected中是捕获不到这个异常的。</li>
+<li>promise.then(onFulfilled).catch(onRejected)<br>.then中产生的异常能在.catch中捕获。所以还是建议这种写法</li>
+</ul>
+<ol start="2">
+<li><p>如果在then中抛错，而没有对错误进行处理（即catch），那么会一直保持reject状态，直到catch了错误。如下面的代码，这样写才能保证taskB正常执行</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">promise</span><br><span class="line">    .then(taskA)</span><br><span class="line">    .catch(onRejectedA)</span><br><span class="line">    .then(taskB)</span><br><span class="line">    .catch(onRejectedB)</span><br><span class="line">    .then(finalTask)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>每次调用<code>then</code>都会返回一个新创建的<code>promise</code>对象，而<code>then</code>内部只是返回的数据。<br>如下面的代码，第一种方法中，then的调用几乎是同时开始执行的，且传给每个then的value都是100，这种方法应当避免。方法二才是正确的链式调用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//方法1：对同一个promise对象同时调用 then 方法</span></span><br><span class="line"><span class="keyword">var</span> p1 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    resolve(<span class="number">100</span>);</span><br><span class="line">&#125;);</span><br><span class="line">p1.then(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> value * <span class="number">2</span>;</span><br><span class="line">&#125;);</span><br><span class="line">p1.then(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> value * <span class="number">2</span>;</span><br><span class="line">&#125;);</span><br><span class="line">p1.then(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"finally: "</span> + value);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// finally: 100</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//方法2：对 then 进行 promise chain 方式进行调用</span></span><br><span class="line"><span class="keyword">var</span> p2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    resolve(<span class="number">100</span>);</span><br><span class="line">&#125;);</span><br><span class="line">p2.then(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> value * <span class="number">2</span>;</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> value * <span class="number">2</span>;</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"finally: "</span> + value);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// finally: 400</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在异步回调中抛错，不会被catch到</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="string">'Uncaught Exception!'</span> <span class="comment">// 异步回调中抛错</span></span><br><span class="line">  &#125;, <span class="number">1000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">promise.catch(<span class="function"><span class="params">e</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(e);       <span class="comment">//This is never called</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>promise</code>状态变为resove或reject，就凝固了，不会再改变</p>
+</li>
+</ol>
+<h2 id="Async-Await"><a href="#Async-Await" class="headerlink" title="Async/Await"></a>Async/Await</h2><p><code>Promise</code>让我们告别回调函数，写出更优雅的异步代码。但在实践过程中，我们发现Promise也有不完美的地方。ES7中提出了Async/Await，它能使得我们在编写异步代码时变得像同步一样的方式来编写。</p>
+<h3 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h3><ul>
+<li><code>async</code>表示这是一个<code>async</code>函数，而<code>await</code>只能在这个函数里面使用。</li>
+<li><code>await</code>表示在这里等待<code>await</code>后面的操作执行完毕，再执行下一句代码。</li>
+<li><code>await</code>后面紧跟着的最好是一个耗时的操作或者是一个异步操作(当然非耗时的操作也可以的，但是就失去意义了)</li>
+</ul>
+<h3 id="与Promise对比"><a href="#与Promise对比" class="headerlink" title="与Promise对比"></a>与Promise对比</h3><p>下面是<a href="https://github.com/axios/axios" target="_blank" rel="noopener">Axios</a>库向GraphQL服务器发送一个请求的例子：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// promise写法</span></span><br><span class="line">axios.get(<span class="string">`url`</span>)</span><br><span class="line">  .then(<span class="function"><span class="params">response</span> =&gt;</span> response.data)</span><br><span class="line">  .then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    f1(data)</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function"><span class="params">error</span> =&gt;</span> <span class="built_in">console</span>.log(error))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Async/Await写法</span></span><br><span class="line"><span class="keyword">async</span> fetchData(url) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> axios.get(<span class="string">`url`</span>)</span><br><span class="line">    <span class="keyword">const</span> data = response.data</span><br><span class="line">    f1(data)</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，async/await与Promise一样，是非阻塞的。但async/await使得异步代码看起来像同步代码，这正是它的魔力所在。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://www.ruanyifeng.com/blog/2012/12/asynchronous%EF%BC%BFjavascript.html" target="_blank" rel="noopener">Javascript异步编程的4种方法</a></li>
+<li><a href="http://es6.ruanyifeng.com/#docs/promise" target="_blank" rel="noopener">Promise对象</a></li>
+<li><a href="https://segmentfault.com/a/1190000007032448" target="_blank" rel="noopener">初探Promise</a></li>
+<li><a href="https://www.jianshu.com/p/a138a525c287" target="_blank" rel="noopener">ES7 and ES8 特性</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Es6/" rel="tag"># Es6</a>
+              <a href="/tags/Es7/" rel="tag"># Es7</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/11/19/php/" rel="prev" title="学习笔记之php的运行机制与原理">
+      <i class="fa fa-chevron-left"></i> 学习笔记之php的运行机制与原理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/07/koa/" rel="next" title="koa学习笔记">
+      koa学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#异步编程"><span class="nav-number">1.</span> <span class="nav-text">异步编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见的几种“异步模式”编程"><span class="nav-number">2.</span> <span class="nav-text">常见的几种“异步模式”编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#回调函数"><span class="nav-number">2.1.</span> <span class="nav-text">回调函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事件监听"><span class="nav-number">2.2.</span> <span class="nav-text">事件监听</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布-订阅"><span class="nav-number">2.3.</span> <span class="nav-text">发布/订阅</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Promise对象"><span class="nav-number">2.4.</span> <span class="nav-text">Promise对象</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise基本API和常见问题"><span class="nav-number">3.</span> <span class="nav-text">Promise基本API和常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#then"><span class="nav-number">3.1.</span> <span class="nav-text">.then()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#catch"><span class="nav-number">3.2.</span> <span class="nav-text">.catch()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#all"><span class="nav-number">3.3.</span> <span class="nav-text">.all()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#race"><span class="nav-number">3.4.</span> <span class="nav-text">.race()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些常见的问题"><span class="nav-number">3.5.</span> <span class="nav-text">一些常见的问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Async-Await"><span class="nav-number">4.</span> <span class="nav-text">Async/Await</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#规则"><span class="nav-number">4.1.</span> <span class="nav-text">规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与Promise对比"><span class="nav-number">4.2.</span> <span class="nav-text">与Promise对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

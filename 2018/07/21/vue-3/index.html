@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="实现数据绑定的几种方法 发布者－订阅者模式 脏值检查：如angular.js，在指定事件触发时，通过脏值检测的方式比对数据是否有变更，来决定是否更新视图。这些事件有：DOM事件（输入文本、点击按钮）、XHR响应事件、浏览器Location变更事件、Timer事件（$timeout、$interval）、执行$digest()或apply()。 数据劫持：如vue.js，采用数据劫持结合发布者－订阅">
+<meta name="keywords" content="Vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue实现原理——实现双向绑定mvvm 学习笔记">
+<meta property="og:url" content="http://159.75.213.179/2018/07/21/vue-3/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="实现数据绑定的几种方法 发布者－订阅者模式 脏值检查：如angular.js，在指定事件触发时，通过脏值检测的方式比对数据是否有变更，来决定是否更新视图。这些事件有：DOM事件（输入文本、点击按钮）、XHR响应事件、浏览器Location变更事件、Timer事件（$timeout、$interval）、执行$digest()或apply()。 数据劫持：如vue.js，采用数据劫持结合发布者－订阅">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://159.75.213.179/static/2018/07/mvvm-1.png">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.111Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vue实现原理——实现双向绑定mvvm 学习笔记">
+<meta name="twitter:description" content="实现数据绑定的几种方法 发布者－订阅者模式 脏值检查：如angular.js，在指定事件触发时，通过脏值检测的方式比对数据是否有变更，来决定是否更新视图。这些事件有：DOM事件（输入文本、点击按钮）、XHR响应事件、浏览器Location变更事件、Timer事件（$timeout、$interval）、执行$digest()或apply()。 数据劫持：如vue.js，采用数据劫持结合发布者－订阅">
+<meta name="twitter:image" content="http://159.75.213.179/static/2018/07/mvvm-1.png">
+
+<link rel="canonical" href="http://159.75.213.179/2018/07/21/vue-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vue实现原理——实现双向绑定mvvm 学习笔记 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2018/07/21/vue-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue实现原理——实现双向绑定mvvm 学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-21 13:12:06" itemprop="dateCreated datePublished" datetime="2018-07-21T13:12:06+08:00">2018-07-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端框架/" itemprop="url" rel="index"><span itemprop="name">前端框架</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="实现数据绑定的几种方法"><a href="#实现数据绑定的几种方法" class="headerlink" title="实现数据绑定的几种方法"></a>实现数据绑定的几种方法</h2><ul>
+<li>发布者－订阅者模式</li>
+<li>脏值检查：如angular.js，在指定事件触发时，通过脏值检测的方式比对数据是否有变更，来决定是否更新视图。这些事件有：DOM事件（输入文本、点击按钮）、XHR响应事件、浏览器Location变更事件、Timer事件（$timeout、$interval）、执行$digest()或apply()。</li>
+<li>数据劫持：如vue.js，采用数据劫持结合发布者－订阅者模式，通过<code>Object.defineProperty()</code>来劫持各个属性的<code>setter</code>、<code>getter</code>，在数据变动时发布消息给订阅者，触发相应的监听回调。</li>
+</ul>
+<a id="more"></a>
+<h2 id="实现vue的双向绑定"><a href="#实现vue的双向绑定" class="headerlink" title="实现vue的双向绑定"></a>实现vue的双向绑定</h2><p>主要通过<code>Object</code>的<code>defineProperty</code>属性，重写data的<code>set</code>和<code>get</code>函数来实现的。<br><img src="/static/2018/07/mvvm-1.png" alt="双向绑定"><br>下面是一个实现的例子，主要实现<code>v-model</code>、<code>v-bind</code>和<code>v-click</code>三个命令。</p>
+<h3 id="最后实现结果"><a href="#最后实现结果" class="headerlink" title="最后实现结果"></a>最后实现结果</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">v-model</span>=<span class="string">"number"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">v-click</span>=<span class="string">"increment"</span>&gt;</span>增加<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span> <span class="attr">v-bind</span>=<span class="string">"number"</span>&gt;</span><span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> app = <span class="keyword">new</span> myVue(&#123;</span><br><span class="line">  el: <span class="string">'#app'</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    number: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    increment: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.number++</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="mvvm实例"><a href="#mvvm实例" class="headerlink" title="mvvm实例"></a>mvvm实例</h3><p><code>myVue</code>构造函数<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myVue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>._init(options)</span><br><span class="line">&#125;</span><br><span class="line">myVue.prototype._init = <span class="function"><span class="keyword">function</span> (<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.$options = options</span><br><span class="line">  <span class="keyword">this</span>.$el = <span class="built_in">document</span>.querySelector(options.el) <span class="comment">// 根节点dom</span></span><br><span class="line">  <span class="keyword">this</span>.$data = options.data</span><br><span class="line">  <span class="keyword">this</span>.$methods = options.methods</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>._binding = &#123;&#125; <span class="comment">// 绑定的订阅者</span></span><br><span class="line">  <span class="keyword">this</span>._observe(<span class="keyword">this</span>.$data) <span class="comment">// 监听属性</span></span><br><span class="line">  <span class="keyword">this</span>._compile(<span class="keyword">this</span>.$el)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Observer-监听器"><a href="#Observer-监听器" class="headerlink" title="Observer 监听器"></a>Observer 监听器</h3><p>监听每个数据的变化，并且在监听到变化时通知订阅者。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">myVue.prototype._observe = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> value</span><br><span class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> obj) &#123;</span><br><span class="line">    <span class="keyword">if</span> (obj.hasOwnProperty(key)) &#123;</span><br><span class="line">      value = obj[key]</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> value === <span class="string">'object'</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>._observe(value)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">this</span>._binding[key] = &#123;</span><br><span class="line">        _watchers: []</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">var</span> binding = <span class="keyword">this</span>._binding[key]</span><br><span class="line">      <span class="built_in">Object</span>.defineProperty(<span class="keyword">this</span>.$data, key, &#123;</span><br><span class="line">        enumerable: <span class="literal">true</span>,</span><br><span class="line">        configurable: <span class="literal">true</span>,</span><br><span class="line">        <span class="keyword">get</span>: function() &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'获取属性'</span> + key + <span class="string">': '</span> + value)</span><br><span class="line">          <span class="keyword">return</span> value</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="keyword">set</span>: function(newVal) &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'设置属性'</span> + key + <span class="string">': '</span> + newVal)</span><br><span class="line">          value = newVal</span><br><span class="line">          <span class="comment">// 通知该属性的所有订阅者更新数据</span></span><br><span class="line">          binding._watchers.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">item</span>) </span>&#123;</span><br><span class="line">            item.update()</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="订阅者"><a href="#订阅者" class="headerlink" title="订阅者"></a>订阅者</h3><p>用来绑定更新函数，实现对DOM元素的更新<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Watcher</span>(<span class="params">el, vm, exp, attr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.el = el 　<span class="comment">// 指令对应的DOM元素</span></span><br><span class="line">  <span class="keyword">this</span>.vm = vm <span class="comment">// 指令所属的myVue实例</span></span><br><span class="line">  <span class="keyword">this</span>.exp = exp <span class="comment">// myVue实例更新的属性</span></span><br><span class="line">  <span class="keyword">this</span>.attr = attr <span class="comment">// DOM元素绑定的属性值</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.update()</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 更新视图</span></span><br><span class="line">Watcher.prototype.update = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.el[<span class="keyword">this</span>.attr] = <span class="keyword">this</span>.vm.$data[<span class="keyword">this</span>.exp]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Compile解析"><a href="#Compile解析" class="headerlink" title="Compile解析"></a><code>Compile</code>解析</h3><p>解析<code>v-bind</code>、<code>v-model</code>、<code>v-click</code>等指令，并对view与model进行绑定<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">myVue.prototype._compile = <span class="function"><span class="keyword">function</span>(<span class="params">app</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> nodes = app.children</span><br><span class="line">  <span class="keyword">var</span> _this = <span class="keyword">this</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>, len = nodes.length; i &lt; len; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> node = nodes[i]</span><br><span class="line">    <span class="keyword">if</span> (node.children.length) &#123;</span><br><span class="line">      <span class="keyword">this</span>._compile(node)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// v-click</span></span><br><span class="line">    <span class="keyword">if</span> (node.hasAttribute(<span class="string">'v-click'</span>)) &#123;</span><br><span class="line">      <span class="keyword">var</span> methodName = node.getAttribute(<span class="string">'v-click'</span>)</span><br><span class="line">      node.onclick = _this.$methods[methodName].bind(_this.$data)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// v-model</span></span><br><span class="line">    <span class="keyword">if</span> (node.hasAttribute(<span class="string">'v-model'</span>) &amp;&amp; (node.tagName === <span class="string">'INPUT'</span> || node.tagName === <span class="string">'TEXTAREA'</span>)) &#123;</span><br><span class="line">      <span class="keyword">var</span> dataName = node.getAttribute(<span class="string">'v-model'</span>)</span><br><span class="line">      <span class="comment">// 添加订阅者</span></span><br><span class="line">      _this._binding[dataName]._watchers.push(<span class="keyword">new</span> Watcher(node, _this, dataName, <span class="string">'value'</span>))</span><br><span class="line">      node.addEventListener(<span class="string">'input'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        _this.$data[dataName] = <span class="keyword">this</span>.value <span class="comment">// 使data与dom的值保持一致</span></span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// v-bind</span></span><br><span class="line">    <span class="keyword">if</span> (node.hasAttribute(<span class="string">'v-bind'</span>)) &#123;</span><br><span class="line">      <span class="keyword">var</span> dataName = node.getAttribute(<span class="string">'v-bind'</span>)</span><br><span class="line">      <span class="comment">// 添加订阅者</span></span><br><span class="line">      _this._binding[dataName]._watchers.push(<span class="keyword">new</span> Watcher(node, _this, dataName, <span class="string">'innerHTML'</span>))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><p><a href="https://github.com/seminelee/mvvm-demo" target="_blank" rel="noopener">mvvm-demo</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/DMQ/mvvm" target="_blank" rel="noopener">剖析vue实现原理，自己动手实现mvvm</a></li>
+<li><a href="https://mp.weixin.qq.com/s/MGsEGejaADVHGlZFYQgCnQ" target="_blank" rel="noopener">面试题：你能写一个 Vue 的双向数据绑定吗？</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/18/algorithms/" rel="prev" title="《数据结构与算法JavaScript描述》算法部分学习心得">
+      <i class="fa fa-chevron-left"></i> 《数据结构与算法JavaScript描述》算法部分学习心得
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/15/tcp/" rel="next" title="从浏览器中输入网址到网页显示的探索之旅">
+      从浏览器中输入网址到网页显示的探索之旅 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现数据绑定的几种方法"><span class="nav-number">1.</span> <span class="nav-text">实现数据绑定的几种方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现vue的双向绑定"><span class="nav-number">2.</span> <span class="nav-text">实现vue的双向绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#最后实现结果"><span class="nav-number">2.1.</span> <span class="nav-text">最后实现结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mvvm实例"><span class="nav-number">2.2.</span> <span class="nav-text">mvvm实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Observer-监听器"><span class="nav-number">2.3.</span> <span class="nav-text">Observer 监听器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#订阅者"><span class="nav-number">2.4.</span> <span class="nav-text">订阅者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Compile解析"><span class="nav-number">2.5.</span> <span class="nav-text">Compile解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码"><span class="nav-number">3.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

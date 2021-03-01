@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="依赖包基于jsPDF和html2canvas两个包12npm install jspdf –save-devnpm install html2canvas –save-dev  jspdf github地址：https://github.com/MrRio/jsPDF html2canvas github地址：https://github.com/niklasvh/html2canvas">
+<meta name="keywords" content="JavaScript,Canvas">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS将HTML导出PDF">
+<meta property="og:url" content="http://159.75.213.179/2017/09/03/html2pdf/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="依赖包基于jsPDF和html2canvas两个包12npm install jspdf –save-devnpm install html2canvas –save-dev  jspdf github地址：https://github.com/MrRio/jsPDF html2canvas github地址：https://github.com/niklasvh/html2canvas">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.105Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JS将HTML导出PDF">
+<meta name="twitter:description" content="依赖包基于jsPDF和html2canvas两个包12npm install jspdf –save-devnpm install html2canvas –save-dev  jspdf github地址：https://github.com/MrRio/jsPDF html2canvas github地址：https://github.com/niklasvh/html2canvas">
+
+<link rel="canonical" href="http://159.75.213.179/2017/09/03/html2pdf/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JS将HTML导出PDF | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2017/09/03/html2pdf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JS将HTML导出PDF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-09-03 23:44:44" itemprop="dateCreated datePublished" datetime="2017-09-03T23:44:44+08:00">2017-09-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/其他/" itemprop="url" rel="index"><span itemprop="name">其他</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="依赖包"><a href="#依赖包" class="headerlink" title="依赖包"></a>依赖包</h2><p>基于jsPDF和html2canvas两个包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install jspdf –save-dev</span><br><span class="line">npm install html2canvas –save-dev</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>jspdf github地址：<a href="https://github.com/MrRio/jsPDF" target="_blank" rel="noopener">https://github.com/MrRio/jsPDF</a></li>
+<li>html2canvas github地址：<a href="https://github.com/niklasvh/html2canvas" target="_blank" rel="noopener">https://github.com/niklasvh/html2canvas</a></li>
+</ul>
+<a id="more"></a>
+<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><ol>
+<li>算出页数和每一页的宽度和高度</li>
+<li>创建一个jsPDF实例。循环，调用html2canvas方法，渲染每一页page为canvas，并获取图片数据插入pdf中。插入之后，调用jsPDF.addPage()方法，加一页。然后，改变dom的css属性top，使其向上移动一页的距离，进入下一页。</li>
+<li>当到达最后一页，获取最后一页的图片数据之后调用jsPDF.save()方法，保存pdf文件。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jsPDF <span class="keyword">from</span> <span class="string">'jspdf'</span></span><br><span class="line"><span class="keyword">import</span> html2canvas <span class="keyword">from</span> <span class="string">'html2canvas'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author   <span class="variable">seminelee</span></span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DateTime </span>2017-09-01</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param    <span class="type">&#123;object&#125;</span>   </span>dom          dom</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param    <span class="type">&#123;number&#125;</span>   </span>domWidth     dom宽度</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param    <span class="type">&#123;number&#125;</span>   </span>domHeight    dom高度</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param    <span class="type">&#123;number&#125;</span>   </span>windowWidth  window.innerWidth</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param    <span class="type">&#123;number&#125;</span>   </span>windowHeight window.innerHeight</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param    <span class="type">&#123;string&#125;</span>   </span>fileName     导出文件名</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return   <span class="type">&#123;function&#125;</span>              </span>[description]</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html2pdf = <span class="function"><span class="keyword">function</span>(<span class="params">dom, domWidth, domHeight, windowWidth, windowHeight, fileName</span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> pageNum = <span class="built_in">Math</span>.ceil(domHeight / windowHeight);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> a4Width = <span class="number">592.28</span>;</span><br><span class="line">    <span class="keyword">const</span> a4Height = <span class="number">841.89</span>;</span><br><span class="line">    <span class="keyword">const</span> imgWidth = domWidth / windowWidth * a4Width;</span><br><span class="line">    <span class="keyword">const</span> imgHeight = domHeight / windowHeight * a4Height;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> pdf = <span class="keyword">new</span> jsPDF(<span class="string">''</span>, <span class="string">'pt'</span>, <span class="string">'a4'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> ( <span class="keyword">let</span> i= <span class="number">0</span>; i &lt; pageNum; i++) &#123;</span><br><span class="line">        dom.style.top = (- i * windowHeight) + <span class="string">'px'</span>;</span><br><span class="line">        html2canvas(dom, &#123;</span><br><span class="line">            onrendered: <span class="function">(<span class="params">canvas</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">let</span> pageData = canvas.toDataURL(<span class="string">'image/jpeg'</span>, <span class="number">1.0</span>);</span><br><span class="line"></span><br><span class="line">                pdf.addImage(pageData, <span class="string">'JPEG'</span>, <span class="number">0</span>, <span class="number">0</span>, imgWidth, imgHeight );</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (i == pageNum <span class="number">-1</span>) &#123;</span><br><span class="line">                    pdf.save(fileName)</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    pdf.addPage();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    dom.style.top = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> html2pdf;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Canvas/" rel="tag"># Canvas</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/07/23/webpack-1/" rel="prev" title="理解webpack中间件">
+      <i class="fa fa-chevron-left"></i> 理解webpack中间件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/09/03/rem/" rel="next" title="基于js+rem的移动端自适应方案小总结">
+      基于js+rem的移动端自适应方案小总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖包"><span class="nav-number">1.</span> <span class="nav-text">依赖包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本思路"><span class="nav-number">2.</span> <span class="nav-text">基本思路</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

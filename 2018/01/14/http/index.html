@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"159.75.213.179","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="TCP的构成因特网有两个核心协议：IP和TCP。IP(Internet Protocol，因特网协议)，负责联网主机之间的路由选择和寻址；TCP(Transmission Control Protocol，传输控制协议)，负责在不可靠的传输信道之上提供可靠的抽象层。它向应用层隐藏了大多数网络通信的复杂细节，如丢包重发、按序发送、拥塞控制及避免、数据完整等。">
+<meta name="keywords" content="http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Web性能权威指南》之读书笔记">
+<meta property="og:url" content="http://159.75.213.179/2018/01/14/http/index.html">
+<meta property="og:site_name" content="seminelee blog">
+<meta property="og:description" content="TCP的构成因特网有两个核心协议：IP和TCP。IP(Internet Protocol，因特网协议)，负责联网主机之间的路由选择和寻址；TCP(Transmission Control Protocol，传输控制协议)，负责在不可靠的传输信道之上提供可靠的抽象层。它向应用层隐藏了大多数网络通信的复杂细节，如丢包重发、按序发送、拥塞控制及避免、数据完整等。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-02-19T07:09:08.105Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Web性能权威指南》之读书笔记">
+<meta name="twitter:description" content="TCP的构成因特网有两个核心协议：IP和TCP。IP(Internet Protocol，因特网协议)，负责联网主机之间的路由选择和寻址；TCP(Transmission Control Protocol，传输控制协议)，负责在不可靠的传输信道之上提供可靠的抽象层。它向应用层隐藏了大多数网络通信的复杂细节，如丢包重发、按序发送、拥塞控制及避免、数据完整等。">
+
+<link rel="canonical" href="http://159.75.213.179/2018/01/14/http/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Web性能权威指南》之读书笔记 | seminelee blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">seminelee blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Remember to look up at the stars</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://159.75.213.179/2018/01/14/http/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Semine Lee">
+      <meta itemprop="description" content="Web前端开发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="seminelee blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Web性能权威指南》之读书笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-01-14 20:51:39" itemprop="dateCreated datePublished" datetime="2018-01-14T20:51:39+08:00">2018-01-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-19 15:09:08" itemprop="dateModified" datetime="2021-02-19T15:09:08+08:00">2021-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络知识/" itemprop="url" rel="index"><span itemprop="name">网络知识</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="TCP的构成"><a href="#TCP的构成" class="headerlink" title="TCP的构成"></a>TCP的构成</h2><p>因特网有两个核心协议：IP和TCP。IP(Internet Protocol，因特网协议)，负责联网主机之间的路由选择和寻址；TCP(Transmission Control Protocol，传输控制协议)，负责在不可靠的传输信道之上提供可靠的抽象层。它向应用层隐藏了大多数网络通信的复杂细节，如丢包重发、按序发送、拥塞控制及避免、数据完整等。<br><a id="more"></a></p>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>握手机制：每次传输应用数据之前，都必须经历一次完整的往返（三次握手）</li>
+<li>拥塞崩溃：在复杂网络中，IP网关容易受到拥塞崩溃。可能是往返时间超过了所有主机的最大中断间隔，主机会把每个分组都发送好几次。相应的主机会在网络中制造越来越多的数据报副本，使得网络陷入瘫痪。最终，所有交换节点的缓冲区都将被填满，多出来的分组必须删掉。</li>
+<li>流量控制：在三次握手后，TCP连接的每一方都要通告自己的接收窗口大小(rwnd)，其中包含能够保存数据的缓冲区空间大小信息。</li>
+<li>慢启动：为了预防任何一端向潜在网络过多发送数据，TCP连接传输的最大数据量取rwnd和cwnd(拥塞窗口大小)中的最小值。当TCP开始在一个网络中传输数据或发现数据丢失并开始重发时，首先慢慢的对网路实际容量进行试探，避免由于发送了过量的数据而导致阻塞。主机发送了一个报文后就要停下来等待应答，每收到一个应答，拥塞窗口就增加一段长度，直至等于设定的阈值。</li>
+</ul>
+<h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><ul>
+<li>增大TCP的初始拥塞窗口：这使TCP在第一次往返就传输较多数据，随后的速度提升也很明显。</li>
+<li>慢启动重启：在连接空闲时禁用慢启动可以改善瞬时发送数据的长TCP连接的性能</li>
+<li>启用窗口缩放：这能增大最大接受窗口大小，让高延迟的连接达到更好的吞吐量</li>
+<li>TCP快速打开：允许在第一个SYN分组（第一次握手）中发送应用程序数据</li>
+</ul>
+<h2 id="传输层安全-TLS"><a href="#传输层安全-TLS" class="headerlink" title="传输层安全(TLS)"></a>传输层安全(TLS)</h2><p>SSL(Secure Sockets Layer，安全套接字层)3.0升级版即TLS(Transport Layer Security，传输层安全)1.0。TLS位于TCP（传输层）上一层（会话层）。它不会影响上层（应用层）协议，但能够保证上层协议的网络通信安全。</p>
+<h3 id="加密、身份验证与完整性"><a href="#加密、身份验证与完整性" class="headerlink" title="加密、身份验证与完整性"></a>加密、身份验证与完整性</h3><ul>
+<li>加密：混淆数据的机制。TLS规定的握手机制使用非对称密钥加密。详细过程在T下面一节提及。</li>
+<li>身份验证：验证身份标识有效性的机制。允许通信两端互相验明正身。这个验证首先建立“认证机构信任链”。</li>
+<li>完整性：检测消息是否被篡改或伪造的机制。使用MAC(Message Authentication Code，消息认证码)签注每一条消息。只要发送TLS记录，就会生成一个MAC值并附加到该消息中，接收端通过计算和验证这个MAC值来判断消息的完整性和可靠性。</li>
+</ul>
+<h3 id="TLS握手"><a href="#TLS握手" class="headerlink" title="TLS握手"></a>TLS握手</h3><ol>
+<li>TLS握手在可靠的传输层(TCP)上运行，即首先要完成TCP的“三次握手”。</li>
+<li>TCP连接建立后，客户端以纯文本形式发送一些规格说明，包括TLS协议的版本、支持的加密套件等。</li>
+<li>服务端根据客户端的规格说明，并附上自己的证书，将响应发送给客户端。也可以发送一个请求，要求客户端提供证书等。</li>
+<li>假设两端确定了共同的版本和加密套件，客户端也把自己的证书提供给服务器。然后，客户端会生成一个新的对称密钥，用服务端的公钥加密，加密后发送给服务器。</li>
+<li>服务器用自己的私钥解密出客户端发来的对称密钥，通过验证消息的MAC检测消息完整性，再返回客户端一个加密的“finished”消息。</li>
+<li>客户端用它之前生成的对称密钥解密这条消息，验证MAC，如果一切顺利，则建立信道并开始发送应用数据。</li>
+</ol>
+<h3 id="信任链与证书颁发机构"><a href="#信任链与证书颁发机构" class="headerlink" title="信任链与证书颁发机构"></a>信任链与证书颁发机构</h3><p>如何验证通信两端的身份？最常见的方案是通过CA(Certificate Authorrity，证书颁发机构)验证。<br>CA是证书拥有者和依赖证书的一方共同信任的第三方。浏览器指定可信任的CA，然后CA会审计和验证站点的证书有没有被滥用或冒充，或者需不需要撤销该站点的证书</p>
+<h2 id="Web性能要点"><a href="#Web性能要点" class="headerlink" title="Web性能要点"></a>Web性能要点</h2><p>限制Web性能的主要因素是客户端与服务器之间的网络往返延迟。这正是TCP握手机制、流量和拥塞控制、由丢包导致的队首拥塞等底层协议特点影响性能的直接后果。</p>
+<h3 id="优化-1"><a href="#优化-1" class="headerlink" title="优化"></a>优化</h3><p>大多数浏览器替我们自动完成了这些优化：</p>
+<ul>
+<li>资源预取和排定优先次序</li>
+<li>DNS预解析：通过学习导航历史、用户鼠标悬停等</li>
+<li>TCP预连接</li>
+<li>页面预渲染：在隐藏的标签页中预先渲染整个页面</li>
+</ul>
+<p>对开发者的优化建议：</p>
+<ul>
+<li>优化页面结构：CSS和JS等重要资源应该尽早在文档中出现；应该尽早交付CSS，从而解除阻塞并让JS执行等</li>
+<li>在文档中嵌入提示，以触发浏览器的优化机制：如<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 预解析域名 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"dns-prefetch"</span> <span class="attr">href</span>=<span class="string">"//xxx.com"</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 预取得关键性资源 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"subresource"</span> <span class="attr">href</span>=<span class="string">"/xxx.js"</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 预取得导航要用的资源 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"prefetch"</span> <span class="attr">href</span>=<span class="string">"/xxx.jpeg"</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 预渲染特定页面 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"prerender"</span> <span class="attr">href</span>=<span class="string">"//xxx/xxx.html"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="HTTP1-X"><a href="#HTTP1-X" class="headerlink" title="HTTP1.X"></a>HTTP1.X</h2><h3 id="持久连接"><a href="#持久连接" class="headerlink" title="持久连接"></a>持久连接</h3><p>HTTP1.1 的一个主要改进就是引入了持久HTTP连接。<br>一个新TCP连接发送的HTTP请求所花的总时间，最少等于两次网络往返的时间：一次用于握手，一次用于请求和响应。而添加对HTTP持久连接的支持，重用底层的连接，就可以避免第二次TCP连接时的三次握手，消除另一次TCP慢启动的往返，节约整整一次网络延迟。因此：</p>
+<ul>
+<li>没有持久连接：每次请求都会导致两次往返延迟</li>
+<li>有持久连接：只有第一次请求会导致两次往返延迟，后续请求只会导致一次往返延迟</li>
+</ul>
+<h3 id="HTTP管道"><a href="#HTTP管道" class="headerlink" title="HTTP管道"></a>HTTP管道</h3><p>持久连接可以让我们重用已有的连接来完成多次应用请求，这多次请求必须严格满足先进先出(FIFO)的队列顺序。而HTTP管道则可以让我们把FIFO队列从客户端（请求队列）迁移到服务器（响应队列）。</p>
+<ul>
+<li>没有HTTP管道：客户端发起请求，服务器处理请求，然后响应回传，然后客户端再发起请求，服务器再处理请求</li>
+<li>HTTP管道：服务器并行处理请求，消除了发送请求和响应的等待时间，然后串行地返回响应。</li>
+</ul>
+<p>因为协议的局限性，不能实现多路复用（一个连接上的多个响应数据交错到达），只能串行地返回响应。因此有可能导致以下问题：</p>
+<ul>
+<li>队首阻塞：如客户端同时发送两个请求（先HTML后CSS），而且CSS资源先准备就绪，服务器也会先发送HTML响应，然后再交付CSS</li>
+<li>一个慢响应就会阻塞所有后续请求</li>
+<li>响应失败可能终止TCP连接，从而强迫客户端重新发送对所有后续资源的请求，导致重复处理<br>等等</li>
+</ul>
+<h3 id="使用多个TCP连接"><a href="#使用多个TCP连接" class="headerlink" title="使用多个TCP连接"></a>使用多个TCP连接</h3><p>由于协议不支持多路复用，一个接一个地发送请求实在太慢，浏览器开发商允许我们并行打开多个TCP连接。大多数浏览器支持主机打开6个连接。</p>
+<h3 id="域名分区"><a href="#域名分区" class="headerlink" title="域名分区"></a>域名分区</h3><p>对于包含多资源的页面，6个并行的连接可能仍然不够用。因此，我们可以不只通过一个主机提供所有资源，而是手工将所有资源分散到多个子域名，从而突破浏览器的连接限制，实现更高的并行能力。<br>然而，这样做的缺点是：每个新主机名都要求有一次额外的DNS查询，每多一个套接字都会多消耗两端的资源；需要手工分离资源，并托管到多个主机</p>
+<h3 id="其他优化"><a href="#其他优化" class="headerlink" title="其他优化"></a>其他优化</h3><ul>
+<li>度量和控制协议开销：服务器和客户端可以扩展首部，且协议没有对首部大小作限制。因此，应减少要传输到首部数据（高度重复且未压缩）</li>
+<li>连接与拼合：把多个js文件（或其他资源）组合为一个文件；把多张图片组合为一个更大的复合图片（图片精灵）。这种做法的缺点：降低了初始启动的速度、更新资源的速度、内存占用的问题。解决：首次绘制的CSS单独出来、递增地交付较小的js块等</li>
+<li>嵌入资源：体积小、只用一次的资源可以直接嵌入页面中。如script和style块、数据URI(base64)等。</li>
+</ul>
+<h2 id="HTTP2-0"><a href="#HTTP2-0" class="headerlink" title="HTTP2.0"></a>HTTP2.0</h2><p>HTTP2.0的目的就是通过支持请求与响应的多路复用来减少延迟，通过压缩HTTP首部字段将协议开销降至最低，同时增加对请求优先级和服务器端推送的支持。</p>
+<h3 id="二进制分帧层"><a href="#二进制分帧层" class="headerlink" title="二进制分帧层"></a>二进制分帧层</h3><p>HTTP2.0性能增强的核心，全在于新增的二进制分帧层（headers帧和data帧），它定义了如何封装HTTP消息并在客户端与服务器之间传输。<br>HTTP2.0把HTTP协议通信的基本单位缩小为一个一个的帧，这些帧对应着逻辑流中的消息。相应地，很多流可以并行地在同一个TCP连接上交换消息。</p>
+<h3 id="多向请求与响应"><a href="#多向请求与响应" class="headerlink" title="多向请求与响应"></a>多向请求与响应</h3><p>如2.3所说，在HTTP1.x中，如果客户端想发送多个并行的请求以及改进性能，那么必须使用多个TCP连接。这是因为HTTP1.x的交付模型保证每个连接每次只交付一个响应（不支持多路复用），这也导致了队首阻塞，降低TCP连接的效率。<br>HTTP2.0的二进制分帧层则突破了这些限制，实现了多向请求和响应：客户端和服务器可以把HTTP消息分解为互不依赖的帧，然后乱序发送，最后再在另一端把它们重新组合起来。这实现了只使用一个连接即可并行交错地发送多个请求或响应，且请求/响应之间互不影响，消除了不必要的延迟，减少页面加载的时间。</p>
+<h3 id="请求优先级"><a href="#请求优先级" class="headerlink" title="请求优先级"></a>请求优先级</h3><p>每个流都可以带有一个31比特的优先值。HTTP2.0通过优化这些帧的交错和传输顺序，进一步提升性能。</p>
+<ul>
+<li>0表示最高优先级</li>
+<li>2^31 - 1 表示最低优先级<br>浏览器会基于资源的类型以及它在页面中的位置排定请求的优先次序，甚至通过之前的访问来学习优先级模式。<h3 id="其他优化-1"><a href="#其他优化-1" class="headerlink" title="其他优化"></a>其他优化</h3></li>
+<li>每个来源一个连接：不再像HTTP1.x一样依赖多个TCP连接，客户端与服务器之间只需要一个连接即可</li>
+<li>流量控制：在同一个TCP连接上传输多个数据流，就意味着要共享带宽。流量控制基于每一跳、窗口更新帧等进行</li>
+<li>服务器推送：服务器可以对一个客户端请求发送多个响应。即对最初请求的响应外，服务器还可以额外向客户端推送资源，而无需客户端明确地请求。</li>
+<li>首部压缩：压缩首部元数据，使用“首部表”来跟踪和存储之前发送的键－值对。这个首部表在连接存续期内始终存在并由客户端和服务器共同更新。这样，第二个（及之后）请求只需要发送变化了的部分首部，几乎不会改变的通用键－值对只需发送一次。</li>
+</ul>
+<h2 id="经典的性能优化最佳实践"><a href="#经典的性能优化最佳实践" class="headerlink" title="经典的性能优化最佳实践"></a>经典的性能优化最佳实践</h2><p>传输层/网络层方面</p>
+<ul>
+<li>减少DNS查找</li>
+<li>重用TCP连接，尽可能使用持久连接，消除TCP握手和慢启动延迟</li>
+<li>减少HTTP重定向，特别是不同域名之间的重定向</li>
+<li>使用CDN（内容分发网络）把数据放到离用户地理位置更近的地方</li>
+<li>去掉不必要的资源</li>
+</ul>
+<p>应用层(HTTP)方面</p>
+<ul>
+<li>在客户端缓存资源(cache)</li>
+<li>传输压缩过的内容</li>
+<li>消除不必要的请求开销，减少请求的首部数据</li>
+<li>并行处理请求和响应，HTTP2.0的优化</li>
+<li>针对协议版本采取优化措施</li>
+</ul>
+<h2 id="浏览器API与协议"><a href="#浏览器API与协议" class="headerlink" title="浏览器API与协议"></a>浏览器API与协议</h2><p>前面讨论过TCP、HTTP的性能特点，现在理解如何最恰当地利用浏览器的网络PI、协议和服务，给应用带来性能提升。</p>
+<h3 id="浏览器网络概述"><a href="#浏览器网络概述" class="headerlink" title="浏览器网络概述"></a>浏览器网络概述</h3><ul>
+<li>自动化的套接字池管理</li>
+<li>网络安全与沙箱：管理所有打开的套接字池并强制施加连接数限制；格式化所有请求，自动完成响应解码；执行TLS握手和必要的证书检查；同源策略。</li>
+<li>资源与客户端状态缓存</li>
+<li>应用PI与协议：XMLHttpRequest、Sever-Sent-Event、WebSocket等</li>
+</ul>
+<h3 id="XMLHttpRequest"><a href="#XMLHttpRequest" class="headerlink" title="XMLHttpRequest"></a>XMLHttpRequest</h3><p>XMLHttpRequest(XHR)是浏览器提供的应用API，让开发人员能通过JavaScript实现数据传输，实现浏览器的异步通信。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/http/" rel="tag"># http</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/07/koa/" rel="prev" title="koa学习笔记">
+      <i class="fa fa-chevron-left"></i> koa学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/19/security/" rel="next" title="web安全中常见攻击及防御小总结">
+      web安全中常见攻击及防御小总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP的构成"><span class="nav-number">1.</span> <span class="nav-text">TCP的构成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#缺点"><span class="nav-number">1.1.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化"><span class="nav-number">1.2.</span> <span class="nav-text">优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传输层安全-TLS"><span class="nav-number">2.</span> <span class="nav-text">传输层安全(TLS)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加密、身份验证与完整性"><span class="nav-number">2.1.</span> <span class="nav-text">加密、身份验证与完整性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TLS握手"><span class="nav-number">2.2.</span> <span class="nav-text">TLS握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信任链与证书颁发机构"><span class="nav-number">2.3.</span> <span class="nav-text">信任链与证书颁发机构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web性能要点"><span class="nav-number">3.</span> <span class="nav-text">Web性能要点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优化-1"><span class="nav-number">3.1.</span> <span class="nav-text">优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP1-X"><span class="nav-number">4.</span> <span class="nav-text">HTTP1.X</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#持久连接"><span class="nav-number">4.1.</span> <span class="nav-text">持久连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP管道"><span class="nav-number">4.2.</span> <span class="nav-text">HTTP管道</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用多个TCP连接"><span class="nav-number">4.3.</span> <span class="nav-text">使用多个TCP连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#域名分区"><span class="nav-number">4.4.</span> <span class="nav-text">域名分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他优化"><span class="nav-number">4.5.</span> <span class="nav-text">其他优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP2-0"><span class="nav-number">5.</span> <span class="nav-text">HTTP2.0</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制分帧层"><span class="nav-number">5.1.</span> <span class="nav-text">二进制分帧层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多向请求与响应"><span class="nav-number">5.2.</span> <span class="nav-text">多向请求与响应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求优先级"><span class="nav-number">5.3.</span> <span class="nav-text">请求优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他优化-1"><span class="nav-number">5.4.</span> <span class="nav-text">其他优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#经典的性能优化最佳实践"><span class="nav-number">6.</span> <span class="nav-text">经典的性能优化最佳实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器API与协议"><span class="nav-number">7.</span> <span class="nav-text">浏览器API与协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器网络概述"><span class="nav-number">7.1.</span> <span class="nav-text">浏览器网络概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XMLHttpRequest"><span class="nav-number">7.2.</span> <span class="nav-text">XMLHttpRequest</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Semine Lee</p>
+  <div class="site-description" itemprop="description">Web前端开发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Semine Lee</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
